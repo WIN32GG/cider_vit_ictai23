@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
+from tkinter import Y
 from torch.nn import (Flatten, GELU, Linear, Module, Sequential, Sigmoid, Unflatten)
 from torch.optim import Optimizer
 from torch.nn.functional import cross_entropy
@@ -53,24 +54,44 @@ class Config(BaseConfig):
     optim: OptimizerConfig
     scheduler: SchedulerConfig
 
+def get_projector(language_model, conf: Config):
+    return nn.Sequential(
+        nn.Linear(language_model.config.dim, 200), # TODO switch to baye
+        nn.SiLU(),
+        nn.Dropout(p = .2),
+        nn.Linear(200, 200), # TODO switch to baye
+    )
+
 def get_model(language_model, conf: Config):
     
     return torch.nn.Sequential(
         language_model,
-        nn.Linear(language_model.config.dim, language_model.config.dim), # TODO switch to baye
-        nn.Linear(language_model.config.dim, 1) # OOD classification head, change for other tasks
+        get_projector(language_model, conf)
+        #nn.Linear(language_model.config.dim, 1) # OOD classification head, change for other tasks
         # MLP: possibly bayesian
-
         # classification head
     )
+
+def fit(conf: Config, model, dataset, optim, scheduler):
+    pbar = tqdm(dataset)
+    for x, _ in pbar:
+        # pour n n fois le même x
+            # 1 Get anchor pools
+            # 2 Get displacement pools
+            
+            # losses
+            #   loss d'hypersphere
+            #   loss position relative des samples négatifs
+            #   loss position relative nulle des samples positifs 
+        pass
 
 def main(conf: Config):
     language_model = conf.env.make(torch.hub.load('/home/win32gg/Documents/transformers', 'model', conf.model, source="local"))
     tokenizer = torch.hub.load('/home/win32gg/Documents/transformers', 'tokenizer', conf.model, source="local") 
 
     train_dataset = conf.dataset.train_dataset.make(Split.TRAIN)
-    iid_test_dataset = conf.dataset.train_dataset.make(Split.TEST)
-    ood_test_dataset = conf.dataset.ood_detection_dataset.make(Split.TEST)
+    iid_test_dataset = conf.dataset.train_dataset.make(Split.TRAIN)
+    ood_test_dataset = conf.dataset.ood_detection_dataset.make(Split.TRAIN)
 
 
 if __name__ == "__main__":
