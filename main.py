@@ -9,6 +9,7 @@ from typing import Any, List, Union
 from torch.optim import Optimizer
 from torch.nn.functional import cross_entropy
 from torchbooster.dataset import Split
+from torch.nn.parallel import DistributedDataParallel
 from torchbooster.config import (
     BaseConfig,
     DatasetConfig,
@@ -17,6 +18,7 @@ from torchbooster.config import (
     OptimizerConfig,
     SchedulerConfig,
 )
+from copy import deepcopy
 from tqdm import tqdm
 import nlpaug.augmenter.sentence as nas
 import nlpaug.augmenter.word as naw
@@ -76,22 +78,22 @@ class CustomModel(nn.Module):
         self.conf: Config = conf
         self.backbone = backbone
         self.projector = projector
-        logging.info(f'Flat size = {get_backbone_model_output_features(backbone)}')
+        logging.info(f'Flat size = {get_backbone_model_output_features(backbone, conf)}')
 
     def forward(self, *kargs, **kwargs):
         o = self.backbone(**kwargs)
 
         if hasattr(o, "last_hidden_state"): # transformers/ bert model
             o : torch.FloatTensor = o.last_hidden_state#.view(conf.loader.batch_size, self.flat_size)
-            o = o.flatten(1)
-            print(o.shape)
-            o = self.projector(o)
+            o = self.projector(o.flatten(1))
         else:
             o = self.projector(o)
 
         return o
 
-def get_backbone_model_output_features(backbone_model):
+def get_backbone_model_output_features(backbone_model, conf):
+    if isinstance(backbone_model, DistributedDataParallel):
+        backbone_model = backbone_model.module
     return backbone_model.config.dim * conf.tokenizer_max_length #! make gen 
 
 def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
@@ -119,7 +121,7 @@ def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
 
     base_projector = nn.Sequential(
         nn.SiLU(),
-        nn.Linear(get_backbone_model_output_features(backbone_network), conf.model.projection_hidden), # TODO switch to baye
+        nn.Linear(get_backbone_model_output_features(backbone_network, conf), conf.model.projection_hidden), # TODO switch to baye
         nn.SiLU(), #TODO param?
         nn.Dropout(p = conf.model.dropout_p),
         nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
@@ -175,6 +177,8 @@ def get_noise_samples(batch: List[str], conf: Config) -> List[List[str]]:
         The augmented data from the batch
     """
     strength = .1 #! displacement strength TODO: make random
+    if conf.loader.batch_size < 2:
+        raise ValueError("Batch size has to be at least 2")
     return [get_augmenter(strength, conf.loader.batch_size)(a) for a in batch]
 
 
@@ -191,24 +195,23 @@ def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
     #TODO hypersphere uniform sampling + displacement scaler
 
     model = conf.env.make(model).train()
-    pbar = tqdm(dataset)
+    pbar = tqdm(dataset, disable=not dist.is_primary())
     for x in pbar:
         # anchors
         anchors = conf.env.make(torch.zeros(conf.samples, conf.loader.batch_size, conf.model.projection_size))
         inp = tokenize_and_make(conf, tokenizer, x, padding='max_length', max_length=conf.tokenizer_max_length)
-        for i in tqdm(range(conf.samples)):
+        for i in range(conf.samples):
             out = F.normalize(model(**inp), dim=1) #! not general
             anchors[i] = out # swap if necassary
 
         # displacement
         displacement: torch.Tensor = conf.env.make(torch.zeros(conf.noise_samples, conf.loader.batch_size, conf.model.projection_size))
         noisy_samples: List[List[str]] = get_noise_samples(x, conf) # batch x samples
-        # noisy samples have to be resliced into batches
 
-
-        for i, inp in tqdm(enumerate(noisy_samples)):
-            if len(inp) == 0: continue
+        for i, inp in enumerate(noisy_samples):
+            if len(inp) == 0: continue #! quick fix, check if necessary
             inp = tokenize_and_make(conf, tokenizer, inp, padding='max_length', max_length=conf.tokenizer_max_length)
+
             out = model(**inp)
             out = F.normalize(out, dim=1)
             displacement[i] = out 
@@ -231,22 +234,25 @@ def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
         # final loss
         loss = anchor_loss + displacement_loss #! add scalers
 
+        dist.synchronize()
         utils.step(loss, optim, scheduler, clip=conf.clip)
         pbar.set_postfix(anchor_loss=anchor_loss.item(), displacement_loss=displacement_loss.item())
         
 
 def main(conf: Config):
     logging.info(f'Loading model')
-    backbone_network = conf.env.make(torch.hub.load('/home/win32gg/Documents/transformers', 'model', conf.model.backbone_network, source="local"))
+    backbone_network = conf.env.make(torch.hub.load('huggingface/transformers', 'model', conf.model.backbone_network))
     logging.info(f'Loading tokenizer')
-    tokenizer = torch.hub.load('/home/win32gg/Documents/transformers', 'tokenizer', conf.model.backbone_network, source="local") 
+    tokenizer = torch.hub.load('huggingface/transformers', 'tokenizer', conf.model.backbone_network) 
 
-    model = CustomModel(conf, backbone_network, get_projector(backbone_network, conf))
+    model = conf.env.make(CustomModel(conf, backbone_network, get_projector(backbone_network, conf)))
 
     logging.info(f'Loading train dataset')
-    train_dataset = conf.loader.make(conf.dataset.train_dataset.make(Split.TRAIN), shuffle=True)
+    train_dataset = conf.dataset.train_dataset.make(Split.TRAIN, distributed=conf.env.distributed)
+    train_dataset = conf.loader.make(train_dataset, shuffle=True, distributed=conf.env.distributed)
     # iid_test_dataset = conf.dataset.train_dataset.make(Split.TRAIN)
     # ood_test_dataset = conf.dataset.ood_detection_dataset.make(Split.TRAIN)
+    # DistributedIterableDataset
 
     optim = conf.optim.make(model.parameters())
     scheduler = None #conf.scheduler.make()
@@ -257,10 +263,11 @@ def main(conf: Config):
 if __name__ == "__main__":
     logging.info("Starting")
     utils.seed(42)
-    utils.boost()
+    utils.boost(False)
 
     nltk.download('averaged_perceptron_tagger')
     nltk.download('wordnet')
+    nltk.download('omw-1.4')
 
     conf = Config.load(Path("configs/base.yml"))
 

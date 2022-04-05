@@ -23,7 +23,7 @@ dataset:
 
 loader:
   num_workers: 0
-  batch_size: 1
+  batch_size: 2
   pin_memory: true
   drop_last: true
 
@@ -33,7 +33,8 @@ optim:
 
 env:
   fp16: true
-  n_gpu: 1
+  n_gpu: 2
+  distributed: True
 
 # scheduler:
 #   name: cycle

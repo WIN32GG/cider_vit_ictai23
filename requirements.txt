@@ -1,0 +1,14 @@
+lmdb
+nlpaug
+nltk
+torch==1.11
+torchbooster
+#bayeformers
+torchvision
+tqdm
+transformers
+torchtext==0.12.0
+transformers
+torchdata
+sentencepiece
+importlib_metadata
