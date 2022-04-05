@@ -1,4 +1,5 @@
 from __future__ import annotations
+from ast import AugAssign
 
 from dataclasses import dataclass
 from enum import Enum
@@ -52,6 +53,7 @@ class ModelParam(BaseConfig):
 class Config(BaseConfig):
     epochs: int
     samples: int
+    noise_samples: int
     clip: float
     task: str
 
@@ -74,14 +76,15 @@ class CustomModel(nn.Module):
         self.conf: Config = conf
         self.backbone = backbone
         self.projector = projector
-        self.flat_size = conf.tokenizer_max_length * get_backbone_model_output_features(self.backbone)
-        logging.info(f'Flat size = {self.flat_size}')
+        logging.info(f'Flat size = {get_backbone_model_output_features(backbone)}')
 
     def forward(self, *kargs, **kwargs):
         o = self.backbone(**kwargs)
 
         if hasattr(o, "last_hidden_state"): # transformers/ bert model
-            o : torch.FloatTensor = o.last_hidden_state.reshape(conf.loader.batch_size, self.flat_size)
+            o : torch.FloatTensor = o.last_hidden_state#.view(conf.loader.batch_size, self.flat_size)
+            o = o.flatten(1)
+            print(o.shape)
             o = self.projector(o)
         else:
             o = self.projector(o)
@@ -89,7 +92,7 @@ class CustomModel(nn.Module):
         return o
 
 def get_backbone_model_output_features(backbone_model):
-    return backbone_model.config.dim
+    return backbone_model.config.dim * conf.tokenizer_max_length #! make gen 
 
 def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
     """get_projector
@@ -115,6 +118,7 @@ def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
     """
 
     base_projector = nn.Sequential(
+        nn.SiLU(),
         nn.Linear(get_backbone_model_output_features(backbone_network), conf.model.projection_hidden), # TODO switch to baye
         nn.SiLU(), #TODO param?
         nn.Dropout(p = conf.model.dropout_p),
@@ -153,6 +157,27 @@ def get_augmenter(strength: float, samples: int):
     return wrap
 
 
+def get_noise_samples(batch: List[str], conf: Config) -> List[List[str]]:
+    """get_noise_samples
+
+        Returns samples from the augmenter (get_augmenter) fir the current batch of data
+
+    Parameters
+    ----------
+    batch : List[str]
+        The batch provided
+    conf : Config
+        The config
+    
+    Returns
+    -------
+    List[str]
+        The augmented data from the batch
+    """
+    strength = .1 #! displacement strength TODO: make random
+    return [get_augmenter(strength, conf.loader.batch_size)(a) for a in batch]
+
+
 def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
     # pour n n fois le même x
         # 1 Get anchor pools
@@ -176,25 +201,38 @@ def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
             anchors[i] = out # swap if necassary
 
         # displacement
-        strength = .1 #! displacement strength TODO: make random
-        displacement = conf.env.make(torch.zeros(conf.samples, conf.loader.batch_size, conf.model.projection_size))
-        augmenter = get_augmenter(strength, conf.samples)
+        displacement: torch.Tensor = conf.env.make(torch.zeros(conf.noise_samples, conf.loader.batch_size, conf.model.projection_size))
+        noisy_samples: List[List[str]] = get_noise_samples(x, conf) # batch x samples
+        # noisy samples have to be resliced into batches
 
 
-        # custom collate 
-        noisy_samples: List[List[str]] = [augmenter(a) for a in x] # batch x samples
-        #TODO CONTINUE HERE: noisy_samples: tokenize to dataset
-
-        for i, inp in tqdm(enumerate()):
+        for i, inp in tqdm(enumerate(noisy_samples)):
+            if len(inp) == 0: continue
             inp = tokenize_and_make(conf, tokenizer, inp, padding='max_length', max_length=conf.tokenizer_max_length)
-            out = F.normalize(model(**inp), dim=1)
+            out = model(**inp)
+            out = F.normalize(out, dim=1)
             displacement[i] = out 
 
-        anchor_loss = torch.std(anchors, dim=0) #! replace with hypersphere sampling
-        displacement_loss = torch.mean(torch.cosine_similarity(displacement, torch.mean(anchors, dim=0), dim=1))
+        # reshape batch first
+        displacement = displacement.view((conf.loader.batch_size, conf.samples, conf.model.projection_size))
+        
+        # compute anchor loss
+        anchor_loss = torch.std(anchors, dim=2) #! replace with hypersphere sampling
+
+        # compute displacement loss
+        mean_anchors = torch.mean(anchors, dim=0, keepdim=True).view((conf.loader.batch_size, 1, conf.model.projection_size))
+        mean_anchors = mean_anchors.expand((-1, conf.noise_samples, -1))
+        displacement_loss = torch.cosine_similarity(displacement, mean_anchors, dim=2)
+        
+        # aveerage all
+        anchor_loss = anchor_loss.view((conf.loader.batch_size * conf.samples)).mean()
+        displacement_loss = displacement_loss.view((conf.loader.batch_size * conf.samples)).mean()
+
+        # final loss
         loss = anchor_loss + displacement_loss #! add scalers
 
         utils.step(loss, optim, scheduler, clip=conf.clip)
+        pbar.set_postfix(anchor_loss=anchor_loss.item(), displacement_loss=displacement_loss.item())
         
 
 def main(conf: Config):
