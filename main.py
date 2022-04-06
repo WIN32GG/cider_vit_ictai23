@@ -20,6 +20,7 @@ from torchbooster.config import (
 )
 from copy import deepcopy
 from tqdm import tqdm
+from random import random as rand
 import nlpaug.augmenter.sentence as nas
 import nlpaug.augmenter.word as naw
 
@@ -33,6 +34,7 @@ import torch.nn.functional as F
 import torchvision.transforms as T
 import transformers
 
+ZERO = torch.tensor(0.)
 
 class BayeMethod(str, Enum):
     BAYE_BY_BACKPROP = "baye_by_backprop"
@@ -53,11 +55,13 @@ class ModelParam(BaseConfig):
 
 @dataclass
 class Config(BaseConfig):
+    debug: bool
     epochs: int
     samples: int
     noise_samples: int
     clip: float
     task: str
+    lr: float
 
     #NLP task
     tokenizer_max_length: int
@@ -130,22 +134,24 @@ def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
     if conf.method == BayeMethod.FREQUENTIST.value or conf.method == BayeMethod.BAYESIAN_DROPOUT.value: # Train handles baye dropout
         return base_projector
     elif conf.method == BayeMethod.BAYE_BY_BACKPROP.value:
+        logging.info("Using Baye by Backprop")
         return bayeformers.to_bayesian(base_projector) # TODO change ð or init better
     else:
         raise ValueError()
 
 
-def get_model(backbone_network, conf: Config):
-    #! Add classification head for testing 
-    return torch.nn.Sequential(
-        backbone_network,
-        get_projector(backbone_network, conf)
-    )
+# def get_model(backbone_network, conf: Config):
+#     #! Add classification head for testing 
+
+#     return torch.nn.Sequential(
+#         backbone_network,
+#         get_projector(backbone_network, conf)
+#     )
 
 
 def tokenize_and_make(conf: Config, tokenizer: Any, strs: Union[str, List[str]], **kwargs) -> torch.Tensor:
     if isinstance(strs, str):
-        return conf.env.make(utils.to_tensor(tokenizer(strs, **kwargs)))
+        return conf.env.make(utils.to_tensor(tokenizer(strs, **kwargs))) # use return_tensors = pt and unsqueeze
     return conf.env.make(utils.stack_dictionaries([utils.to_tensor(tokenizer(s, **kwargs)) for s in strs]))
 
 def get_augmenter(strength: float, samples: int):
@@ -159,7 +165,7 @@ def get_augmenter(strength: float, samples: int):
     return wrap
 
 
-def get_noise_samples(batch: List[str], conf: Config) -> List[List[str]]:
+def get_noise_samples(strength: float, batch: List[str], conf: Config) -> List[List[str]]:
     """get_noise_samples
 
         Returns samples from the augmenter (get_augmenter) fir the current batch of data
@@ -176,13 +182,14 @@ def get_noise_samples(batch: List[str], conf: Config) -> List[List[str]]:
     List[str]
         The augmented data from the batch
     """
-    strength = .1 #! displacement strength TODO: make random
     if conf.loader.batch_size < 2:
         raise ValueError("Batch size has to be at least 2")
-    return [get_augmenter(strength, conf.loader.batch_size)(a) for a in batch]
+    return [get_augmenter(strength, conf.noise_samples)(a) for a in batch]
 
 
 def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
+    #NOTE Notes on the implementation
+    # Base Algorithm
     # pour n n fois le même x
         # 1 Get anchor pools
         # 2 Get displacement pools
@@ -192,9 +199,11 @@ def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
         #   loss position relative des samples négatifs
         #   loss position relative nulle des samples positifs 
 
-    #TODO hypersphere uniform sampling + displacement scaler
+    #      hypersphere uniform sampling + displacement scaler
+    #      mais en fait non car on n'opère pas au niveau des classes mais des features
+    #  hypothèse: la displacement loos va forcer les anchors à rester au même emplacement. 
 
-    model = conf.env.make(model).train()
+    model = conf.env.make(model).train() 
     pbar = tqdm(dataset, disable=not dist.is_primary())
     for x in pbar:
         # anchors
@@ -205,41 +214,57 @@ def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
             anchors[i] = out # swap if necassary
 
         # displacement
-        displacement: torch.Tensor = conf.env.make(torch.zeros(conf.noise_samples, conf.loader.batch_size, conf.model.projection_size))
-        noisy_samples: List[List[str]] = get_noise_samples(x, conf) # batch x samples
+        strength = rand() * .45 #! put in config: allow max 45% rand
+        #TODO: increase during train
+        displacement: torch.Tensor = conf.env.make(torch.zeros(conf.loader.batch_size, conf.noise_samples, conf.model.projection_size))
+        noisy_samples: List[List[str]] = get_noise_samples(strength, x, conf) # batch x samples
 
         for i, inp in enumerate(noisy_samples):
             if len(inp) == 0: continue #! quick fix, check if necessary
-            inp = tokenize_and_make(conf, tokenizer, inp, padding='max_length', max_length=conf.tokenizer_max_length)
+            inp = tokenize_and_make(conf, tokenizer, inp, padding='max_length', max_length=conf.tokenizer_max_length) #! tokenize in advance, in dataset!!!
+            out = F.normalize(model(**inp), dim=1)
+            displacement[i] = out
 
-            out = model(**inp)
-            out = F.normalize(out, dim=1)
-            displacement[i] = out 
-
-        # reshape batch first
-        displacement = displacement.view((conf.loader.batch_size, conf.samples, conf.model.projection_size))
-        
         # compute anchor loss
-        anchor_loss = torch.std(anchors, dim=2) #! replace with hypersphere sampling
+        anchor_loss = torch.std(anchors, dim=2)
 
         # compute displacement loss
         mean_anchors = torch.mean(anchors, dim=0, keepdim=True).view((conf.loader.batch_size, 1, conf.model.projection_size))
         mean_anchors = mean_anchors.expand((-1, conf.noise_samples, -1))
-        displacement_loss = torch.cosine_similarity(displacement, mean_anchors, dim=2)
+        displacement_loss = torch.abs(strength - (1. - torch.clip(torch.cosine_similarity(displacement, mean_anchors, dim=2), 0)))
         
-        # aveerage all
+        # average all
         anchor_loss = anchor_loss.view((conf.loader.batch_size * conf.samples)).mean()
         displacement_loss = displacement_loss.view((conf.loader.batch_size * conf.samples)).mean()
 
-        # final loss
-        loss = anchor_loss + displacement_loss #! add scalers
+        # if bayse by backprop, inclide lp and lvp
+        if conf.method == BayeMethod.BAYE_BY_BACKPROP.value:
+            projector = model.module.module.projector if isinstance(model, DistributedDataParallel) else model.projector
+            loss_baye = 10e-9 * (projector.log_variational_posterior() - projector.log_prior()) #! fixme scaler
+        else:
+            loss_baye = ZERO
 
-        dist.synchronize()
+        # final loss
+        loss = anchor_loss + displacement_loss + loss_baye #! add scalers
+        loss *= conf.lr 
+
+        #TODO: fix distributed
+        # if dist.is_primary():
+        #     if conf.env.distributed:
+        #         gathered_losses = [torch.zeros_like(loss) for _ in range(dist.get_world_size())]
+        #         dist.gather(loss, gathered_losses)
+        #         print(gathered_losses)
         utils.step(loss, optim, scheduler, clip=conf.clip)
-        pbar.set_postfix(anchor_loss=anchor_loss.item(), displacement_loss=displacement_loss.item())
+        pbar.set_postfix(anchor_loss=anchor_loss.item(), displacement_loss=displacement_loss.item(), loss_baye=loss_baye.item())
+        # else:
+        #     dist.gather(loss)
+
         
 
 def main(conf: Config):
+    utils.seed(42)
+    utils.boost(not conf.debug)
+
     logging.info(f'Loading model')
     backbone_network = conf.env.make(torch.hub.load('huggingface/transformers', 'model', conf.model.backbone_network))
     logging.info(f'Loading tokenizer')
@@ -249,7 +274,7 @@ def main(conf: Config):
 
     logging.info(f'Loading train dataset')
     train_dataset = conf.dataset.train_dataset.make(Split.TRAIN, distributed=conf.env.distributed)
-    train_dataset = conf.loader.make(train_dataset, shuffle=True, distributed=conf.env.distributed)
+    train_dataset = conf.loader.make(train_dataset, shuffle=not conf.env.distributed, distributed=conf.env.distributed)
     # iid_test_dataset = conf.dataset.train_dataset.make(Split.TRAIN)
     # ood_test_dataset = conf.dataset.ood_detection_dataset.make(Split.TRAIN)
     # DistributedIterableDataset
@@ -262,12 +287,11 @@ def main(conf: Config):
 
 if __name__ == "__main__":
     logging.info("Starting")
-    utils.seed(42)
-    utils.boost(False)
 
-    nltk.download('averaged_perceptron_tagger')
-    nltk.download('wordnet')
-    nltk.download('omw-1.4')
+    if dist.is_primary():
+        nltk.download('averaged_perceptron_tagger')
+        nltk.download('wordnet')
+        nltk.download('omw-1.4')
 
     conf = Config.load(Path("configs/base.yml"))
 
