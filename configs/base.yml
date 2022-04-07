@@ -6,16 +6,16 @@ freeze_backbone: True
 samples: 8
 noise_samples: 10
 lr: 1e-3
-tokenizer_max_length: 64 # sequence length
+tokenizer_max_length: 200 # sequence length
 task: tbd
 
 method: baye_by_backprop
 
 model:
   backbone_network: distilbert-base-uncased
-  projection_size: 600
-  projection_hidden: 600
-  dropout_p: .2
+  projection_size: 718
+  projection_hidden: 718
+  dropout_p: .1
 
 dataset:
   train_dataset: 
@@ -26,7 +26,7 @@ dataset:
 
 loader:
   num_workers: 0
-  batch_size: 16
+  batch_size: 32
   pin_memory: false
   drop_last: true
 
@@ -36,8 +36,8 @@ optim:
 
 env:
   fp16: false
-  n_gpu: 1
-  distributed: False
+  n_gpu: 4
+  distributed: True
 
 # scheduler:
 #   name: cycle

@@ -162,8 +162,8 @@ def tokenize_and_make(conf: Config, tokenizer: Any, strs: Union[str, List[str]],
 
 def get_augmenter(strength: float, samples: int):
     #! Make general for other tasks, NLPAUG for now
-    augmenter1 = naw.AntonymAug(aug_p=strength)
-    augmenter2 = naw.SynonymAug(aug_p=strength)    
+    augmenter1 = naw.AntonymAug(aug_p=strength/2)
+    augmenter2 = naw.SynonymAug(aug_p=strength/2)    
 
     def wrap(inp: str):
         return augmenter2.augment(augmenter1.augment(inp), n = samples)
@@ -190,8 +190,28 @@ def get_noise_samples(strength: float, batch: List[str], conf: Config) -> List[L
     """
     if conf.loader.batch_size < 2:
         raise ValueError("Batch size has to be at least 2")
-    return [get_augmenter(strength, conf.noise_samples)(a) for a in batch]
+    aug = get_augmenter(strength, conf.noise_samples)
+    return [aug(a) for a in batch]
 
+
+class TextDataPreparator():
+    def __init__(self, dataset_len, tokenizer, conf) -> None:
+        self.batch_num = 0
+        self.dataset_len: int = dataset_len
+        self.tokenizer = tokenizer
+        self.conf: Config = conf
+
+
+    def collate_fn(self, x):
+        self.batch_num += 1
+
+        clear_x = tokenize_and_make(self.conf, self.tokenizer, x, padding='max_length', max_length=self.conf.tokenizer_max_length)
+        
+        strength = 0. * (self.batch_num * .5/(self.dataset_len/self.conf.loader.batch_size)) * .3 #! put in config TODO: increase during train
+        noisy_samples: List[List[str]] = get_noise_samples(strength, x, self.conf) # batch x samples
+        # noisy_samples = list(filter(lambda e: type(e) == list, noisy_samples))
+        noisy_samples = [tokenize_and_make(self.conf, self.tokenizer, [a[i] for a in noisy_samples], padding='max_length', max_length=self.conf.tokenizer_max_length) for i in range(len(noisy_samples[0]))] # List(l=samples)[Tensor[BSxSEQ]]
+        return (strength, clear_x, noisy_samples)
 
 def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
     #NOTE Notes on the implementation
@@ -209,35 +229,40 @@ def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
     #      mais en fait non car on n'opère pas au niveau des classes mais des features
     #  hypothèse: la displacement loos va forcer les anchors à rester au même emplacement. 
 
-    writer = SummaryWriter()
+    writer = SummaryWriter() if dist.is_primary() else None
     model = conf.env.make(model).train()
     pbar = tqdm(dataset, disable=not dist.is_primary())
+
     for batch_num, x in enumerate(pbar):
+        strength, anchor, noisy_samples = x
         # anchors
         anchors = conf.env.make(torch.zeros(conf.samples, conf.loader.batch_size, conf.model.projection_size))
-        inp = tokenize_and_make(conf, tokenizer, x, padding='max_length', max_length=conf.tokenizer_max_length)
+        inp = anchor#tokenize_and_make(conf, tokenizer, x, padding='max_length', max_length=conf.tokenizer_max_length)
         for i in range(conf.samples):
             out = F.normalize(model(**inp), dim=1) #! not general
             anchors[i] = out # swap if necassary
 
         # displacement
-        strength = batch_num/len(pbar) * .9 #! put in config TODO: increase during train
-        displacement: torch.Tensor = conf.env.make(torch.zeros(conf.loader.batch_size, conf.noise_samples, conf.model.projection_size))
-        noisy_samples: List[List[str]] = get_noise_samples(strength, x, conf) # batch x samples
+        displacement: torch.Tensor = conf.env.make(torch.zeros(conf.noise_samples, conf.loader.batch_size, conf.model.projection_size))
+        # strength = batch_num/len(pbar) * .9 #! put in config TODO: increase during train
+        #noisy_samples: List[List[str]] = get_noise_samples(strength, x, conf) # batch x samples
+        
+        
+        #noisy_samples: List(l=samples)[Tensor[BSxSEQ]]
 
         for i, inp in enumerate(noisy_samples):
             if len(inp) == 0: continue #! quick fix, check if necessary
-            inp = tokenize_and_make(conf, tokenizer, inp, padding='max_length', max_length=conf.tokenizer_max_length) #! tokenize in advance, in dataset!!!
+            # inp = tokenize_and_make(conf, tokenizer, inp, padding='max_length', max_length=conf.tokenizer_max_length) #! tokenize in advance, in dataset!!!
             out = F.normalize(model(**inp), dim=1)
             displacement[i] = out
 
         # compute anchor loss
-        anchor_loss = torch.mean(torch.std(anchors, dim=0)) # BSx
+        anchor_loss = torch.mean(torch.std(anchors, dim=0), dim=1) # BSx
 
         # compute displacement loss
-        mean_anchors = torch.mean(anchors, dim=0, keepdim=True).view((conf.loader.batch_size, 1, conf.model.projection_size))
-        mean_anchors = mean_anchors.expand((-1, conf.noise_samples, -1))
-        displacement_loss = torch.abs(strength - (1. - torch.clip(torch.cosine_similarity(displacement, mean_anchors, dim=2), 0))).mean(dim=1) # BSx
+        mean_anchors = torch.mean(anchors, dim=0, keepdim=True)#.view((conf.loader.batch_size, 1, conf.model.projection_size))
+        mean_anchors = mean_anchors.expand((conf.noise_samples, -1, -1))
+        displacement_loss = torch.abs(strength - (1. - torch.clip(torch.cosine_similarity(displacement, mean_anchors, dim=2), 0))).mean(dim=0) # BSx
         
         # average all
         anchor_loss = anchor_loss.mean() # /
@@ -251,7 +276,7 @@ def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
             loss_baye = ZERO
 
         # final loss
-        loss = anchor_loss + displacement_loss + loss_baye #! add scalers
+        loss = 2. * anchor_loss + displacement_loss + loss_baye #! add scalers
         loss *= conf.lr 
 
         #TODO CONTINUE HERE
@@ -265,14 +290,15 @@ def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
         #         print(gathered_losses)
         utils.step(loss, optim, scheduler, clip=conf.clip)
         
-        writer.add_scalar('loss/anchor', anchor_loss.detach().item(), batch_num)
-        writer.add_scalar('loss/displacement', displacement_loss.detach().item(), batch_num)
-        writer.add_scalar('loss/baye', loss_baye.detach().item(), batch_num)
-        writer.add_scalar('loss/total', loss.detach().item(), batch_num)
+        if dist.is_primary():
+            writer.add_scalar('loss/anchor', anchor_loss.detach().item(), batch_num)
+            writer.add_scalar('loss/displacement', displacement_loss.detach().item(), batch_num)
+            writer.add_scalar('loss/baye', loss_baye.detach().item(), batch_num)
+            writer.add_scalar('loss/total', loss.detach().item(), batch_num)
         
         pbar.set_postfix(anchor_loss=anchor_loss.detach().item(), displacement_loss=displacement_loss.detach().item(), loss_baye=loss_baye.detach().item(), strength=strength)
         
-        if batch_num % 500 == 0:
+        if batch_num % 500 == 0 and dist.is_primary():
             save_path = f'./models/model_{batch_num}.pth'
             logging.info(f'Saving to {save_path}')
             torch.save(model, save_path)
@@ -293,8 +319,9 @@ def main(conf: Config):
     model = conf.env.make(CustomModel(conf, backbone_network, get_projector(backbone_network, conf)))
 
     logging.info(f'Loading train dataset')
-    train_dataset = conf.dataset.train_dataset.make(Split.TRAIN)
-    train_dataset = conf.loader.make(train_dataset, shuffle=not conf.env.distributed, distributed=conf.env.distributed)
+    train_dataset = conf.dataset.train_dataset.make(Split.TRAIN, acceptance_fn=lambda x: len(x.strip()) > 0 )
+    prep = TextDataPreparator(len(train_dataset), tokenizer, conf)
+    train_dataset = conf.loader.make(train_dataset, shuffle=not conf.env.distributed, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
     # iid_test_dataset = conf.dataset.train_dataset.make(Split.TRAIN)
     # ood_test_dataset = conf.dataset.ood_detection_dataset.make(Split.TRAIN)
     # DistributedIterableDataset
@@ -314,7 +341,7 @@ if __name__ == "__main__":
         nltk.download('omw-1.4')
 
     conf = Config.load(Path("configs/base.yml"))
-
+    torch.multiprocessing.set_start_method('spawn')
     dist.launch(
         main,
         conf.env.n_gpu,
