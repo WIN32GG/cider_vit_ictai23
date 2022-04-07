@@ -20,6 +20,7 @@ from torchbooster.config import (
 )
 from copy import deepcopy
 from tqdm import tqdm
+from torch.utils.tensorboard import SummaryWriter
 from random import random as rand
 import nlpaug.augmenter.sentence as nas
 import nlpaug.augmenter.word as naw
@@ -55,6 +56,7 @@ class ModelParam(BaseConfig):
 
 @dataclass
 class Config(BaseConfig):
+    freeze_backbone: bool
     debug: bool
     epochs: int
     samples: int
@@ -77,11 +79,15 @@ class Config(BaseConfig):
     # scheduler: SchedulerConfig
 
 class CustomModel(nn.Module):
-    def __init__(self, conf, backbone, projector):
+    def __init__(self, conf: Config, backbone, projector):
         super().__init__()
         self.conf: Config = conf
         self.backbone = backbone
         self.projector = projector
+        if conf.freeze_backbone:
+            logging.info(f'Backbone model is frozen')
+            for param in self.backbone.parameters():
+                param.requires_grad = False
         logging.info(f'Flat size = {get_backbone_model_output_features(backbone, conf)}')
 
     def forward(self, *kargs, **kwargs):
@@ -151,8 +157,8 @@ def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
 
 def tokenize_and_make(conf: Config, tokenizer: Any, strs: Union[str, List[str]], **kwargs) -> torch.Tensor:
     if isinstance(strs, str):
-        return conf.env.make(utils.to_tensor(tokenizer(strs, **kwargs))) # use return_tensors = pt and unsqueeze
-    return conf.env.make(utils.stack_dictionaries([utils.to_tensor(tokenizer(s, **kwargs)) for s in strs]))
+        return conf.env.make(utils.to_tensor(tokenizer(strs, truncation=True, **kwargs))) # use return_tensors = pt and unsqueeze
+    return conf.env.make(utils.stack_dictionaries([utils.to_tensor(tokenizer(s, truncation=True, **kwargs)) for s in strs]))
 
 def get_augmenter(strength: float, samples: int):
     #! Make general for other tasks, NLPAUG for now
@@ -203,9 +209,10 @@ def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
     #      mais en fait non car on n'opère pas au niveau des classes mais des features
     #  hypothèse: la displacement loos va forcer les anchors à rester au même emplacement. 
 
-    model = conf.env.make(model).train() 
+    writer = SummaryWriter()
+    model = conf.env.make(model).train()
     pbar = tqdm(dataset, disable=not dist.is_primary())
-    for x in pbar:
+    for batch_num, x in enumerate(pbar):
         # anchors
         anchors = conf.env.make(torch.zeros(conf.samples, conf.loader.batch_size, conf.model.projection_size))
         inp = tokenize_and_make(conf, tokenizer, x, padding='max_length', max_length=conf.tokenizer_max_length)
@@ -214,8 +221,7 @@ def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
             anchors[i] = out # swap if necassary
 
         # displacement
-        strength = rand() * .45 #! put in config: allow max 45% rand
-        #TODO: increase during train
+        strength = batch_num/len(pbar) * .9 #! put in config TODO: increase during train
         displacement: torch.Tensor = conf.env.make(torch.zeros(conf.loader.batch_size, conf.noise_samples, conf.model.projection_size))
         noisy_samples: List[List[str]] = get_noise_samples(strength, x, conf) # batch x samples
 
@@ -226,27 +232,30 @@ def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
             displacement[i] = out
 
         # compute anchor loss
-        anchor_loss = torch.std(anchors, dim=2)
+        anchor_loss = torch.mean(torch.std(anchors, dim=0)) # BSx
 
         # compute displacement loss
         mean_anchors = torch.mean(anchors, dim=0, keepdim=True).view((conf.loader.batch_size, 1, conf.model.projection_size))
         mean_anchors = mean_anchors.expand((-1, conf.noise_samples, -1))
-        displacement_loss = torch.abs(strength - (1. - torch.clip(torch.cosine_similarity(displacement, mean_anchors, dim=2), 0)))
+        displacement_loss = torch.abs(strength - (1. - torch.clip(torch.cosine_similarity(displacement, mean_anchors, dim=2), 0))).mean(dim=1) # BSx
         
         # average all
-        anchor_loss = anchor_loss.view((conf.loader.batch_size * conf.samples)).mean()
-        displacement_loss = displacement_loss.view((conf.loader.batch_size * conf.samples)).mean()
+        anchor_loss = anchor_loss.mean() # /
+        displacement_loss = displacement_loss.mean() # / #displacement_loss.view((conf.loader.batch_size * conf.noise_samples)).mean()
 
         # if bayse by backprop, inclide lp and lvp
         if conf.method == BayeMethod.BAYE_BY_BACKPROP.value:
             projector = model.module.module.projector if isinstance(model, DistributedDataParallel) else model.projector
-            loss_baye = 10e-9 * (projector.log_variational_posterior() - projector.log_prior()) #! fixme scaler
+            loss_baye = 10e-12 * (projector.log_variational_posterior() - projector.log_prior()) #! fixme scaler
         else:
             loss_baye = ZERO
 
         # final loss
         loss = anchor_loss + displacement_loss + loss_baye #! add scalers
         loss *= conf.lr 
+
+        #TODO CONTINUE HERE
+        # triplet loss ou négative samples ou autr epour empécher collapse
 
         #TODO: fix distributed
         # if dist.is_primary():
@@ -255,7 +264,18 @@ def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
         #         dist.gather(loss, gathered_losses)
         #         print(gathered_losses)
         utils.step(loss, optim, scheduler, clip=conf.clip)
-        pbar.set_postfix(anchor_loss=anchor_loss.item(), displacement_loss=displacement_loss.item(), loss_baye=loss_baye.item())
+        
+        writer.add_scalar('loss/anchor', anchor_loss.detach().item(), batch_num)
+        writer.add_scalar('loss/displacement', displacement_loss.detach().item(), batch_num)
+        writer.add_scalar('loss/baye', loss_baye.detach().item(), batch_num)
+        writer.add_scalar('loss/total', loss.detach().item(), batch_num)
+        
+        pbar.set_postfix(anchor_loss=anchor_loss.detach().item(), displacement_loss=displacement_loss.detach().item(), loss_baye=loss_baye.detach().item(), strength=strength)
+        
+        if batch_num % 500 == 0:
+            save_path = f'./models/model_{batch_num}.pth'
+            logging.info(f'Saving to {save_path}')
+            torch.save(model, save_path)
         # else:
         #     dist.gather(loss)
 
@@ -273,7 +293,7 @@ def main(conf: Config):
     model = conf.env.make(CustomModel(conf, backbone_network, get_projector(backbone_network, conf)))
 
     logging.info(f'Loading train dataset')
-    train_dataset = conf.dataset.train_dataset.make(Split.TRAIN, distributed=conf.env.distributed)
+    train_dataset = conf.dataset.train_dataset.make(Split.TRAIN)
     train_dataset = conf.loader.make(train_dataset, shuffle=not conf.env.distributed, distributed=conf.env.distributed)
     # iid_test_dataset = conf.dataset.train_dataset.make(Split.TRAIN)
     # ood_test_dataset = conf.dataset.ood_detection_dataset.make(Split.TRAIN)
