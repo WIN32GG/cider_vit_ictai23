@@ -133,10 +133,11 @@ def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
         nn.SiLU(),
         nn.Linear(get_backbone_model_output_features(backbone_network, conf), conf.model.projection_hidden), # TODO switch to baye
         nn.SiLU(), #TODO param?
-        nn.Dropout(p = conf.model.dropout_p),
+        # nn.Dropout(p = conf.model.dropout_p),
         nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
     )
     
+    return base_projector
     if conf.method == BayeMethod.FREQUENTIST.value or conf.method == BayeMethod.BAYESIAN_DROPOUT.value: # Train handles baye dropout
         return base_projector
     elif conf.method == BayeMethod.BAYE_BY_BACKPROP.value:
@@ -155,155 +156,100 @@ def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
 #     )
 
 
-def tokenize_and_make(conf: Config, tokenizer: Any, strs: Union[str, List[str]], **kwargs) -> torch.Tensor:
-    if isinstance(strs, str):
-        return conf.env.make(utils.to_tensor(tokenizer(strs, truncation=True, **kwargs))) # use return_tensors = pt and unsqueeze
-    return conf.env.make(utils.stack_dictionaries([utils.to_tensor(tokenizer(s, truncation=True, **kwargs)) for s in strs]))
-
-def get_augmenter(strength: float, samples: int):
-    #! Make general for other tasks, NLPAUG for now
-    augmenter1 = naw.AntonymAug(aug_p=strength/2)
-    augmenter2 = naw.SynonymAug(aug_p=strength/2)    
-
-    def wrap(inp: str):
-        return augmenter2.augment(augmenter1.augment(inp), n = samples)
-
-    return wrap
-
-
-def get_noise_samples(strength: float, batch: List[str], conf: Config) -> List[List[str]]:
-    """get_noise_samples
-
-        Returns samples from the augmenter (get_augmenter) fir the current batch of data
-
-    Parameters
-    ----------
-    batch : List[str]
-        The batch provided
-    conf : Config
-        The config
-    
-    Returns
-    -------
-    List[str]
-        The augmented data from the batch
-    """
-    if conf.loader.batch_size < 2:
-        raise ValueError("Batch size has to be at least 2")
-    aug = get_augmenter(strength, conf.noise_samples)
-    return [aug(a) for a in batch]
-
-
 class TextDataPreparator():
-    def __init__(self, dataset_len, tokenizer, conf) -> None:
+    def __init__(self, dataset_len, tokenizer, conf, max_classes = -1) -> None:
         self.batch_num = 0
         self.dataset_len: int = dataset_len
         self.tokenizer = tokenizer
         self.conf: Config = conf
+        self.max_classes = max_classes
+
+    def tokenize_and_make(self, strs: Union[str, List[str]], **kwargs) -> torch.Tensor:
+        if isinstance(strs, str):
+            return self.conf.env.make(utils.to_tensor(self.tokenizer(strs, truncation=True, padding='max_length', max_length=self.conf.tokenizer_max_length, **kwargs))) # use return_tensors = pt and unsqueeze
+        return self.conf.env.make(utils.stack_dictionaries([utils.to_tensor(self.tokenizer(s, truncation=True, padding='max_length', max_length=self.conf.tokenizer_max_length, **kwargs)) for s in strs]))
+
+    def get_augmenter(self, samples: int):
+        strength = rand() #! change me    
+        augmenter1 = naw.AntonymAug(aug_p=strength/2)
+        augmenter2 = naw.SynonymAug(aug_p=strength/2)    
+
+        def wrap(inp: str):
+            return augmenter2.augment(augmenter1.augment(inp), n = samples)
+
+        return wrap
 
 
-    def collate_fn(self, x):
-        self.batch_num += 1
+    def get_noise_samples(self, batch: List[str], conf: Config) -> List[List[str]]:
+        """get_noise_samples
 
-        clear_x = tokenize_and_make(self.conf, self.tokenizer, x, padding='max_length', max_length=self.conf.tokenizer_max_length)
+            Returns samples from the augmenter (get_augmenter) fir the current batch of data
+
+        Parameters
+        ----------
+        batch : List[str]
+            The batch provided
+        conf : Config
+            The config
         
-        strength = 0. * (self.batch_num * .5/(self.dataset_len/self.conf.loader.batch_size)) * .3 #! put in config TODO: increase during train
-        noisy_samples: List[List[str]] = get_noise_samples(strength, x, self.conf) # batch x samples
-        # noisy_samples = list(filter(lambda e: type(e) == list, noisy_samples))
-        noisy_samples = [tokenize_and_make(self.conf, self.tokenizer, [a[i] for a in noisy_samples], padding='max_length', max_length=self.conf.tokenizer_max_length) for i in range(len(noisy_samples[0]))] # List(l=samples)[Tensor[BSxSEQ]]
-        return (strength, clear_x, noisy_samples)
+        Returns
+        -------
+        List[str]
+            The augmented data from the batch
+        """
+        if conf.loader.batch_size < 2:
+            raise ValueError("Batch size has to be at least 2")
+        aug = self.get_augmenter(conf.noise_samples)
+        return [aug(a) for a in batch]
 
-def fit_text_task(conf: Config, model, tokenizer, dataset, optim, scheduler):
-    #NOTE Notes on the implementation
-    # Base Algorithm
-    # pour n n fois le même x
-        # 1 Get anchor pools
-        # 2 Get displacement pools
+    def augment_and_prepare_batch(self, batch):
+        augmenter = self.get_augmenter(1)
+        new_batch = []
+        for elem in batch:
+            new_batch.append([elem[0], augmenter(elem[1])])
+
+        x, y = [], []
+        for elem in new_batch:
+            x.append(elem[1])
+            y.append(elem[0])
+
+        return self.tokenize_and_make(x), y
+
+    def collate_fn(self, data):
+        # self.batch_num += 1
+        # x, y = [], []
+        # for e in data:
+        #     #! dataset specific
+        #     x.append(e[1])
+        #     y.append(e[0])
+
+        # clear_x = self.tokenize_and_make(self.conf, self.tokenizer, x, padding='max_length', max_length=self.conf.tokenizer_max_length)
         
-        # losses
-        #   loss d'hypersphere:
-        #   loss position relative des samples négatifs
-        #   loss position relative nulle des samples positifs 
+        # # strength = 0. * (self.batch_num * .5/(self.dataset_len/self.conf.loader.batch_size)) * .3 #! put in config TODO: increase during train
+        # noisy_samples: List[List[str]] = self.get_noise_samples(x, self.conf) # batch x samples
+        # # noisy_samples = list(filter(lambda e: type(e) == list, noisy_samples))
+        # noisy_samples = [self.tokenize_and_make(self.conf, self.tokenizer, [a[i] for a in noisy_samples], padding='max_length', max_length=self.conf.tokenizer_max_length) for i in range(len(noisy_samples[0]))] # List(l=samples)[Tensor[BSxSEQ]]
+        # return clear_x, noisy_samples, y
+        return data
 
-    #      hypersphere uniform sampling + displacement scaler
-    #      mais en fait non car on n'opère pas au niveau des classes mais des features
-    #  hypothèse: la displacement loos va forcer les anchors à rester au même emplacement. 
+def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dataset, optim, scheduler):
 
     writer = SummaryWriter() if dist.is_primary() else None
     model = conf.env.make(model).train()
     pbar = tqdm(dataset, disable=not dist.is_primary())
 
-    for batch_num, x in enumerate(pbar):
-        strength, anchor, noisy_samples = x
-        # anchors
-        anchors = conf.env.make(torch.zeros(conf.samples, conf.loader.batch_size, conf.model.projection_size))
-        inp = anchor#tokenize_and_make(conf, tokenizer, x, padding='max_length', max_length=conf.tokenizer_max_length)
-        for i in range(conf.samples):
-            out = F.normalize(model(**inp), dim=1) #! not general
-            anchors[i] = out # swap if necassary
 
-        # displacement
-        displacement: torch.Tensor = conf.env.make(torch.zeros(conf.noise_samples, conf.loader.batch_size, conf.model.projection_size))
-        # strength = batch_num/len(pbar) * .9 #! put in config TODO: increase during train
-        #noisy_samples: List[List[str]] = get_noise_samples(strength, x, conf) # batch x samples
-        
-        
-        #noisy_samples: List(l=samples)[Tensor[BSxSEQ]]
+    alpha = conf.prototype_shift
+    prototypes = [F.normalize(torch.rand(conf.model.projection_size, requires_grad=False)) for _ in range(text_preparator.max_classes)]
 
-        for i, inp in enumerate(noisy_samples):
-            if len(inp) == 0: continue #! quick fix, check if necessary
-            # inp = tokenize_and_make(conf, tokenizer, inp, padding='max_length', max_length=conf.tokenizer_max_length) #! tokenize in advance, in dataset!!!
-            out = F.normalize(model(**inp), dim=1)
-            displacement[i] = out
+    for batch_num, batch in enumerate(pbar):
+        x,y = text_preparator.augment_and_prepare_batch(batch)
+        out = F.normalize(model(**x)) # bs x ProjectorSize
 
-        # compute anchor loss
-        anchor_loss = torch.mean(torch.std(anchors, dim=0), dim=1) # BSx
+        for i, label in enumerate(y):
+            prototypes[i] = prototypes[i] * alpha + (1 - alpha) * out[i]
 
-        # compute displacement loss
-        mean_anchors = torch.mean(anchors, dim=0, keepdim=True)#.view((conf.loader.batch_size, 1, conf.model.projection_size))
-        mean_anchors = mean_anchors.expand((conf.noise_samples, -1, -1))
-        displacement_loss = torch.abs(strength - (1. - torch.clip(torch.cosine_similarity(displacement, mean_anchors, dim=2), 0))).mean(dim=0) # BSx
-        
-        # average all
-        anchor_loss = anchor_loss.mean() # /
-        displacement_loss = displacement_loss.mean() # / #displacement_loss.view((conf.loader.batch_size * conf.noise_samples)).mean()
-
-        # if bayse by backprop, inclide lp and lvp
-        if conf.method == BayeMethod.BAYE_BY_BACKPROP.value:
-            projector = model.module.module.projector if isinstance(model, DistributedDataParallel) else model.projector
-            loss_baye = 10e-12 * (projector.log_variational_posterior() - projector.log_prior()) #! fixme scaler
-        else:
-            loss_baye = ZERO
-
-        # final loss
-        loss = 2. * anchor_loss + displacement_loss + loss_baye #! add scalers
-        loss *= conf.lr 
-
-        #TODO CONTINUE HERE
-        # triplet loss ou négative samples ou autr epour empécher collapse
-
-        #TODO: fix distributed
-        # if dist.is_primary():
-        #     if conf.env.distributed:
-        #         gathered_losses = [torch.zeros_like(loss) for _ in range(dist.get_world_size())]
-        #         dist.gather(loss, gathered_losses)
-        #         print(gathered_losses)
-        utils.step(loss, optim, scheduler, clip=conf.clip)
-        
-        if dist.is_primary():
-            writer.add_scalar('loss/anchor', anchor_loss.detach().item(), batch_num)
-            writer.add_scalar('loss/displacement', displacement_loss.detach().item(), batch_num)
-            writer.add_scalar('loss/baye', loss_baye.detach().item(), batch_num)
-            writer.add_scalar('loss/total', loss.detach().item(), batch_num)
-        
-        pbar.set_postfix(anchor_loss=anchor_loss.detach().item(), displacement_loss=displacement_loss.detach().item(), loss_baye=loss_baye.detach().item(), strength=strength)
-        
-        if batch_num % 500 == 0 and dist.is_primary():
-            save_path = f'./models/model_{batch_num}.pth'
-            logging.info(f'Saving to {save_path}')
-            torch.save(model, save_path)
-        # else:
-        #     dist.gather(loss)
+        exit()
 
         
 
@@ -319,7 +265,7 @@ def main(conf: Config):
     model = conf.env.make(CustomModel(conf, backbone_network, get_projector(backbone_network, conf)))
 
     logging.info(f'Loading train dataset')
-    train_dataset = conf.dataset.train_dataset.make(Split.TRAIN, acceptance_fn=lambda x: len(x.strip()) > 0 )
+    train_dataset = conf.dataset.train_dataset.make(Split.TRAIN) # acceptance_fn=lambda x: len(x.strip()) > 0
     prep = TextDataPreparator(len(train_dataset), tokenizer, conf)
     train_dataset = conf.loader.make(train_dataset, shuffle=not conf.env.distributed, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
     # iid_test_dataset = conf.dataset.train_dataset.make(Split.TRAIN)
@@ -329,7 +275,7 @@ def main(conf: Config):
     optim = conf.optim.make(model.parameters())
     scheduler = None #conf.scheduler.make()
 
-    fit_text_task(conf, model, tokenizer, train_dataset, optim, scheduler)
+    fit(conf, model, prep, tokenizer, train_dataset, optim, scheduler)
 
 
 if __name__ == "__main__":

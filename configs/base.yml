@@ -2,31 +2,31 @@ debug: False
 epochs: 1
 clip: 1
 
-freeze_backbone: True
+freeze_backbone: False
 samples: 8
 noise_samples: 10
 lr: 1e-3
-tokenizer_max_length: 200 # sequence length
+tokenizer_max_length: 90 # sequence length
 task: tbd
 
 method: baye_by_backprop
 
 model:
   backbone_network: distilbert-base-uncased
-  projection_size: 718
-  projection_hidden: 718
+  projection_size: 200
+  projection_hidden: 200
   dropout_p: .1
 
 dataset:
   train_dataset: 
-    name: WikiText2
-    root: ./dataset/wikitext2
+    name: AG_NEWS
+    root: ./dataset/train
   ood_detection_dataset: 
     name: EnWik9
 
 loader:
   num_workers: 0
-  batch_size: 32
+  batch_size: 3
   pin_memory: false
   drop_last: true
 
@@ -36,8 +36,8 @@ optim:
 
 env:
   fp16: false
-  n_gpu: 4
-  distributed: True
+  n_gpu: 1
+  distributed: False
 
 # scheduler:
 #   name: cycle
