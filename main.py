@@ -219,7 +219,7 @@ class TextDataPreparator():
 
         x, y = [], []
         for elem in new_batch:
-            x.append(elem[1])
+            x.append(elem[1]) #! specific
             y.append(elem[0])
 
         return self.tokenize_and_make(x), y
@@ -243,14 +243,14 @@ class TextDataPreparator():
 
 def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dataset, optim, scheduler, prototypes):
 
-    temp = .5 #! TODO config
+    temp = 1.0 #! TODO config
 
     writer = SummaryWriter() if dist.is_primary() else None
     model = conf.env.make(model).train()
 
     C = text_preparator.max_classes
 
-    alpha = 0.95 # TODO conf.prototype_shift
+    alpha = 0.05 # TODO conf.prototype_shift
    
 
     for epoch in range(conf.epochs):
@@ -262,12 +262,12 @@ def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dat
             for i, label in enumerate(y):
                 # Update class prototype
                 l =  label - 1
-                prototypes[l].data = F.normalize(prototypes[l] * alpha + (1 - alpha) * out.select(0, i), dim=0)
+                prototypes[l] = F.normalize(prototypes[l] * alpha + (1 - alpha) * out.select(0, i), dim=0)
 
             # compute L_compactness
             l_compactness = 0.
             for i in range(len(x)):
-                l_compactness += torch.log(torch.exp(torch.dot(out[i], prototypes[y[i] - 1])/temp) / torch.sum(torch.stack([torch.exp(torch.dot(out[i], prototypes[j])/temp) for j in range(C)]), dim=0))
+                l_compactness += torch.log(torch.exp(torch.dot(out[i], prototypes[y[i] - 1].detach())/temp) / torch.sum(torch.stack([torch.exp(torch.dot(out[i], prototypes[j])/temp) for j in range(C)]), dim=0))
             l_compactness *= -1
             
             # compute L_dispersion
@@ -278,15 +278,17 @@ def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dat
                 )  for i in range(C)])
             , dim = 0)
 
-            loss = l_dispersion + l_compactness
+            loss = 10 * l_dispersion + l_compactness
 
-            utils.step(loss, optim, scheduler)
+            utils.step(loss, optim, scheduler, retain_graph=True)
             pbar.set_postfix(l_d=l_dispersion.detach().item(), l_c=l_compactness.detach().item())
 
             if dist.is_primary():
-                writer.add_scalar("loss/L_disper",  l_dispersion.detach().item(), batch_num*(epoch+1))
-                writer.add_scalar("loss/L_compact", l_compactness.detach().item(), batch_num*(epoch+1))
-                writer.add_scalar("loss/L_total",   loss.detach().item(), batch_num*(epoch+1))
+                step = batch_num*(epoch+1)
+                writer.add_scalar("loss/L_disper",  l_dispersion.detach().item(), step)
+                writer.add_scalar("loss/L_compact", l_compactness.detach().item(), step)
+                writer.add_scalar("loss/L_total",   loss.detach().item(), step)
+                writer.add_scalar("proto/std", torch.stack(prototypes).std(0).mean().detach().item(), step)
             
 
 def main(conf: Config):

@@ -1,18 +1,18 @@
-debug: False
+debug: True
 epochs: 1
 clip: 1
 
 freeze_backbone: False
 samples: 8
 noise_samples: 10
-tokenizer_max_length: 120 # sequence length
+tokenizer_max_length: 64 # sequence length
 task: tbd
 
 method: baye_by_backprop
 
 model:
   backbone_network: distilbert-base-uncased
-  projection_size: 200
+  projection_size: 300
   projection_hidden: 200
   dropout_p: .1
 
