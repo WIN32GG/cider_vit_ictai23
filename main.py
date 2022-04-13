@@ -4,6 +4,7 @@ from asyncore import write
 
 from dataclasses import dataclass
 from enum import Enum
+from itertools import chain
 import logging
 from pathlib import Path
 from typing import Any, List, Union
@@ -64,7 +65,6 @@ class Config(BaseConfig):
     noise_samples: int
     clip: float
     task: str
-    lr: float
 
     #NLP task
     tokenizer_max_length: int
@@ -77,7 +77,7 @@ class Config(BaseConfig):
     env: EnvironementConfig
     loader: LoaderConfig
     optim: OptimizerConfig
-    # scheduler: SchedulerConfig
+    scheduler: SchedulerConfig
 
 class CustomModel(nn.Module):
     def __init__(self, conf: Config, backbone, projector):
@@ -132,11 +132,19 @@ def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
 
     base_projector = nn.Sequential(
         nn.SiLU(),
-        nn.Linear(get_backbone_model_output_features(backbone_network, conf), conf.model.projection_hidden), # TODO switch to baye
-        nn.SiLU(), #TODO param?
+        nn.Linear(get_backbone_model_output_features(backbone_network, conf), conf.model.projection_size), # TODO switch to baye
+        # nn.SiLU(), #TODO param?
         # nn.Dropout(p = conf.model.dropout_p),
-        nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
+        # nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
     )
+
+    # base_projector = nn.Sequential(
+    #     nn.SiLU(),
+    #     nn.Linear(get_backbone_model_output_features(backbone_network, conf), conf.model.projection_hidden), # TODO switch to baye
+    #     nn.SiLU(), #TODO param?
+    #     # nn.Dropout(p = conf.model.dropout_p),
+    #     nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
+    # )
     
     return base_projector
     if conf.method == BayeMethod.FREQUENTIST.value or conf.method == BayeMethod.BAYESIAN_DROPOUT.value: # Train handles baye dropout
@@ -171,12 +179,12 @@ class TextDataPreparator():
         return self.conf.env.make(utils.stack_dictionaries([conf.env.make(utils.to_tensor(self.tokenizer(s, truncation=True, padding='max_length', max_length=self.conf.tokenizer_max_length, **kwargs))) for s in strs]))
 
     def get_augmenter(self, samples: int):
-        strength = rand() #! change me    
-        augmenter1 = naw.AntonymAug(aug_p=strength/2)
-        augmenter2 = naw.SynonymAug(aug_p=strength/2)    
+        strength = .8 #rand() #! change me    
+        # augmenter1 = naw.AntonymAug(aug_p=strength/2)
+        augmenter2 = naw.SynonymAug(aug_p=strength)    
 
         def wrap(inp: str):
-            return augmenter2.augment(augmenter1.augment(inp), n = samples)
+            return augmenter2.augment(inp, n = samples) # augmenter1.augment(inp)
 
         return wrap
 
@@ -233,7 +241,7 @@ class TextDataPreparator():
         # return clear_x, noisy_samples, y
         return data
 
-def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dataset, optim, scheduler):
+def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dataset, optim, scheduler, prototypes):
 
     temp = .5 #! TODO config
 
@@ -242,8 +250,8 @@ def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dat
 
     C = text_preparator.max_classes
 
-    alpha = 0.5 # TODO conf.prototype_shift
-    prototypes = [conf.env.make(F.normalize(torch.rand(conf.model.projection_size), dim=0)) for _ in range(C)]
+    alpha = 0.95 # TODO conf.prototype_shift
+   
 
     for epoch in range(conf.epochs):
         pbar = tqdm(dataset, disable=not dist.is_primary())
@@ -254,7 +262,7 @@ def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dat
             for i, label in enumerate(y):
                 # Update class prototype
                 l =  label - 1
-                prototypes[l].data = F.normalize(prototypes[l] * alpha + (1 - alpha) * out.detach().select(0, i), dim=0)
+                prototypes[l].data = F.normalize(prototypes[l] * alpha + (1 - alpha) * out.select(0, i), dim=0)
 
             # compute L_compactness
             l_compactness = 0.
@@ -270,11 +278,11 @@ def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dat
                 )  for i in range(C)])
             , dim = 0)
 
-            loss = .1 * l_dispersion + l_compactness
-            loss *= conf.lr
-            # print(prototypes)
+            loss = l_dispersion + l_compactness
 
             utils.step(loss, optim, scheduler)
+            pbar.set_postfix(l_d=l_dispersion.detach().item(), l_c=l_compactness.detach().item())
+
             if dist.is_primary():
                 writer.add_scalar("loss/L_disper",  l_dispersion.detach().item(), batch_num*(epoch+1))
                 writer.add_scalar("loss/L_compact", l_compactness.detach().item(), batch_num*(epoch+1))
@@ -300,10 +308,12 @@ def main(conf: Config):
     # ood_test_dataset = conf.dataset.ood_detection_dataset.make(Split.TRAIN)
     # DistributedIterableDataset
 
-    optim = conf.optim.make(model.parameters())
-    scheduler = None #conf.scheduler.make()
+    prototypes = [torch.nn.parameter.Parameter(conf.env.make(F.normalize(torch.rand(conf.model.projection_size), dim=0))) for _ in range(prep.max_classes)]
 
-    fit(conf, model, prep, tokenizer, train_dataset, optim, scheduler)
+    optim = conf.optim.make(chain(model.parameters(), prototypes))
+    scheduler = conf.scheduler.make(optim)
+
+    fit(conf, model, prep, tokenizer, train_dataset, optim, scheduler, prototypes=prototypes)
 
 
 if __name__ == "__main__":

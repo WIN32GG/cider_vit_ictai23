@@ -1,11 +1,10 @@
-debug: True
+debug: False
 epochs: 1
 clip: 1
 
 freeze_backbone: False
 samples: 8
 noise_samples: 10
-lr: 1e-2
 tokenizer_max_length: 120 # sequence length
 task: tbd
 
@@ -26,7 +25,7 @@ dataset:
 
 loader:
   num_workers: 0
-  batch_size: 32
+  batch_size: 16
   pin_memory: false
   drop_last: true
 
@@ -39,6 +38,7 @@ env:
   n_gpu: 1
   distributed: False
 
-# scheduler:
-#   name: cycle
-#   decay: lin, cos
+scheduler:
+  name: cycle
+  decay: lin, cos
+  n_iter: 10_000
