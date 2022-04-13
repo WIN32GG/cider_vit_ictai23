@@ -267,7 +267,7 @@ def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dat
             # compute L_compactness
             l_compactness = 0.
             for i in range(len(x)):
-                l_compactness += torch.log(torch.exp(torch.dot(out[i], prototypes[y[i] - 1].detach())/temp) / torch.sum(torch.stack([torch.exp(torch.dot(out[i], prototypes[j])/temp) for j in range(C)]), dim=0))
+                l_compactness += torch.log(torch.exp(torch.dot(out.select(0, i), prototypes[y[i] - 1].detach())/temp) / torch.sum(torch.stack([torch.exp(torch.dot(out.select(0, i), prototypes[j])/temp) for j in range(C)]), dim=0))
             l_compactness *= -1
             
             # compute L_dispersion
