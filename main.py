@@ -1,5 +1,6 @@
 from __future__ import annotations
 from ast import AugAssign
+from asyncore import write
 
 from dataclasses import dataclass
 from enum import Enum
@@ -234,24 +235,51 @@ class TextDataPreparator():
 
 def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dataset, optim, scheduler):
 
+    temp = .5 #! TODO config
+
     writer = SummaryWriter() if dist.is_primary() else None
     model = conf.env.make(model).train()
-    pbar = tqdm(dataset, disable=not dist.is_primary())
 
+    C = text_preparator.max_classes
 
-    alpha = conf.prototype_shift
-    prototypes = [F.normalize(torch.rand(conf.model.projection_size, requires_grad=False)) for _ in range(text_preparator.max_classes)]
+    alpha = 0.5 # TODO conf.prototype_shift
+    prototypes = [conf.env.make(F.normalize(torch.rand(conf.model.projection_size, requires_grad=False), dim=0)) for _ in range(C)]
 
-    for batch_num, batch in enumerate(pbar):
-        x,y = text_preparator.augment_and_prepare_batch(batch)
-        out = F.normalize(model(**x)) # bs x ProjectorSize
+    for epoch in range(conf.epochs):
+        pbar = tqdm(dataset, disable=not dist.is_primary())
+        for batch_num, batch in enumerate(pbar):
+            x,y = text_preparator.augment_and_prepare_batch(batch)
+            out = F.normalize(model(**x)) # bs x ProjectorSize
 
-        for i, label in enumerate(y):
-            prototypes[i] = prototypes[i] * alpha + (1 - alpha) * out[i]
+            for i, label in enumerate(y):
+                # Update class prototype
+                l =  label - 1
+                prototypes[l] = F.normalize(prototypes[l] * alpha + (1 - alpha) * out.detach().select(0, i), dim=0)
 
-        exit()
+            # compute L_compactness
+            l_compactness = 0.
+            for i in range(len(x)):
+                l_compactness += torch.log(torch.exp(torch.dot(out[i], prototypes[y[i] - 1])/temp) / torch.sum(torch.stack([torch.exp(torch.dot(out[i], prototypes[j])/temp) for j in range(C)]), dim=0))
+            l_compactness *= -1
+            
+            # compute L_dispersion
+            l_dispersion = 1/C * torch.sum(
+                torch.stack([ torch.log(1/(C-1) * torch.sum(
+                    torch.stack([ torch.exp(torch.dot(prototypes[i], prototypes[j])/temp) for j in range(C) if i != j ])
+                , dim=0)
+                )  for i in range(C)])
+            , dim = 0)
 
-        
+            loss = .1 * l_dispersion + l_compactness
+            loss *= conf.lr
+            # print(loss)
+
+            utils.step(loss, optim, scheduler)
+            if dist.is_primary():
+                writer.add_scalar("loss/L_disper",  l_dispersion.detach().item(), batch_num*(epoch+1))
+                writer.add_scalar("loss/L_compact", l_compactness.detach().item(), batch_num*(epoch+1))
+                writer.add_scalar("loss/L_total",   loss.detach().item(), batch_num*(epoch+1))
+            
 
 def main(conf: Config):
     utils.seed(42)
@@ -266,7 +294,7 @@ def main(conf: Config):
 
     logging.info(f'Loading train dataset')
     train_dataset = conf.dataset.train_dataset.make(Split.TRAIN) # acceptance_fn=lambda x: len(x.strip()) > 0
-    prep = TextDataPreparator(len(train_dataset), tokenizer, conf)
+    prep = TextDataPreparator(len(train_dataset), tokenizer, conf, max_classes=4) #! make general with other datasets
     train_dataset = conf.loader.make(train_dataset, shuffle=not conf.env.distributed, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
     # iid_test_dataset = conf.dataset.train_dataset.make(Split.TRAIN)
     # ood_test_dataset = conf.dataset.ood_detection_dataset.make(Split.TRAIN)

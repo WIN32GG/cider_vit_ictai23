@@ -1,12 +1,12 @@
-debug: False
+debug: True
 epochs: 1
 clip: 1
 
 freeze_backbone: False
 samples: 8
 noise_samples: 10
-lr: 1e-3
-tokenizer_max_length: 90 # sequence length
+lr: 1e-2
+tokenizer_max_length: 120 # sequence length
 task: tbd
 
 method: baye_by_backprop
@@ -26,7 +26,7 @@ dataset:
 
 loader:
   num_workers: 0
-  batch_size: 3
+  batch_size: 32
   pin_memory: false
   drop_last: true
 
