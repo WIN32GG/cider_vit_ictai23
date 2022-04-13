@@ -168,7 +168,7 @@ class TextDataPreparator():
     def tokenize_and_make(self, strs: Union[str, List[str]], **kwargs) -> torch.Tensor:
         if isinstance(strs, str):
             return self.conf.env.make(utils.to_tensor(self.tokenizer(strs, truncation=True, padding='max_length', max_length=self.conf.tokenizer_max_length, **kwargs))) # use return_tensors = pt and unsqueeze
-        return self.conf.env.make(utils.stack_dictionaries([utils.to_tensor(self.tokenizer(s, truncation=True, padding='max_length', max_length=self.conf.tokenizer_max_length, **kwargs)) for s in strs]))
+        return self.conf.env.make(utils.stack_dictionaries([conf.env.make(utils.to_tensor(self.tokenizer(s, truncation=True, padding='max_length', max_length=self.conf.tokenizer_max_length, **kwargs))) for s in strs]))
 
     def get_augmenter(self, samples: int):
         strength = rand() #! change me    
@@ -243,7 +243,7 @@ def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dat
     C = text_preparator.max_classes
 
     alpha = 0.5 # TODO conf.prototype_shift
-    prototypes = [conf.env.make(F.normalize(torch.rand(conf.model.projection_size, requires_grad=False), dim=0)) for _ in range(C)]
+    prototypes = [conf.env.make(F.normalize(torch.rand(conf.model.projection_size), dim=0)) for _ in range(C)]
 
     for epoch in range(conf.epochs):
         pbar = tqdm(dataset, disable=not dist.is_primary())
@@ -254,7 +254,7 @@ def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dat
             for i, label in enumerate(y):
                 # Update class prototype
                 l =  label - 1
-                prototypes[l] = F.normalize(prototypes[l] * alpha + (1 - alpha) * out.detach().select(0, i), dim=0)
+                prototypes[l].data = F.normalize(prototypes[l] * alpha + (1 - alpha) * out.detach().select(0, i), dim=0)
 
             # compute L_compactness
             l_compactness = 0.
@@ -272,7 +272,7 @@ def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dat
 
             loss = .1 * l_dispersion + l_compactness
             loss *= conf.lr
-            # print(loss)
+            # print(prototypes)
 
             utils.step(loss, optim, scheduler)
             if dist.is_primary():
