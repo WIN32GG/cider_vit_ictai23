@@ -334,15 +334,16 @@ class TextDataPreparator(DataPreparator):
         return data
 
 def fit(conf: Config, model, preparator: DataPreparator, dataset, optim, scheduler, prototypes):
+    logging.info("Start training")
 
-    temp = 1.0 #! TODO config
+    temp = .1 #! TODO config
 
     writer = SummaryWriter() if dist.is_primary() else None
     model = conf.env.make(model).train()
 
     C = preparator.max_classes
 
-    alpha = 0.05 #! TODO conf.prototype_shift
+    alpha = 0.95 #! TODO conf.prototype_shift
    
     for epoch in range(conf.epochs):
         pbar = tqdm(dataset, disable=not dist.is_primary())
@@ -375,7 +376,7 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, optim, schedul
             pbar.set_postfix(l_d=l_dispersion.detach().item(), l_c=l_compactness.detach().item())
 
             if dist.is_primary():
-                step = batch_num*(epoch+1)
+                step = len(dataset)*epoch + batch_num
                 writer.add_scalar("loss/L_disper",  l_dispersion.detach().item(), step)
                 writer.add_scalar("loss/L_compact", l_compactness.detach().item(), step)
                 writer.add_scalar("loss/L_total",   loss.detach().item(), step)
