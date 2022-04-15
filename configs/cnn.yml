@@ -1,29 +1,33 @@
 debug: True
-epochs: 1
+epochs: 10
 clip: 1
-data_type: txt
+data_type: img
 
+# Plus tard
 freeze_backbone: False
 samples: 8
 noise_samples: 10
 tokenizer_max_length: 64 # sequence length
 task: tbd
-
 method: baye_by_backprop
 
 model:
-  backbone_network: distilbert-base-uncased
+  backbone_network: cnn/resnet18
   projection_size: 300
   projection_hidden: 200
   dropout_p: .1
 
 dataset:
-  max_classes: 4
+  input_features: 3 # b&w pour mnist
+  input_position: 0
+  label_position: 1 # mnist is (x, y)
+  max_classes: 10
+
   train_dataset: 
-    name: AG_NEWS
+    name: CIFAR10
     root: ./dataset/train
   ood_detection_dataset: 
-    name: EnWik9
+    name: MNIST
 
 loader:
   num_workers: 0

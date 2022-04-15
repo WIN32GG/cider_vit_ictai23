@@ -1,15 +1,10 @@
 from __future__ import annotations
-from ast import AugAssign
-from asyncore import write
 
 from dataclasses import dataclass
 from enum import Enum
 from itertools import chain
-import logging
 from pathlib import Path
-from typing import Any, List, Union
-from torch.optim import Optimizer
-from torch.nn.functional import cross_entropy
+from typing import Any, List, TypeVar, Union
 from torchbooster.dataset import Split
 from torch.nn.parallel import DistributedDataParallel
 from torchbooster.config import (
@@ -20,11 +15,16 @@ from torchbooster.config import (
     OptimizerConfig,
     SchedulerConfig,
 )
-from copy import deepcopy
+
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
 from random import random as rand
+
+
+import sys
 import nlpaug.augmenter.sentence as nas
+import logging
+import torchvision
 import nlpaug.augmenter.word as naw
 
 import bayeformers
@@ -49,6 +49,12 @@ class MyDataset(BaseConfig):
     train_dataset: DatasetConfig
     ood_detection_dataset: DatasetConfig
 
+    input_features: int = 1 # used for CNN models
+    label_position: int = 0
+    input_position: int = 1
+    max_classes: int = 2
+    
+
 @dataclass
 class ModelParam(BaseConfig):
     backbone_network: str
@@ -64,7 +70,7 @@ class Config(BaseConfig):
     samples: int
     noise_samples: int
     clip: float
-    task: str
+    data_type: str
 
     #NLP task
     tokenizer_max_length: int
@@ -80,11 +86,12 @@ class Config(BaseConfig):
     scheduler: SchedulerConfig
 
 class CustomModel(nn.Module):
-    def __init__(self, conf: Config, backbone, projector):
+    def __init__(self, conf: Config, backbone, projector, preparator: DataPreparator):
         super().__init__()
         self.conf: Config = conf
         self.backbone = backbone
         self.projector = projector
+        self.preparator: DataPreparator = preparator
         if conf.freeze_backbone:
             logging.info(f'Backbone model is frozen')
             for param in self.backbone.parameters():
@@ -92,7 +99,7 @@ class CustomModel(nn.Module):
         logging.info(f'Flat size = {get_backbone_model_output_features(backbone, conf)}')
 
     def forward(self, *kargs, **kwargs):
-        o = self.backbone(**kwargs)
+        o = self.backbone(*kargs, **kwargs)
 
         if hasattr(o, "last_hidden_state"): # transformers/ bert model
             o : torch.FloatTensor = o.last_hidden_state#.view(conf.loader.batch_size, self.flat_size)
@@ -105,7 +112,35 @@ class CustomModel(nn.Module):
 def get_backbone_model_output_features(backbone_model, conf):
     if isinstance(backbone_model, DistributedDataParallel):
         backbone_model = backbone_model.module
-    return backbone_model.config.dim * conf.tokenizer_max_length #! make gen 
+    if hasattr(backbone_model, "config"): # probably a HuggingFace model
+        return backbone_model.config.dim * conf.tokenizer_max_length #! make gen 
+    return list(backbone_model.modules())[-1].out_features # for most torchvision models
+
+def load_cnn_backbone(model_name):
+    if model_name == "raw_small":
+        return nn.Sequential(
+            nn.Conv2d(conf.dataset.input_features, 50, (3, 3)),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(50, 50, (3, 3)),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(50, 50, (3, 3)),
+            nn.ReLU(inplace=True)
+        )
+    if model_name == "raw_large":
+        return nn.Sequential( #! add MaxPool
+            nn.Conv2d(conf.dataset.input_features, 256, (3, 3)),
+            nn.ReLU(),
+            nn.Conv2d(256, 256, (3, 3)),
+            nn.ReLU(),
+            nn.Conv2d(256, 256, (3, 3)),
+            nn.ReLU()
+        )
+
+    if hasattr(torchvision.models, model_name):
+        #torchvision.models.resnet152()
+        return getattr(torchvision.models, model_name)(pretrained=True, progress=True)
+    raise RuntimeError("CNN model not found")
+
 
 def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
     """get_projector
@@ -146,7 +181,7 @@ def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
     #     nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
     # )
     
-    return base_projector
+    return base_projector # Bayesian projectors in a second time
     if conf.method == BayeMethod.FREQUENTIST.value or conf.method == BayeMethod.BAYESIAN_DROPOUT.value: # Train handles baye dropout
         return base_projector
     elif conf.method == BayeMethod.BAYE_BY_BACKPROP.value:
@@ -164,8 +199,62 @@ def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
 #         get_projector(backbone_network, conf)
 #     )
 
+class DataPreparator():
+    def __init__(self, dataset_len, conf, max_classes = -1) -> None:
+        self.batch_num = 0
+        self.conf: Config = conf
+        self.dataset_len = dataset_len
+        self.max_classes = max_classes
 
-class TextDataPreparator():
+    def augment_and_prepare_batch(self, batch):
+        """augment_and_prepare_batch
+
+        Prepares a given batch to be processed in a model, the returned value should be immediatly usable
+        by the model.
+
+        Parameters
+        ----------
+        batch : Any
+            The batch, usually a list of size batch_size
+
+        Raises
+        ------
+        NotImplementedError
+            This must be implemented in others Preparator
+        """
+        raise NotImplementedError("Not Implemented")
+
+    def forward(self, model: torch.Module, data: Any):
+        return model(data)
+
+    def collate_fn(self, data):
+        return data
+
+class ImageDataPreparator(DataPreparator):
+    def __init__(self, dataset_len, conf, max_classes=-1) -> None:
+        super().__init__(dataset_len, conf, max_classes)
+        self.augmenter = self.get_augmenter()
+
+    def get_augmenter(self):
+        return T.Compose([
+            T.RandomRotation(45),
+            T.ToTensor()
+        ])
+
+    def forward(self, model: torch.Module, data: Any):
+        return model(data)
+
+    def augment_and_prepare_batch(self, batch):
+        new_batch = [ (conf.env.make(self.augmenter(a[conf.dataset.input_position])), a[conf.dataset.label_position]) for a in batch ]
+
+        X, Y = [], []
+        for e in new_batch:
+            X.append(e[0])
+            Y.append(e[1])
+        
+        return conf.env.make(torch.stack(X)), Y
+
+class TextDataPreparator(DataPreparator):
     def __init__(self, dataset_len, tokenizer, conf, max_classes = -1) -> None:
         self.batch_num = 0
         self.dataset_len: int = dataset_len
@@ -219,10 +308,13 @@ class TextDataPreparator():
 
         x, y = [], []
         for elem in new_batch:
-            x.append(elem[1]) #! specific
-            y.append(elem[0])
+            x.append(elem[conf.dataset.input_position])
+            y.append(elem[conf.dataset.label_position])
 
         return self.tokenize_and_make(x), y
+
+    def forward(self, model: torch.Module, data: Any):
+        return model(**data)
 
     def collate_fn(self, data):
         # self.batch_num += 1
@@ -241,28 +333,27 @@ class TextDataPreparator():
         # return clear_x, noisy_samples, y
         return data
 
-def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dataset, optim, scheduler, prototypes):
+def fit(conf: Config, model, preparator: DataPreparator, dataset, optim, scheduler, prototypes):
 
     temp = 1.0 #! TODO config
 
     writer = SummaryWriter() if dist.is_primary() else None
     model = conf.env.make(model).train()
 
-    C = text_preparator.max_classes
+    C = preparator.max_classes
 
-    alpha = 0.05 # TODO conf.prototype_shift
+    alpha = 0.05 #! TODO conf.prototype_shift
    
-
     for epoch in range(conf.epochs):
         pbar = tqdm(dataset, disable=not dist.is_primary())
         for batch_num, batch in enumerate(pbar):
-            x,y = text_preparator.augment_and_prepare_batch(batch)
-            out = F.normalize(model(**x)) # bs x ProjectorSize
+            x,y = preparator.augment_and_prepare_batch(batch)
+            out = F.normalize(preparator.forward(model, x)) # bs x ProjectorSize
 
             for i, label in enumerate(y):
                 # Update class prototype
                 l =  label - 1
-                prototypes[l] = F.normalize(prototypes[l] * alpha + (1 - alpha) * out.select(0, i), dim=0)
+                prototypes[l].data = F.normalize(prototypes[l] * alpha + (1 - alpha) * out.select(0, i), dim=0)
 
             # compute L_compactness
             l_compactness = 0.
@@ -292,30 +383,46 @@ def fit(conf: Config, model, text_preparator: TextDataPreparator, tokenizer, dat
             
 
 def main(conf: Config):
+    logging.info("Setting base config")
     utils.seed(42)
     utils.boost(not conf.debug)
 
-    logging.info(f'Loading model')
-    backbone_network = conf.env.make(torch.hub.load('huggingface/transformers', 'model', conf.model.backbone_network))
-    logging.info(f'Loading tokenizer')
-    tokenizer = torch.hub.load('huggingface/transformers', 'tokenizer', conf.model.backbone_network) 
 
-    model = conf.env.make(CustomModel(conf, backbone_network, get_projector(backbone_network, conf)))
-
-    logging.info(f'Loading train dataset')
+    logging.info(f'Loading dataset: Loading raw data')
     train_dataset = conf.dataset.train_dataset.make(Split.TRAIN) # acceptance_fn=lambda x: len(x.strip()) > 0
-    prep = TextDataPreparator(len(train_dataset), tokenizer, conf, max_classes=4) #! make general with other datasets
+
+    logging.info("Loading data preparator")
+    if conf.data_type == "img":
+        prep = ImageDataPreparator(len(train_dataset), conf, max_classes=conf.dataset.max_classes)
+    else:
+        prep = TextDataPreparator(len(train_dataset), tokenizer, conf, max_classes=conf.dataset.max_classes) 
+
+    logging.info(f'Loading dataset: Making Data Loaders')
     train_dataset = conf.loader.make(train_dataset, shuffle=not conf.env.distributed, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
     # iid_test_dataset = conf.dataset.train_dataset.make(Split.TRAIN)
     # ood_test_dataset = conf.dataset.ood_detection_dataset.make(Split.TRAIN)
     # DistributedIterableDataset
+
+    logging.info(f'Loading model')
+    if conf.data_type == "img":
+        logging.info("Loading CNN based backbone")
+        backbone_network = load_cnn_backbone(conf.model.backbone_network.split("cnn/")[1])
+    else:
+        logging.info("Loading Transformer based backbone")
+        backbone_network = torch.hub.load('huggingface/transformers', 'model', conf.model.backbone_network)
+        logging.info(f'Loading tokenizer')
+        tokenizer = torch.hub.load('huggingface/transformers', 'tokenizer', conf.model.backbone_network)
+        
+
+    backbone_network = conf.env.make(backbone_network)
+    model = conf.env.make(CustomModel(conf, backbone_network, get_projector(backbone_network, conf), preparator=prep))
 
     prototypes = [torch.nn.parameter.Parameter(conf.env.make(F.normalize(torch.rand(conf.model.projection_size), dim=0))) for _ in range(prep.max_classes)]
 
     optim = conf.optim.make(chain(model.parameters(), prototypes))
     scheduler = conf.scheduler.make(optim)
 
-    fit(conf, model, prep, tokenizer, train_dataset, optim, scheduler, prototypes=prototypes)
+    fit(conf, model, prep, train_dataset, optim, scheduler, prototypes=prototypes)
 
 
 if __name__ == "__main__":
@@ -326,7 +433,7 @@ if __name__ == "__main__":
         nltk.download('wordnet')
         nltk.download('omw-1.4')
 
-    conf = Config.load(Path("configs/base.yml"))
+    conf = Config.load(Path(f"configs/{sys.argv[1]}.yml"))
     torch.multiprocessing.set_start_method('spawn')
     dist.launch(
         main,
