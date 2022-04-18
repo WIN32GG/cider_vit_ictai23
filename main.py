@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, List, TypeVar, Union
 from torchbooster.dataset import Split
 from torch.nn.parallel import DistributedDataParallel
+from tensorboard.plugins import projector
 from torchbooster.config import (
     BaseConfig,
     DatasetConfig,
@@ -21,6 +22,8 @@ from torch.utils.tensorboard import SummaryWriter
 from random import random as rand
 
 
+import os
+import csv
 import sys
 import nlpaug.augmenter.sentence as nas
 import logging
@@ -38,6 +41,7 @@ import torchvision.transforms as T
 import transformers
 
 ZERO = torch.tensor(0.)
+LOG_DIR = "./runs"
 
 class BayeMethod(str, Enum):
     BAYE_BY_BACKPROP = "baye_by_backprop"
@@ -71,6 +75,8 @@ class Config(BaseConfig):
     noise_samples: int
     clip: float
     data_type: str
+    lambda_c: float
+    lambda_d: float
 
     #NLP task
     tokenizer_max_length: int
@@ -206,7 +212,7 @@ class DataPreparator():
         self.dataset_len = dataset_len
         self.max_classes = max_classes
 
-    def augment_and_prepare_batch(self, batch):
+    def augment_and_prepare_batch(self, batch, augment=True):
         """augment_and_prepare_batch
 
         Prepares a given batch to be processed in a model, the returned value should be immediatly usable
@@ -234,18 +240,23 @@ class ImageDataPreparator(DataPreparator):
     def __init__(self, dataset_len, conf, max_classes=-1) -> None:
         super().__init__(dataset_len, conf, max_classes)
         self.augmenter = self.get_augmenter()
+        self.id_augmenter = T.ToTensor()
 
     def get_augmenter(self):
         return T.Compose([
             T.RandomRotation(45),
+            # T.RandomCrop(10),
             T.ToTensor()
         ])
 
     def forward(self, model: torch.Module, data: Any):
         return model(data)
 
-    def augment_and_prepare_batch(self, batch):
-        new_batch = [ (conf.env.make(self.augmenter(a[conf.dataset.input_position])), a[conf.dataset.label_position]) for a in batch ]
+    def augment_and_prepare_batch(self, batch, augment=True):
+        if augment:
+            new_batch = [ (conf.env.make(self.augmenter(a[conf.dataset.input_position])), a[conf.dataset.label_position]) for a in batch ]
+        else:
+            new_batch = [ (conf.env.make(self.id_augmenter(a[conf.dataset.input_position])), a[conf.dataset.label_position]) for a in batch ]
 
         X, Y = [], []
         for e in new_batch:
@@ -300,8 +311,8 @@ class TextDataPreparator(DataPreparator):
         aug = self.get_augmenter(conf.noise_samples)
         return [aug(a) for a in batch]
 
-    def augment_and_prepare_batch(self, batch):
-        augmenter = self.get_augmenter(1)
+    def augment_and_prepare_batch(self, batch, augment=True):
+        augmenter = self.get_augmenter(1) if augment else lambda x: x
         new_batch = []
         for elem in batch:
             new_batch.append([elem[0], augmenter(elem[1])])
@@ -333,23 +344,58 @@ class TextDataPreparator(DataPreparator):
         # return clear_x, noisy_samples, y
         return data
 
-def fit(conf: Config, model, preparator: DataPreparator, dataset, optim, scheduler, prototypes):
+def print_projector(conf: Config, model: torch.Module, test_dataset, preparator: DataPreparator, writer: SummaryWriter, steps: int = 0):
+    logging.info("Printing projector state to tensoboard")
+    with torch.no_grad():
+        model = model.eval()
+
+        data_embeddings, labels = [], []
+        inp = []
+        pbar = tqdm(test_dataset)
+        for batch in pbar:
+            x, y = preparator.augment_and_prepare_batch(batch, augment=False) 
+            inp.append(x)
+            data_embeddings += [F.normalize(preparator.forward(model, x), dim=1)]
+            labels += y
+
+        mat = torch.cat(data_embeddings, dim=0)
+
+        img_labels = None# torch.cat(inp) if isinstance(preparator, ImageDataPreparator) else None
+        writer.add_embedding(mat, labels, tag="Projector", global_step=steps, label_img=img_labels)
+
+    # os.makedirs(f'{LOG_DIR}/embeddings', exist_ok=True)
+    # with open(f'{LOG_DIR}/embeddings/feature_vecs.tsv', 'w') as fw:
+    #     csv_writer = csv.writer(fw, delimiter='\t')
+    #     csv_writer.writerows(tqdm(data_embeddings, desc="write::embedding"))
+    # with open(f'{LOG_DIR}/embeddings/metadata.tsv', 'w') as file: 
+    #     for label in tqdm(labels, desc="write::labels"):
+    #         file.write(f"{label}\n")
+
+
+    # pc = projector.ProjectorConfig()
+    # embedding = pc.embeddings.add()
+
+    
+
+def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, optim, scheduler, prototypes):
     logging.info("Start training")
 
     temp = .1 #! TODO config
 
     writer = SummaryWriter() if dist.is_primary() else None
-    model = conf.env.make(model).train()
+    model = conf.env.make(model)
 
     C = preparator.max_classes
 
     alpha = 0.95 #! TODO conf.prototype_shift
-   
+    print_projector(conf, model, test_dataset, preparator, writer, steps=0)
     for epoch in range(conf.epochs):
         pbar = tqdm(dataset, disable=not dist.is_primary())
+        model = model.train()
         for batch_num, batch in enumerate(pbar):
+            step = len(dataset)*epoch + batch_num
             x,y = preparator.augment_and_prepare_batch(batch)
-            out = F.normalize(preparator.forward(model, x)) # bs x ProjectorSize
+            out = F.normalize(preparator.forward(model, x), dim=1) # bs x ProjectorSize
 
             for i, label in enumerate(y):
                 # Update class prototype
@@ -370,18 +416,21 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, optim, schedul
                 )  for i in range(C)])
             , dim = 0)
 
-            loss = 10 * l_dispersion + l_compactness
+            loss = conf.lambda_d * l_dispersion + conf.lambda_c * l_compactness
 
             utils.step(loss, optim, scheduler, retain_graph=True)
             pbar.set_postfix(l_d=l_dispersion.detach().item(), l_c=l_compactness.detach().item())
 
             if dist.is_primary():
-                step = len(dataset)*epoch + batch_num
                 writer.add_scalar("loss/L_disper",  l_dispersion.detach().item(), step)
                 writer.add_scalar("loss/L_compact", l_compactness.detach().item(), step)
                 writer.add_scalar("loss/L_total",   loss.detach().item(), step)
                 writer.add_scalar("proto/std", torch.stack(prototypes).std(0).mean().detach().item(), step)
-            
+
+        # Epoch finished, test it
+        print_projector(conf, model, test_dataset, preparator, writer, steps=step)
+        
+
 
 def main(conf: Config):
     logging.info("Setting base config")
@@ -391,6 +440,7 @@ def main(conf: Config):
 
     logging.info(f'Loading dataset: Loading raw data')
     train_dataset = conf.dataset.train_dataset.make(Split.TRAIN) # acceptance_fn=lambda x: len(x.strip()) > 0
+    test_dataset  = conf.dataset.train_dataset.make(Split.TEST)  # acceptance_fn=lambda x: len(x.strip()) > 0
 
     logging.info("Loading data preparator")
     if conf.data_type == "img":
@@ -400,6 +450,7 @@ def main(conf: Config):
 
     logging.info(f'Loading dataset: Making Data Loaders')
     train_dataset = conf.loader.make(train_dataset, shuffle=not conf.env.distributed, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
+    test_dataset = conf.loader.make(test_dataset, shuffle=False, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
     # iid_test_dataset = conf.dataset.train_dataset.make(Split.TRAIN)
     # ood_test_dataset = conf.dataset.ood_detection_dataset.make(Split.TRAIN)
     # DistributedIterableDataset
@@ -423,7 +474,7 @@ def main(conf: Config):
     optim = conf.optim.make(chain(model.parameters(), prototypes))
     scheduler = conf.scheduler.make(optim)
 
-    fit(conf, model, prep, train_dataset, optim, scheduler, prototypes=prototypes)
+    fit(conf, model, prep, train_dataset, test_dataset, optim, scheduler, prototypes=prototypes)
 
 
 if __name__ == "__main__":
