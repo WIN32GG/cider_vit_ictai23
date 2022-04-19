@@ -75,6 +75,10 @@ class Config(BaseConfig):
     noise_samples: int
     clip: float
     data_type: str
+
+    #Cider param
+    alpha: float
+    temp: float
     lambda_c: float
     lambda_d: float
 
@@ -180,10 +184,10 @@ def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
     )
 
     # base_projector = nn.Sequential(
-    #     nn.SiLU(),
+    #     # nn.SiLU(),
     #     nn.Linear(get_backbone_model_output_features(backbone_network, conf), conf.model.projection_hidden), # TODO switch to baye
     #     nn.SiLU(), #TODO param?
-    #     # nn.Dropout(p = conf.model.dropout_p),
+    #     nn.Dropout(p = conf.model.dropout_p),
     #     nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
     # )
     
@@ -345,6 +349,8 @@ class TextDataPreparator(DataPreparator):
         return data
 
 def print_projector(conf: Config, model: torch.Module, test_dataset, preparator: DataPreparator, writer: SummaryWriter, steps: int = 0):
+    if not dist.is_primary(): return
+
     logging.info("Printing projector state to tensoboard")
     with torch.no_grad():
         model = model.eval()
@@ -380,14 +386,14 @@ def print_projector(conf: Config, model: torch.Module, test_dataset, preparator:
 def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, optim, scheduler, prototypes):
     logging.info("Start training")
 
-    temp = .1 #! TODO config
+    temp = conf.temp #.1 #! TODO config
 
     writer = SummaryWriter() if dist.is_primary() else None
     model = conf.env.make(model)
 
     C = preparator.max_classes
 
-    alpha = 0.95 #! TODO conf.prototype_shift
+    alpha = conf.alpha #0.95 #! TODO conf.prototype_shift
     print_projector(conf, model, test_dataset, preparator, writer, steps=0)
     for epoch in range(conf.epochs):
         pbar = tqdm(dataset, disable=not dist.is_primary())
@@ -411,10 +417,14 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
             # compute L_dispersion
             l_dispersion = 1/C * torch.sum(
                 torch.stack([ torch.log(1/(C-1) * torch.sum(
-                    torch.stack([ torch.exp(torch.dot(prototypes[i], prototypes[j])/temp) for j in range(C) if i != j ])
+                    torch.stack([ torch.exp(
+                        torch.dot(prototypes[i], prototypes[j])/temp) 
+                            for j in range(C) if i != j ]
+                    )
                 , dim=0)
                 )  for i in range(C)])
             , dim = 0)
+
 
             loss = conf.lambda_d * l_dispersion + conf.lambda_c * l_compactness
 
@@ -446,6 +456,8 @@ def main(conf: Config):
     if conf.data_type == "img":
         prep = ImageDataPreparator(len(train_dataset), conf, max_classes=conf.dataset.max_classes)
     else:
+        logging.info(f'Loading tokenizer')
+        tokenizer = torch.hub.load('huggingface/transformers', 'tokenizer', conf.model.backbone_network)
         prep = TextDataPreparator(len(train_dataset), tokenizer, conf, max_classes=conf.dataset.max_classes) 
 
     logging.info(f'Loading dataset: Making Data Loaders')
@@ -462,9 +474,6 @@ def main(conf: Config):
     else:
         logging.info("Loading Transformer based backbone")
         backbone_network = torch.hub.load('huggingface/transformers', 'model', conf.model.backbone_network)
-        logging.info(f'Loading tokenizer')
-        tokenizer = torch.hub.load('huggingface/transformers', 'tokenizer', conf.model.backbone_network)
-        
 
     backbone_network = conf.env.make(backbone_network)
     model = conf.env.make(CustomModel(conf, backbone_network, get_projector(backbone_network, conf), preparator=prep))

@@ -3,6 +3,10 @@ epochs: 20
 clip: 1
 data_type: img
 
+
+# CIDER params
+temp: .1
+alpha: .95
 lambda_c: 1.
 lambda_d: 10.
 

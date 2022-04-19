@@ -1,7 +1,14 @@
 debug: True
-epochs: 1
+epochs: 10
 clip: 1
 data_type: txt
+
+
+# CIDER params
+temp: 100.
+alpha: .05 # 1: anchors wont change
+lambda_c: 1.
+lambda_d: 2.
 
 freeze_backbone: False
 samples: 8
@@ -13,9 +20,9 @@ method: baye_by_backprop
 
 model:
   backbone_network: distilbert-base-uncased
-  projection_size: 300
-  projection_hidden: 200
-  dropout_p: .1
+  projection_size: 512
+  projection_hidden: 512
+  dropout_p: .2
 
 dataset:
   max_classes: 4
@@ -27,13 +34,13 @@ dataset:
 
 loader:
   num_workers: 0
-  batch_size: 16
+  batch_size: 8
   pin_memory: false
   drop_last: true
 
 optim:
   name: adamw
-  lr: 1e-3
+  lr: 1e-1
 
 env:
   fp16: false
