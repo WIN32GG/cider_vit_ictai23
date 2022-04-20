@@ -2,7 +2,7 @@ debug: False
 epochs: 20
 clip: 1
 data_type: img
-
+force_make_table_dataset: False
 
 # CIDER params
 text_shift_stength: -1 # doesnt matter here
@@ -33,9 +33,10 @@ dataset:
 
   train_dataset: 
     name: CIFAR10
-    root: ./dataset/train
+    root: ./dataset/cifar10
   ood_detection_dataset: 
     name: MNIST
+    root: ./dataset/mnist
 
 loader:
   num_workers: 0

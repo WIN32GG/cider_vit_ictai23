@@ -1,17 +1,20 @@
-debug: True
+debug: False
 epochs: 10
-clip: 1
+clip: 1.
 data_type: txt
 
+force_make_table_dataset: True
 
 # CIDER params
-text_shift_stength: .5
-temp: .1
+text_shift_stength: .2
+temp: 1.
 alpha: .95 # 1: anchors wont change
 lambda_c: 1.
-lambda_d: 2.
+lambda_d: 3.
 
 freeze_backbone: False
+
+# Step2 params
 samples: 8
 noise_samples: 10
 tokenizer_max_length: 128 # sequence length
@@ -21,27 +24,28 @@ method: baye_by_backprop
 
 model:
   backbone_network: distilbert-base-uncased
-  projection_size: 712
-  projection_hidden: 712
+  projection_hidden: 256
+  projection_size: 256
   dropout_p: .2
 
 dataset:
   max_classes: 4
   train_dataset: 
     name: AG_NEWS
-    root: ./dataset/train
+    root: ./dataset/ag_news
   ood_detection_dataset: 
     name: EnWik9
+    root: ./dataset/enwiki9
 
 loader:
   num_workers: 0
-  batch_size: 8
+  batch_size: 64
   pin_memory: false
   drop_last: true
 
 optim:
   name: adamw
-  lr: 1e-7
+  lr: 1e-4
 
 env:
   fp16: false
@@ -51,4 +55,4 @@ env:
 scheduler:
   name: cycle
   decay: lin, cos
-  n_iter: 10_000
+  n_iter: 18_750

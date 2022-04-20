@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 from itertools import chain
 from pathlib import Path
+import random
 from typing import Any, List, TypeVar, Union
 from torchbooster.dataset import Split
 from torch.nn.parallel import DistributedDataParallel
@@ -20,7 +21,7 @@ from torchbooster.config import (
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
 from random import random as rand
-
+from torchtext.data.functional import to_map_style_dataset
 
 import os
 import csv
@@ -29,7 +30,6 @@ import nlpaug.augmenter.sentence as nas
 import logging
 import torchvision
 import nlpaug.augmenter.word as naw
-
 import bayeformers
 import torch
 import nltk
@@ -40,6 +40,7 @@ import torch.nn.functional as F
 import torchvision.transforms as T
 import transformers
 
+TOKENIZER_MASK = '[MASK]'
 ZERO = torch.tensor(0.)
 LOG_DIR = "./runs"
 
@@ -75,6 +76,7 @@ class Config(BaseConfig):
     noise_samples: int
     clip: float
     data_type: str
+    force_make_table_dataset: bool
 
     #Cider param
     text_shift_stength: float
@@ -176,21 +178,21 @@ def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
         Bad Bayemethod passed
     """
 
-    base_projector = nn.Sequential(
-        nn.SiLU(),
-        nn.Linear(get_backbone_model_output_features(backbone_network, conf), conf.model.projection_size), # TODO switch to baye
-        # nn.SiLU(), #TODO param?
-        # nn.Dropout(p = conf.model.dropout_p),
-        # nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
-    )
-
     # base_projector = nn.Sequential(
-    #     # nn.SiLU(),
-    #     nn.Linear(get_backbone_model_output_features(backbone_network, conf), conf.model.projection_hidden), # TODO switch to baye
-    #     nn.SiLU(), #TODO param?
-    #     nn.Dropout(p = conf.model.dropout_p),
-    #     nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
+    #     nn.SiLU(),
+    #     nn.Linear(get_backbone_model_output_features(backbone_network, conf), conf.model.projection_size), # TODO switch to baye
+    #     # nn.SiLU(), #TODO param?
+    #     # nn.Dropout(p = conf.model.dropout_p),
+    #     # nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
     # )
+
+    base_projector = nn.Sequential(
+        # nn.SiLU(),
+        nn.Linear(get_backbone_model_output_features(backbone_network, conf), conf.model.projection_hidden), # TODO switch to baye
+        nn.SiLU(), #TODO param?
+        nn.Dropout(p = conf.model.dropout_p),
+        nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
+    )
     
     return base_projector # Bayesian projectors in a second time
     if conf.method == BayeMethod.FREQUENTIST.value or conf.method == BayeMethod.BAYESIAN_DROPOUT.value: # Train handles baye dropout
@@ -287,8 +289,17 @@ class TextDataPreparator(DataPreparator):
         strength = self.conf.text_shift_stength #rand() #! change me    
         # augmenter1 = naw.AntonymAug(aug_p=strength/2)
         augmenter2 = naw.SynonymAug(aug_p=strength)    
+            
+        def mask_augment(inp: str, strength: float):
+            tok = inp.split()
+            for i in random.sample(range(len(tok)), int(strength*len(tok))+1):
+                tok[i] = TOKENIZER_MASK
+            return ' '.join(tok)
 
-        def wrap(inp: str):
+        def wrap(inp: str): #! implement n_samples
+            x = mask_augment(inp, strength)
+            # print(x)
+            return x
             return augmenter2.augment(inp, n = samples) # augmenter1.augment(inp)
 
         return wrap
@@ -353,13 +364,13 @@ def print_projector(conf: Config, model: torch.Module, test_dataset, preparator:
     if not dist.is_primary(): return
 
     logging.info("Printing projector state to tensoboard")
+    model = model.eval()
     with torch.no_grad():
-        model = model.eval()
 
         data_embeddings, labels = [], []
         inp = []
         pbar = tqdm(test_dataset)
-        for batch in pbar:
+        for _, batch in enumerate(pbar):
             x, y = preparator.augment_and_prepare_batch(batch, augment=False) 
             inp.append(x)
             data_embeddings += [F.normalize(preparator.forward(model, x), dim=1)]
@@ -382,7 +393,6 @@ def print_projector(conf: Config, model: torch.Module, test_dataset, preparator:
     # pc = projector.ProjectorConfig()
     # embedding = pc.embeddings.add()
 
-    
 
 def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, optim, scheduler, prototypes):
     logging.info("Start training")
@@ -428,7 +438,7 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
 
             loss = conf.lambda_d * l_dispersion + conf.lambda_c * l_compactness
 
-            utils.step(loss, optim, scheduler, retain_graph=True)
+            utils.step(loss, optim, scheduler, clip=conf.clip)
             pbar.set_postfix(l_d=l_dispersion.detach().item(), l_c=l_compactness.detach().item())
 
             if dist.is_primary():
@@ -439,18 +449,18 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
 
         # Epoch finished, test it
         print_projector(conf, model, test_dataset, preparator, writer, steps=step)
-        
-
 
 def main(conf: Config):
     logging.info("Setting base config")
     utils.seed(42)
     utils.boost(not conf.debug)
 
-
     logging.info(f'Loading dataset: Loading raw data')
     train_dataset = conf.dataset.train_dataset.make(Split.TRAIN) # acceptance_fn=lambda x: len(x.strip()) > 0
     test_dataset  = conf.dataset.train_dataset.make(Split.TEST)  # acceptance_fn=lambda x: len(x.strip()) > 0
+    if conf.force_make_table_dataset:
+        train_dataset = to_map_style_dataset(train_dataset)
+        test_dataset  = to_map_style_dataset(test_dataset)
 
     logging.info("Loading data preparator")
     if conf.data_type == "img":
@@ -462,7 +472,7 @@ def main(conf: Config):
 
     logging.info(f'Loading dataset: Making Data Loaders')
     train_dataset = conf.loader.make(train_dataset, shuffle=not conf.env.distributed, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
-    test_dataset = conf.loader.make(test_dataset, shuffle=False, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
+    test_dataset  = conf.loader.make(test_dataset, shuffle=False, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
     # iid_test_dataset = conf.dataset.train_dataset.make(Split.TRAIN)
     # ood_test_dataset = conf.dataset.ood_detection_dataset.make(Split.TRAIN)
     # DistributedIterableDataset
