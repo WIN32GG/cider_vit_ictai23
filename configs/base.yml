@@ -5,23 +5,24 @@ data_type: txt
 
 
 # CIDER params
-temp: 100.
-alpha: .05 # 1: anchors wont change
+text_shift_stength: .5
+temp: .1
+alpha: .95 # 1: anchors wont change
 lambda_c: 1.
 lambda_d: 2.
 
 freeze_backbone: False
 samples: 8
 noise_samples: 10
-tokenizer_max_length: 64 # sequence length
+tokenizer_max_length: 128 # sequence length
 task: tbd
 
 method: baye_by_backprop
 
 model:
   backbone_network: distilbert-base-uncased
-  projection_size: 512
-  projection_hidden: 512
+  projection_size: 712
+  projection_hidden: 712
   dropout_p: .2
 
 dataset:
@@ -40,7 +41,7 @@ loader:
 
 optim:
   name: adamw
-  lr: 1e-1
+  lr: 1e-7
 
 env:
   fp16: false

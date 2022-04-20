@@ -77,6 +77,7 @@ class Config(BaseConfig):
     data_type: str
 
     #Cider param
+    text_shift_stength: float
     alpha: float
     temp: float
     lambda_c: float
@@ -283,7 +284,7 @@ class TextDataPreparator(DataPreparator):
         return self.conf.env.make(utils.stack_dictionaries([conf.env.make(utils.to_tensor(self.tokenizer(s, truncation=True, padding='max_length', max_length=self.conf.tokenizer_max_length, **kwargs))) for s in strs]))
 
     def get_augmenter(self, samples: int):
-        strength = .8 #rand() #! change me    
+        strength = self.conf.text_shift_stength #rand() #! change me    
         # augmenter1 = naw.AntonymAug(aug_p=strength/2)
         augmenter2 = naw.SynonymAug(aug_p=strength)    
 
@@ -412,19 +413,18 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
             l_compactness = 0.
             for i in range(len(x)):
                 l_compactness += torch.log(torch.exp(torch.dot(out.select(0, i), prototypes[y[i] - 1].detach())/temp) / torch.sum(torch.stack([torch.exp(torch.dot(out.select(0, i), prototypes[j])/temp) for j in range(C)]), dim=0))
-            l_compactness *= -1
+            l_compactness *= -1.
             
             # compute L_dispersion
             l_dispersion = 1/C * torch.sum(
                 torch.stack([ torch.log(1/(C-1) * torch.sum(
                     torch.stack([ torch.exp(
-                        torch.dot(prototypes[i], prototypes[j])/temp) 
+                        torch.dot(prototypes[i], prototypes[j])/temp)
                             for j in range(C) if i != j ]
                     )
                 , dim=0)
                 )  for i in range(C)])
             , dim = 0)
-
 
             loss = conf.lambda_d * l_dispersion + conf.lambda_c * l_compactness
 

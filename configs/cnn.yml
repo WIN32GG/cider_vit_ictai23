@@ -5,6 +5,7 @@ data_type: img
 
 
 # CIDER params
+text_shift_stength: -1 # doesnt matter here
 temp: .1
 alpha: .95
 lambda_c: 1.
