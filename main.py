@@ -69,6 +69,7 @@ class ModelParam(BaseConfig):
 
 @dataclass
 class Config(BaseConfig):
+    seed: int  # seed for reproductibility
     freeze_backbone: bool
     debug: bool
     epochs: int
@@ -126,7 +127,11 @@ def get_backbone_model_output_features(backbone_model, conf):
     if isinstance(backbone_model, DistributedDataParallel):
         backbone_model = backbone_model.module
     if hasattr(backbone_model, "config"): # probably a HuggingFace model
-        return backbone_model.config.dim * conf.tokenizer_max_length #! make gen 
+        if hasattr(backbone_model.config, 'dim'):
+            return backbone_model.config.dim * conf.tokenizer_max_length #! make gen 
+        if hasattr(backbone_model.config, 'hidden_size'):
+            return backbone_model.config.hidden_size * conf.tokenizer_max_length #! make gen 
+        raise RuntimeError()
     return list(backbone_model.modules())[-1].out_features # for most torchvision models
 
 def load_cnn_backbone(model_name):
@@ -187,11 +192,11 @@ def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
     # )
 
     base_projector = nn.Sequential(
-        # nn.SiLU(),
         nn.Linear(get_backbone_model_output_features(backbone_network, conf), conf.model.projection_hidden), # TODO switch to baye
         nn.SiLU(), #TODO param?
         nn.Dropout(p = conf.model.dropout_p),
         nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
+        nn.SiLU()
     )
     
     return base_projector # Bayesian projectors in a second time
@@ -283,7 +288,7 @@ class TextDataPreparator(DataPreparator):
     def tokenize_and_make(self, strs: Union[str, List[str]], **kwargs) -> torch.Tensor:
         if isinstance(strs, str):
             return self.conf.env.make(utils.to_tensor(self.tokenizer(strs, truncation=True, padding='max_length', max_length=self.conf.tokenizer_max_length, **kwargs))) # use return_tensors = pt and unsqueeze
-        return self.conf.env.make(utils.stack_dictionaries([conf.env.make(utils.to_tensor(self.tokenizer(s, truncation=True, padding='max_length', max_length=self.conf.tokenizer_max_length, **kwargs))) for s in strs]))
+        return self.conf.env.make(utils.stack_dictionaries([self.conf.env.make(utils.to_tensor(self.tokenizer(s, truncation=True, padding='max_length', max_length=self.conf.tokenizer_max_length, **kwargs))) for s in strs]))
 
     def get_augmenter(self, samples: int):
         strength = self.conf.text_shift_stength #rand() #! change me    
@@ -335,8 +340,8 @@ class TextDataPreparator(DataPreparator):
 
         x, y = [], []
         for elem in new_batch:
-            x.append(elem[conf.dataset.input_position])
-            y.append(elem[conf.dataset.label_position])
+            x.append(elem[self.conf.dataset.input_position])
+            y.append(elem[self.conf.dataset.label_position])
 
         return self.tokenize_and_make(x), y
 
@@ -405,14 +410,14 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
     C = preparator.max_classes
 
     alpha = conf.alpha #0.95 #! TODO conf.prototype_shift
-    print_projector(conf, model, test_dataset, preparator, writer, steps=0)
+    # print_projector(conf, model, test_dataset, preparator, writer, steps=0)
     for epoch in range(conf.epochs):
         pbar = tqdm(dataset, disable=not dist.is_primary())
         model = model.train()
         for batch_num, batch in enumerate(pbar):
             step = len(dataset)*epoch + batch_num
-            x,y = preparator.augment_and_prepare_batch(batch)
-            out = F.normalize(preparator.forward(model, x), dim=1) # bs x ProjectorSize
+            x, y = preparator.augment_and_prepare_batch(batch)
+            out  = F.normalize(preparator.forward(model, x), dim=1) # bs x ProjectorSize
 
             for i, label in enumerate(y):
                 # Update class prototype
@@ -429,8 +434,8 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
             l_dispersion = 1/C * torch.sum(
                 torch.stack([ torch.log(1/(C-1) * torch.sum(
                     torch.stack([ torch.exp(
-                        torch.dot(prototypes[i], prototypes[j])/temp)
-                            for j in range(C) if i != j ]
+                            torch.dot(prototypes[i], prototypes[j]) /temp
+                        ) for j in range(C) if i != j ]
                     )
                 , dim=0)
                 )  for i in range(C)])
@@ -452,7 +457,7 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
 
 def main(conf: Config):
     logging.info("Setting base config")
-    utils.seed(42)
+    utils.seed(conf.seed)
     utils.boost(not conf.debug)
 
     logging.info(f'Loading dataset: Loading raw data')
@@ -485,13 +490,14 @@ def main(conf: Config):
         logging.info("Loading Transformer based backbone")
         backbone_network = torch.hub.load('huggingface/transformers', 'model', conf.model.backbone_network)
 
+    logging.info("Loading Full Model")
     backbone_network = conf.env.make(backbone_network)
     model = conf.env.make(CustomModel(conf, backbone_network, get_projector(backbone_network, conf), preparator=prep))
 
     prototypes = [torch.nn.parameter.Parameter(conf.env.make(F.normalize(torch.rand(conf.model.projection_size), dim=0))) for _ in range(prep.max_classes)]
 
     optim = conf.optim.make(chain(model.parameters(), prototypes))
-    scheduler = conf.scheduler.make(optim)
+    scheduler = None# conf.scheduler.make(optim)
 
     fit(conf, model, prep, train_dataset, test_dataset, optim, scheduler, prototypes=prototypes)
 
@@ -499,6 +505,7 @@ def main(conf: Config):
 if __name__ == "__main__":
     logging.info("Starting")
 
+    csv.field_size_limit(sys.maxsize)
     if dist.is_primary():
         nltk.download('averaged_perceptron_tagger')
         nltk.download('wordnet')

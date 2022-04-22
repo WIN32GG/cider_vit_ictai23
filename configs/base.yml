@@ -1,16 +1,17 @@
 debug: False
+seed: 43 # seed for reproductibility
 epochs: 10
 clip: 1.
 data_type: txt
 
 force_make_table_dataset: True
+text_shift_stength: .1
 
 # CIDER params
-text_shift_stength: .2
-temp: 1.
+temp: .3
 alpha: .95 # 1: anchors wont change
 lambda_c: 1.
-lambda_d: 3.
+lambda_d: 1.5
 
 freeze_backbone: False
 
@@ -24,22 +25,22 @@ method: baye_by_backprop
 
 model:
   backbone_network: distilbert-base-uncased
-  projection_hidden: 256
-  projection_size: 256
-  dropout_p: .2
+  projection_hidden: 10_152
+  projection_size: 5_576
+  dropout_p: 0.
 
 dataset:
-  max_classes: 4
+  max_classes: 5
   train_dataset: 
-    name: AG_NEWS
-    root: ./dataset/ag_news
+    name: AG_NEWS #AG_NEWS
+    root: ./dataset/classification
   ood_detection_dataset: 
     name: EnWik9
     root: ./dataset/enwiki9
 
 loader:
   num_workers: 0
-  batch_size: 64
+  batch_size: 32
   pin_memory: false
   drop_last: true
 

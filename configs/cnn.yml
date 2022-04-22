@@ -1,4 +1,5 @@
 debug: False
+seed: 43
 epochs: 20
 clip: 1
 data_type: img
