@@ -33,10 +33,10 @@ dataset:
   max_classes: 5
   train_dataset: 
     name: AG_NEWS #AG_NEWS
-    root: ./dataset/classification
+    root: ./dataset/AG_NEWS
   ood_detection_dataset: 
-    name: EnWik9
-    root: ./dataset/enwiki9
+    name: SogouNews
+    root: ./dataset/classification
 
 loader:
   num_workers: 0

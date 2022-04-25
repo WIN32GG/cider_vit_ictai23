@@ -415,22 +415,30 @@ class ModelEvaluator():
         id_model = self.get_model_for_id_classification()
         optim = torch.optim.AdamW(id_model.parameters())
         self.train_model_for_id_classification(id_model, optim, epoch_fraction)
-        metrics = self.evaluate_id_performance(id_model, steps)
-        print(metrics)
+        id_metrics = self.evaluate_id_performance(id_model, steps)
+        print(id_metrics)
 
         # OOD evaluation
         ood_model = self.get_model_for_id_classification()
         optim = torch.optim.AdamW(ood_model.parameters())
         self.train_model_for_ood_classification(ood_model, optim, epoch_fraction)
-        metrics = self.evaluate_ood_performance(ood_model, steps)
-        print(metrics)
+        ood_metrics = self.evaluate_ood_performance(ood_model, steps)
+        print(ood_metrics)
+
+        self.writer.add_scalar(f'metrics/id_Accuracy', id_metrics['Accuracy'], global_step=steps)
+        self.writer.add_scalar(f'metrics/id_AUROC',    id_metrics['AUROC'],    global_step=steps)
+        self.writer.add_scalar(f'metrics/id_F1',       id_metrics['F1Score'],  global_step=steps)
+
+        self.writer.add_scalar(f'metrics/ood_Accuracy', ood_metrics['Accuracy'], global_step=steps)
+        self.writer.add_scalar(f'metrics/ood_AUROC',    ood_metrics['AUROC'],    global_step=steps)
+        self.writer.add_scalar(f'metrics/ood_F1',       ood_metrics['F1Score'],  global_step=steps)
 
         # Unfreeze base model
         ModelEvaluator.unfreeze(self.model)
 
         return {
-            'id_merics': metrics,
-            'ood_metrics': None
+            'id_merics': id_metrics,
+            'ood_metrics': ood_metrics
         }
 
     def evaluate_ood_performance(self, model: torch.Module, steps: int = 0) -> dict[str, float]:
