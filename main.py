@@ -365,6 +365,26 @@ class TextDataPreparator(DataPreparator):
         # return clear_x, noisy_samples, y
         return data
 
+
+def test_ood_performance(conf: Config, model: torch.Module, test_dataset, preparator: DataPreparator, writer: SummaryWriter, steps: int = 0) -> dict[str, float]:
+    pass
+
+def test_id_performance(conf: Config, model: torch.Module, test_dataset, preparator: DataPreparator, writer: SummaryWriter, steps: int = 0) -> dict[str, float]:
+    if not dist.is_primary(): return
+    logging.info("Evaluating model on ID data")
+
+    with torch.no_grad():
+        pbar = tqdm(test_dataset)
+        for batch in pbar:
+            pass
+
+
+def get_model_for_ood_classification(conf: Config, model: torch.Module, dataset, preparator: DataPreparator) -> torch.Module:
+    pass
+
+def get_model_for_id_classification(conf: Config, model: torch.Module, dataset, preparator: DataPreparator) -> torch.Module:
+    pass
+
 def print_projector(conf: Config, model: torch.Module, test_dataset, preparator: DataPreparator, writer: SummaryWriter, steps: int = 0):
     if not dist.is_primary(): return
 
