@@ -27,7 +27,7 @@ model:
   backbone_network: distilbert-base-uncased
   projection_hidden: 10_152
   projection_size: 5_576
-  dropout_p: 0.
+  dropout_p: .2
 
 dataset:
   max_classes: 5
@@ -36,7 +36,7 @@ dataset:
     root: ./dataset/AG_NEWS
   ood_detection_dataset: 
     name: SogouNews
-    root: ./dataset/classification
+    root: ./dataset/classification  
 
 loader:
   num_workers: 0

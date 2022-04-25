@@ -1,4 +1,5 @@
 from __future__ import annotations
+from turtle import forward
 
 try:
     from rich import pretty
@@ -113,6 +114,13 @@ class Config(BaseConfig):
     loader: LoaderConfig
     optim: OptimizerConfig
     scheduler: SchedulerConfig
+
+class GeneralSequential(nn.Sequential):
+
+    def forward(self, *kargs, **kwargs):
+        for i, module in enumerate(self):
+            input = module(*kargs, **kwargs) if i == 0 else module(input)
+        return input
 
 class CustomModel(nn.Module):
     def __init__(self, conf: Config, backbone, projector, preparator: DataPreparator):
@@ -508,14 +516,14 @@ class ModelEvaluator():
             utils.step(loss, optim)
 
     def get_model_for_ood_classification(self, conf: Config, model: torch.Module, dataset, preparator: DataPreparator) -> torch.Module:
-        return self.conf.env.make(nn.Sequential(
+        return self.conf.env.make(GeneralSequential(
             utils.freeze(self.model),
             nn.SiLU(inplace=True),
             nn.Linear(self.conf.model.projection_size, 1) # 0: ID 1: OOD
         ))
 
     def get_model_for_id_classification(self) -> torch.Module:
-        return self.conf.env.make(nn.Sequential(
+        return self.conf.env.make(GeneralSequential(
             utils.freeze(self.model),
             nn.SiLU(inplace=True),
             nn.Linear(self.conf.model.projection_size, self.preparator.max_classes)
