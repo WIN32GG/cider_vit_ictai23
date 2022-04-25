@@ -1,5 +1,18 @@
 from __future__ import annotations
 
+try:
+    from rich import pretty
+    from rich.traceback import install
+    install(show_locals=True)
+    pretty.install()
+    from rich.progress import track
+    from tqdm.rich import tqdm
+    
+except ImportError:
+    from tqdm import tqdm
+
+import warnings
+warnings.filterwarnings("ignore")
 from dataclasses import dataclass
 from enum import Enum
 from itertools import chain
@@ -18,9 +31,11 @@ from torchbooster.config import (
     SchedulerConfig,
 )
 
-from tqdm import tqdm
+
 from torch.utils.tensorboard import SummaryWriter
 from random import random as rand
+from torch.utils.data import DataLoader, Dataset
+from torchmetrics import MetricCollection, Accuracy, Precision, Recall, F1Score, AUROC, CalibrationError
 from torchtext.data.functional import to_map_style_dataset
 
 import os
@@ -121,7 +136,7 @@ class CustomModel(nn.Module):
         else:
             o = self.projector(o)
 
-        return o
+        return F.normalize(o, dim=1)
 
 def get_backbone_model_output_features(backbone_model, conf):
     if isinstance(backbone_model, DistributedDataParallel):
@@ -275,7 +290,7 @@ class ImageDataPreparator(DataPreparator):
             X.append(e[0])
             Y.append(e[1])
         
-        return conf.env.make(torch.stack(X)), Y
+        return conf.env.make(torch.stack(X)), conf.env.make(utils.to_tensor(Y)) 
 
 class TextDataPreparator(DataPreparator):
     def __init__(self, dataset_len, tokenizer, conf, max_classes = -1) -> None:
@@ -343,7 +358,7 @@ class TextDataPreparator(DataPreparator):
             x.append(elem[self.conf.dataset.input_position])
             y.append(elem[self.conf.dataset.label_position])
 
-        return self.tokenize_and_make(x), y
+        return self.tokenize_and_make(x), conf.env.make(utils.to_tensor(y)) 
 
     def forward(self, model: torch.Module, data: Any):
         return model(**data)
@@ -366,24 +381,137 @@ class TextDataPreparator(DataPreparator):
         return data
 
 
-def test_ood_performance(conf: Config, model: torch.Module, test_dataset, preparator: DataPreparator, writer: SummaryWriter, steps: int = 0) -> dict[str, float]:
-    pass
+class ModelEvaluator():
 
-def test_id_performance(conf: Config, model: torch.Module, test_dataset, preparator: DataPreparator, writer: SummaryWriter, steps: int = 0) -> dict[str, float]:
-    if not dist.is_primary(): return
-    logging.info("Evaluating model on ID data")
+    @staticmethod
+    def unfreeze(module: torch.Module) -> torch.Module:
+        for param in module.parameters():
+            param.requires_grad = True
+        return module
 
-    with torch.no_grad():
-        pbar = tqdm(test_dataset)
-        for batch in pbar:
-            pass
+    def __init__(self, conf: Config, model: torch.Module, train_dataset: DataLoader, test_dataset: DataLoader, combined_ood_train_dataset: DataLoader, combined_ood_test_dataset: Dataset, preparator: DataPreparator, writer: SummaryWriter) -> None:
+        self.conf: Config = conf
+        self.model = model
+        self.train_dataset = train_dataset
+        self.test_dataset = test_dataset
+        self.combined_ood_train_dataset = combined_ood_train_dataset
+        self.combined_ood_test_dataset = combined_ood_test_dataset
+        self.preparator: DataPreparator = preparator
+        self.writer: SummaryWriter = writer
+
+        self.crit = nn.CrossEntropyLoss()
+
+        self.metrics = MetricCollection([
+            Accuracy(),
+            Precision(num_classes=preparator.max_classes, average='macro'),
+            Recall(num_classes=preparator.max_classes, average='macro'),
+            F1Score(num_classes=preparator.max_classes, average='macro'), 
+            AUROC(num_classes=preparator.max_classes, average='macro'), 
+            # CalibrationError(n_bins=10, norm='l2')
+        ])
+
+    def __call__(self, steps: int = 0, epoch_fraction: float = .1) -> Any:
+        # ID EVALUATION
+        id_model = self.get_model_for_id_classification()
+        optim = torch.optim.AdamW(id_model.parameters())
+        self.train_model_for_id_classification(id_model, optim, epoch_fraction)
+        metrics = self.evaluate_id_performance(id_model, steps)
+        print(metrics)
+
+        # OOD evaluation
+        ood_model = self.get_model_for_id_classification()
+        optim = torch.optim.AdamW(ood_model.parameters())
+        self.train_model_for_ood_classification(ood_model, optim, epoch_fraction)
+        metrics = self.evaluate_ood_performance(ood_model, steps)
+        print(metrics)
+
+        # Unfreeze base model
+        ModelEvaluator.unfreeze(self.model)
+
+        return {
+            'id_merics': metrics,
+            'ood_metrics': None
+        }
+
+    def evaluate_ood_performance(self, model: torch.Module, steps: int = 0) -> dict[str, float]:
+        if not dist.is_primary(): return
+        self.metrics.reset()
+        model = model.eval()
+        logging.info("Evaluating model for OOD classification")
+
+        with torch.no_grad():
+            pbar = tqdm(self.combined_ood_test_dataset)
+            for batch in pbar:
+                x, y = self.preparator.augment_and_prepare_batch(batch)
+                out  = self.preparator.forward(model, x) # bs x max_classes
+
+                metrics = self.metrics(out.detach().cpu(), y.detach().cpu())
+                pbar.set_postfix(acc=f'{metrics["Accuracy"]}')
+        return self.metrics.compute()
+
+    def evaluate_id_performance(self, model: torch.Module, steps: int = 0):
+        if not dist.is_primary(): return
+        self.metrics.reset()
+        model = model.eval()
+        logging.info("Evaluating model for ID task")
+
+        with torch.no_grad():
+            pbar = tqdm(self.test_dataset)
+            for batch in pbar:
+                x, y = self.preparator.augment_and_prepare_batch(batch)
+                out  = self.preparator.forward(model, x) # bs x max_classes
+
+                metrics = self.metrics(out.detach().cpu(), y.detach().cpu())
+                pbar.set_postfix(acc=f'{metrics["Accuracy"]}')
+        return self.metrics.compute()
 
 
-def get_model_for_ood_classification(conf: Config, model: torch.Module, dataset, preparator: DataPreparator) -> torch.Module:
-    pass
+    def train_model_for_id_classification(self, model: torch.Module, optim, epoch_fraction: float = .1):
+        self.metrics.reset()
+        model = model.train()
 
-def get_model_for_id_classification(conf: Config, model: torch.Module, dataset, preparator: DataPreparator) -> torch.Module:
-    pass
+        pbar = tqdm(self.train_dataset, desc="ID_FT")
+        logging.info(f'Train head for ID metrics')
+        for i, batch in enumerate(pbar):
+            if i >= len(pbar) * epoch_fraction: return # early stop
+            x, y = self.preparator.augment_and_prepare_batch(batch)
+            out  = self.preparator.forward(model, x) # bs x max_classes
+    
+            loss = self.crit(out, y)
+            metrics = self.metrics(out.detach().cpu(), y.detach().cpu())
+            pbar.set_postfix(acc=f'{metrics["Accuracy"]}')
+            utils.step(loss, optim)
+
+
+    def train_model_for_ood_classification(self, model: torch.Module, optim, epoch_fraction: float = .1):
+        self.metrics.reset()
+        model = model.train()
+
+        pbar = tqdm(self.combined_ood_train_dataset, desc="OOD_FT")
+        logging.info(f'Train head for OOD metrics')
+        for i, batch in enumerate(pbar):
+            if i >= len(pbar) * epoch_fraction: return # early stop
+            x, y = self.preparator.augment_and_prepare_batch(batch)
+            out  = self.preparator.forward(model, x) # bs x max_classes
+    
+            loss = self.crit(out, y)
+            metrics = self.metrics(out.detach().cpu(), y.detach().cpu())
+            pbar.set_postfix(acc=f'{metrics["Accuracy"]}')
+            utils.step(loss, optim)
+
+    def get_model_for_ood_classification(self, conf: Config, model: torch.Module, dataset, preparator: DataPreparator) -> torch.Module:
+        return self.conf.env.make(nn.Sequential(
+            utils.freeze(self.model),
+            nn.SiLU(inplace=True),
+            nn.Linear(self.conf.model.projection_size, 1) # 0: ID 1: OOD
+        ))
+
+    def get_model_for_id_classification(self) -> torch.Module:
+        return self.conf.env.make(nn.Sequential(
+            utils.freeze(self.model),
+            nn.SiLU(inplace=True),
+            nn.Linear(self.conf.model.projection_size, self.preparator.max_classes)
+        ))
 
 def print_projector(conf: Config, model: torch.Module, test_dataset, preparator: DataPreparator, writer: SummaryWriter, steps: int = 0):
     if not dist.is_primary(): return
@@ -419,25 +547,26 @@ def print_projector(conf: Config, model: torch.Module, test_dataset, preparator:
     # embedding = pc.embeddings.add()
 
 
-def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, optim, scheduler, prototypes):
+def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, optim, scheduler, prototypes, writer: SummaryWriter, evaluator: ModelEvaluator):
     logging.info("Start training")
-
-    temp = conf.temp #.1 #! TODO config
-
-    writer = SummaryWriter() if dist.is_primary() else None
+    temp = conf.temp
     model = conf.env.make(model)
-
     C = preparator.max_classes
+    alpha = conf.alpha
 
-    alpha = conf.alpha #0.95 #! TODO conf.prototype_shift
-    # print_projector(conf, model, test_dataset, preparator, writer, steps=0)
+    print_projector(conf, model, test_dataset, preparator, writer, steps=0)
+    evaluator(steps = 0, epoch_fraction = .1)
+    
     for epoch in range(conf.epochs):
         pbar = tqdm(dataset, disable=not dist.is_primary())
         model = model.train()
+        logging.info(f'Epoch {epoch}')
         for batch_num, batch in enumerate(pbar):
             step = len(dataset)*epoch + batch_num
             x, y = preparator.augment_and_prepare_batch(batch)
-            out  = F.normalize(preparator.forward(model, x), dim=1) # bs x ProjectorSize
+            out  = preparator.forward(model, x) # bs x ProjectorSize
+
+            ### Compute CIDER Losses
 
             for i, label in enumerate(y):
                 # Update class prototype
@@ -474,6 +603,30 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
 
         # Epoch finished, test it
         print_projector(conf, model, test_dataset, preparator, writer, steps=step)
+        evaluator(steps = step, epoch_fraction = 1.)
+
+
+class ListDataset(Dataset):
+
+    def __init__(self, elems) -> None:
+        super().__init__()
+        self.list = elems
+
+    def __len__(self):
+        return len(self.list)
+    
+    def __getitem__(self, key):
+        return self.list[key]
+
+def make_ood_dataset(conf: Config, id_dataset, ood_dataset):
+    def elem_with_place(x, y):
+        return (x, y) if conf.dataset.input_position == 0 else (y, x)
+    logging.info('Building OOD classifier dataset')
+
+    dataset = [ elem_with_place(e[conf.dataset.input_position], 0) for e in tqdm(id_dataset)] + [elem_with_place(e[conf.dataset.input_position], 1) for e in tqdm(ood_dataset)]
+    random.shuffle(dataset)
+    dataset = ListDataset(dataset)
+    return dataset
 
 def main(conf: Config):
     logging.info("Setting base config")
@@ -496,10 +649,15 @@ def main(conf: Config):
         prep = TextDataPreparator(len(train_dataset), tokenizer, conf, max_classes=conf.dataset.max_classes) 
 
     logging.info(f'Loading dataset: Making Data Loaders')
+    ood_train_dataset = conf.dataset.ood_detection_dataset.make(Split.TRAIN)
+    ood_test_dataset  = conf.dataset.ood_detection_dataset.make(Split.TEST)
+
+    combined_ood_train_dataset =  conf.loader.make(make_ood_dataset(conf, train_dataset, ood_train_dataset), shuffle=True,  distributed=conf.env.distributed, collate_fn=prep.collate_fn)
+    combined_ood_test_dataset  =  conf.loader.make(make_ood_dataset(conf, test_dataset, ood_test_dataset),   shuffle=False, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
+    
     train_dataset = conf.loader.make(train_dataset, shuffle=not conf.env.distributed, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
     test_dataset  = conf.loader.make(test_dataset, shuffle=False, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
-    # iid_test_dataset = conf.dataset.train_dataset.make(Split.TRAIN)
-    # ood_test_dataset = conf.dataset.ood_detection_dataset.make(Split.TRAIN)
+    # iid_test_dataset = test_dataset
     # DistributedIterableDataset
 
     logging.info(f'Loading model')
@@ -514,12 +672,17 @@ def main(conf: Config):
     backbone_network = conf.env.make(backbone_network)
     model = conf.env.make(CustomModel(conf, backbone_network, get_projector(backbone_network, conf), preparator=prep))
 
+    # CIDER prototypes
     prototypes = [torch.nn.parameter.Parameter(conf.env.make(F.normalize(torch.rand(conf.model.projection_size), dim=0))) for _ in range(prep.max_classes)]
 
     optim = conf.optim.make(chain(model.parameters(), prototypes))
-    scheduler = None# conf.scheduler.make(optim)
+    scheduler = conf.scheduler.make(optim)
 
-    fit(conf, model, prep, train_dataset, test_dataset, optim, scheduler, prototypes=prototypes)
+    writer = SummaryWriter() if dist.is_primary() else None
+    evaluator = ModelEvaluator(conf, model, train_dataset, test_dataset, combined_ood_train_dataset, combined_ood_test_dataset, prep, writer)
+
+    fit(conf, model, prep, train_dataset, test_dataset, optim, scheduler, prototypes, writer, evaluator)
+
 
 
 if __name__ == "__main__":

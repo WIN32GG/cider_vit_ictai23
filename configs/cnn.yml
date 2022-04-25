@@ -36,8 +36,8 @@ dataset:
     name: CIFAR10
     root: ./dataset/cifar10
   ood_detection_dataset: 
-    name: MNIST
-    root: ./dataset/mnist
+    name: CIFAR100
+    root: ./dataset/cifar100
 
 loader:
   num_workers: 0
