@@ -30,6 +30,9 @@ dataset:
   input_features: 3 # b&w pour mnist
   input_position: 0
   label_position: 1 # mnist is (x, y)
+
+  ood_input_position: 0
+  ood_label_position: 1 # mnist is (x, y)
   max_classes: 10
 
   train_dataset: 

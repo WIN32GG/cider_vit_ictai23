@@ -71,8 +71,13 @@ class MyDataset(BaseConfig):
     ood_detection_dataset: DatasetConfig
 
     input_features: int = 1 # used for CNN models
-    label_position: int = 0
+    
     input_position: int = 1
+    label_position: int = 0
+
+    ood_input_position: int = 1
+    ood_label_position: int = 0
+
     max_classes: int = 2
     
 
@@ -247,6 +252,13 @@ class DataPreparator():
         self.dataset_len = dataset_len
         self.max_classes = max_classes
 
+    @staticmethod
+    def get_element(elem, pos):
+        if isinstance(elem, dict):
+            return elem[list(elem.keys())[pos]]
+        else:
+            return elem[pos]
+
     def augment_and_prepare_batch(self, batch, augment=True):
         """augment_and_prepare_batch
 
@@ -289,9 +301,11 @@ class ImageDataPreparator(DataPreparator):
 
     def augment_and_prepare_batch(self, batch, augment=True):
         if augment:
-            new_batch = [ (conf.env.make(self.augmenter(a[conf.dataset.input_position])), a[conf.dataset.label_position]) for a in batch ]
+            new_batch = [ (conf.env.make(self.augmenter(self.get_element(a, conf.dataset.input_position))), 
+                            self.get_element(a, conf.dataset.label_position)) for a in batch ]
         else:
-            new_batch = [ (conf.env.make(self.id_augmenter(a[conf.dataset.input_position])), a[conf.dataset.label_position]) for a in batch ]
+            new_batch = [ (conf.env.make(self.id_augmenter(self.get_element(a, conf.dataset.input_position))), 
+                            self.get_element(a, conf.dataset.label_position)) for a in batch ]
 
         X, Y = [], []
         for e in new_batch:
@@ -311,7 +325,9 @@ class TextDataPreparator(DataPreparator):
     def tokenize_and_make(self, strs: Union[str, List[str]], **kwargs) -> torch.Tensor:
         if isinstance(strs, str):
             return self.conf.env.make(utils.to_tensor(self.tokenizer(strs, truncation=True, padding='max_length', max_length=self.conf.tokenizer_max_length, **kwargs))) # use return_tensors = pt and unsqueeze
-        return self.conf.env.make(utils.stack_dictionaries([self.conf.env.make(utils.to_tensor(self.tokenizer(s, truncation=True, padding='max_length', max_length=self.conf.tokenizer_max_length, **kwargs))) for s in strs]))
+        return self.conf.env.make(
+                utils.stack_dictionaries(
+                        [self.conf.env.make(utils.to_tensor(self.tokenizer(s, truncation=True, padding='max_length', max_length=self.conf.tokenizer_max_length, **kwargs))) for s in strs]))
 
     def get_augmenter(self, samples: int):
         strength = self.conf.text_shift_stength #rand() #! change me    
@@ -359,12 +375,14 @@ class TextDataPreparator(DataPreparator):
         augmenter = self.get_augmenter(1) if augment else lambda x: x
         new_batch = []
         for elem in batch:
-            new_batch.append([elem[0], augmenter(elem[1])])
+            new_batch.append([ augmenter(self.get_element(elem, self.conf.dataset.input_position)), 
+                               self.get_element(elem, self.conf.dataset.label_position)
+                            ])
 
         x, y = [], []
         for elem in new_batch:
-            x.append(elem[self.conf.dataset.input_position])
-            y.append(elem[self.conf.dataset.label_position])
+            x.append(self.get_element(elem, self.conf.dataset.input_position))
+            y.append(self.get_element(elem, self.conf.dataset.label_position))
 
         return self.tokenize_and_make(x), conf.env.make(utils.to_tensor(y)) 
 
@@ -409,12 +427,21 @@ class ModelEvaluator():
 
         self.crit = nn.CrossEntropyLoss()
 
-        self.metrics = MetricCollection([
-            Accuracy(),
+        self.metrics_id = MetricCollection([
+            Accuracy( num_classes=preparator.max_classes, average='macro'),
             Precision(num_classes=preparator.max_classes, average='macro'),
-            Recall(num_classes=preparator.max_classes, average='macro'),
-            F1Score(num_classes=preparator.max_classes, average='macro'), 
-            AUROC(num_classes=preparator.max_classes, average='macro'), 
+            Recall(   num_classes=preparator.max_classes, average='macro'),
+            F1Score(  num_classes=preparator.max_classes, average='macro'), 
+            AUROC(    num_classes=preparator.max_classes, average='macro'), 
+            # CalibrationError(n_bins=10, norm='l2')
+        ])
+
+        self.metrics_ood = MetricCollection([
+            Accuracy( num_classes=2, average='macro'),
+            Precision(num_classes=2, average='macro'),
+            Recall(   num_classes=2, average='macro'),
+            F1Score(  num_classes=2, average='macro'), 
+            AUROC(    num_classes=2, average='macro'), 
             # CalibrationError(n_bins=10, norm='l2')
         ])
 
@@ -427,7 +454,7 @@ class ModelEvaluator():
         print(id_metrics)
 
         # OOD evaluation
-        ood_model = self.get_model_for_id_classification()
+        ood_model = self.get_model_for_ood_classification()
         optim = torch.optim.AdamW(ood_model.parameters())
         self.train_model_for_ood_classification(ood_model, optim, epoch_fraction)
         ood_metrics = self.evaluate_ood_performance(ood_model, steps)
@@ -441,6 +468,8 @@ class ModelEvaluator():
         self.writer.add_scalar(f'metrics/ood_AUROC',    ood_metrics['AUROC'],    global_step=steps)
         self.writer.add_scalar(f'metrics/ood_F1',       ood_metrics['F1Score'],  global_step=steps)
 
+        print_projector(conf, self.model, self.combined_ood_test_dataset, self.preparator, self.writer, steps, "OOD_Projector")
+
         # Unfreeze base model
         ModelEvaluator.unfreeze(self.model)
 
@@ -449,77 +478,55 @@ class ModelEvaluator():
             'ood_metrics': ood_metrics
         }
 
-    def evaluate_ood_performance(self, model: torch.Module, steps: int = 0) -> dict[str, float]:
+    def _evaluate(self, model: torch.Module, dataset: DataLoader, msg: str, metrics: MetricCollection):
         if not dist.is_primary(): return
-        self.metrics.reset()
+        metrics.reset()
         model = model.eval()
-        logging.info("Evaluating model for OOD classification")
+        logging.info(msg)
 
         with torch.no_grad():
-            pbar = tqdm(self.combined_ood_test_dataset)
+            pbar = tqdm(dataset)
             for batch in pbar:
                 x, y = self.preparator.augment_and_prepare_batch(batch)
                 out  = self.preparator.forward(model, x) # bs x max_classes
 
-                metrics = self.metrics(out.detach().cpu(), y.detach().cpu())
-                pbar.set_postfix(acc=f'{metrics["Accuracy"]}')
-        return self.metrics.compute()
+                m = metrics(out.detach().cpu(), y.detach().cpu())
+                pbar.set_postfix(acc=f'{m["Accuracy"]}')
+        return metrics.compute()
+
+    def evaluate_ood_performance(self, model: torch.Module, steps: int = 0) -> dict[str, float]:
+        return self._evaluate(model, self.combined_ood_test_dataset, "Evaluating for OOD classificaiton", self.metrics_ood)
 
     def evaluate_id_performance(self, model: torch.Module, steps: int = 0):
-        if not dist.is_primary(): return
-        self.metrics.reset()
-        model = model.eval()
-        logging.info("Evaluating model for ID task")
+        return self._evaluate(model, self.test_dataset, "Evaluating for ID task", self.metrics_id)
 
-        with torch.no_grad():
-            pbar = tqdm(self.test_dataset)
-            for batch in pbar:
-                x, y = self.preparator.augment_and_prepare_batch(batch)
-                out  = self.preparator.forward(model, x) # bs x max_classes
+    def _train(self, model, optim, metrics: MetricCollection, dataset: DataLoader, desc: str, msg: str, epoch_fraction: float = .1):
+        metrics.reset()
+        model = model.train()
 
-                metrics = self.metrics(out.detach().cpu(), y.detach().cpu())
-                pbar.set_postfix(acc=f'{metrics["Accuracy"]}')
-        return self.metrics.compute()
-
+        pbar = tqdm(dataset, desc=desc)
+        logging.info(msg)
+        for i, batch in enumerate(pbar):
+            if i >= len(pbar) * epoch_fraction: return # early stop
+            x, y = self.preparator.augment_and_prepare_batch(batch)
+            out  = self.preparator.forward(model, x) # bs x max_classes
+    
+            loss = self.crit(out, y)
+            m = metrics(out.detach().cpu(), y.detach().cpu())
+            pbar.set_postfix(acc=f'{m["Accuracy"]}')
+            utils.step(loss, optim)
 
     def train_model_for_id_classification(self, model: torch.Module, optim, epoch_fraction: float = .1):
-        self.metrics.reset()
-        model = model.train()
-
-        pbar = tqdm(self.train_dataset, desc="ID_FT")
-        logging.info(f'Train head for ID metrics')
-        for i, batch in enumerate(pbar):
-            if i >= len(pbar) * epoch_fraction: return # early stop
-            x, y = self.preparator.augment_and_prepare_batch(batch)
-            out  = self.preparator.forward(model, x) # bs x max_classes
-    
-            loss = self.crit(out, y)
-            metrics = self.metrics(out.detach().cpu(), y.detach().cpu())
-            pbar.set_postfix(acc=f'{metrics["Accuracy"]}')
-            utils.step(loss, optim)
-
+        return self._train(model, optim, self.metrics_id, self.train_dataset, "ID_FT", "Train head for ID metrics", epoch_fraction)
 
     def train_model_for_ood_classification(self, model: torch.Module, optim, epoch_fraction: float = .1):
-        self.metrics.reset()
-        model = model.train()
-
-        pbar = tqdm(self.combined_ood_train_dataset, desc="OOD_FT")
-        logging.info(f'Train head for OOD metrics')
-        for i, batch in enumerate(pbar):
-            if i >= len(pbar) * epoch_fraction: return # early stop
-            x, y = self.preparator.augment_and_prepare_batch(batch)
-            out  = self.preparator.forward(model, x) # bs x max_classes
-    
-            loss = self.crit(out, y)
-            metrics = self.metrics(out.detach().cpu(), y.detach().cpu())
-            pbar.set_postfix(acc=f'{metrics["Accuracy"]}')
-            utils.step(loss, optim)
-
-    def get_model_for_ood_classification(self, conf: Config, model: torch.Module, dataset, preparator: DataPreparator) -> torch.Module:
+        return self._train(model, optim, self.metrics_ood, self.combined_ood_train_dataset, "OOD_FT", "Train head for OOD task", epoch_fraction)
+       
+    def get_model_for_ood_classification(self) -> torch.Module:
         return self.conf.env.make(GeneralSequential(
             utils.freeze(self.model),
             nn.SiLU(inplace=True),
-            nn.Linear(self.conf.model.projection_size, 1) # 0: ID 1: OOD
+            nn.Linear(self.conf.model.projection_size, 2) # 0: ID 1: OOD
         ))
 
     def get_model_for_id_classification(self) -> torch.Module:
@@ -529,10 +536,10 @@ class ModelEvaluator():
             nn.Linear(self.conf.model.projection_size, self.preparator.max_classes)
         ))
 
-def print_projector(conf: Config, model: torch.Module, test_dataset, preparator: DataPreparator, writer: SummaryWriter, steps: int = 0):
+def print_projector(conf: Config, model: torch.Module, test_dataset, preparator: DataPreparator, writer: SummaryWriter, steps: int = 0, tag_name = "Projector"):
     if not dist.is_primary(): return
 
-    logging.info("Printing projector state to tensoboard")
+    logging.info(f"Printing projector state to tensoboard with tag \"{tag_name}\"")
     model = model.eval()
     with torch.no_grad():
 
@@ -548,7 +555,7 @@ def print_projector(conf: Config, model: torch.Module, test_dataset, preparator:
         mat = torch.cat(data_embeddings, dim=0)
 
         img_labels = None# torch.cat(inp) if isinstance(preparator, ImageDataPreparator) else None
-        writer.add_embedding(mat, labels, tag="Projector", global_step=steps, label_img=img_labels)
+        writer.add_embedding(mat, labels, tag=tag_name, global_step=steps, label_img=img_labels)
 
     # os.makedirs(f'{LOG_DIR}/embeddings', exist_ok=True)
     # with open(f'{LOG_DIR}/embeddings/feature_vecs.tsv', 'w') as fw:
@@ -639,10 +646,14 @@ def make_ood_dataset(conf: Config, id_dataset, ood_dataset):
         return (x, y) if conf.dataset.input_position == 0 else (y, x)
     logging.info('Building OOD classifier dataset')
 
-    dataset = [ elem_with_place(e[conf.dataset.input_position], 0) for e in tqdm(id_dataset)] + [elem_with_place(e[conf.dataset.input_position], 1) for e in tqdm(ood_dataset)]
+    dataset = [ elem_with_place(DataPreparator.get_element(e, conf.dataset.input_position), 0) for e in tqdm(id_dataset)] + \
+              [ elem_with_place(DataPreparator.get_element(e, conf.dataset.ood_input_position), 1) for e in tqdm(ood_dataset)]
     random.shuffle(dataset)
     dataset = ListDataset(dataset)
     return dataset
+
+def get_hparms(conf: Config):
+    pass # CONTINUE HERE
 
 def main(conf: Config):
     logging.info("Setting base config")
@@ -697,6 +708,9 @@ def main(conf: Config):
     writer = SummaryWriter() if dist.is_primary() else None
     evaluator = ModelEvaluator(conf, model, train_dataset, test_dataset, combined_ood_train_dataset, combined_ood_test_dataset, prep, writer)
 
+    writer.add_hparams()
+
+    print_projector(conf, model, combined_ood_test_dataset, prep, writer, 0, "OOD_Projector")
     fit(conf, model, prep, train_dataset, test_dataset, optim, scheduler, prototypes, writer, evaluator)
 
 
