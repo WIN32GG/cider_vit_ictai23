@@ -1,6 +1,8 @@
 from __future__ import annotations
 from turtle import forward
 
+import tensorboard
+
 try:
     from rich import pretty
     from rich.traceback import install
@@ -15,6 +17,7 @@ except ImportError:
 import warnings
 warnings.filterwarnings("ignore")
 from dataclasses import dataclass
+from typing import NewType
 from enum import Enum
 from itertools import chain
 from pathlib import Path
@@ -59,6 +62,8 @@ import transformers
 TOKENIZER_MASK = '[MASK]'
 ZERO = torch.tensor(0.)
 LOG_DIR = "./runs"
+
+HyperParam = NewType('HyperParam', Any)
 
 class BayeMethod(str, Enum):
     BAYE_BY_BACKPROP = "baye_by_backprop"
@@ -120,7 +125,40 @@ class Config(BaseConfig):
     optim: OptimizerConfig
     scheduler: SchedulerConfig
 
+    def hp(self, prefix: str = "hparams"):
+        return {
+            f'{prefix}/dataset/id_train': self.dataset.train_dataset.name,
+            f'{prefix}/dataset/ood_detection': self.dataset.ood_detection_dataset.name,
+            f'{prefix}/dataset/tokenizer_max_length': self.tokenizer_max_length,
+
+            f'{prefix}/trainer/batch_size': self.loader.batch_size,
+            f'{prefix}/trainer/epochs': self.epochs,
+            f'{prefix}/trainer/seed': self.seed,
+
+            f'{prefix}/scheduler/name': self.scheduler.name if self.scheduler is not None else "None",
+
+            f'{prefix}/text_shift_stength': self.text_shift_stength,
+            f'{prefix}/alpha': self.alpha,
+            f'{prefix}/lambda_c': self.lambda_c,
+            f'{prefix}/lambda_d': self.lambda_d,
+            f'{prefix}/temp': self.temp,
+            f'{prefix}/clip': self.clip,
+
+            f'{prefix}/optim/learning_rate': self.optim.lr,
+            f'{prefix}/optim/name': self.optim.name,
+
+            f'{prefix}/model/freeze_backbone': self.freeze_backbone,
+            f'{prefix}/model/backbone_network': self.model.backbone_network,
+            f'{prefix}/model/projection_hidden': self.model.projection_hidden,
+            f'{prefix}/model/projection_size': self.model.projection_size,
+            f'{prefix}/model/dropout_p': self.model.dropout_p,
+        }
+
 class GeneralSequential(nn.Sequential):
+    """GeneralSequential
+
+    A Sequential that works, among other things, with HuggingFace way of passing inputs
+    """
 
     def forward(self, *kargs, **kwargs):
         for i, module in enumerate(self):
@@ -381,8 +419,8 @@ class TextDataPreparator(DataPreparator):
 
         x, y = [], []
         for elem in new_batch:
-            x.append(self.get_element(elem, self.conf.dataset.input_position))
-            y.append(self.get_element(elem, self.conf.dataset.label_position))
+            x.append(self.get_element(elem, 0)) #self.conf.dataset.input_position))
+            y.append(self.get_element(elem, 1)) #self.conf.dataset.label_position))
 
         return self.tokenize_and_make(x), conf.env.make(utils.to_tensor(y)) 
 
@@ -460,21 +498,22 @@ class ModelEvaluator():
         ood_metrics = self.evaluate_ood_performance(ood_model, steps)
         print(ood_metrics)
 
-        self.writer.add_scalar(f'metrics/id_Accuracy', id_metrics['Accuracy'], global_step=steps)
-        self.writer.add_scalar(f'metrics/id_AUROC',    id_metrics['AUROC'],    global_step=steps)
-        self.writer.add_scalar(f'metrics/id_F1',       id_metrics['F1Score'],  global_step=steps)
+        if steps >= 0:
+            self.writer.add_scalar(f'metrics/id_Accuracy', id_metrics['Accuracy'], global_step=steps)
+            self.writer.add_scalar(f'metrics/id_AUROC',    id_metrics['AUROC'],    global_step=steps)
+            self.writer.add_scalar(f'metrics/id_F1',       id_metrics['F1Score'],  global_step=steps)
 
-        self.writer.add_scalar(f'metrics/ood_Accuracy', ood_metrics['Accuracy'], global_step=steps)
-        self.writer.add_scalar(f'metrics/ood_AUROC',    ood_metrics['AUROC'],    global_step=steps)
-        self.writer.add_scalar(f'metrics/ood_F1',       ood_metrics['F1Score'],  global_step=steps)
+            self.writer.add_scalar(f'metrics/ood_Accuracy', ood_metrics['Accuracy'], global_step=steps)
+            self.writer.add_scalar(f'metrics/ood_AUROC',    ood_metrics['AUROC'],    global_step=steps)
+            self.writer.add_scalar(f'metrics/ood_F1',       ood_metrics['F1Score'],  global_step=steps)
 
-        print_projector(conf, self.model, self.combined_ood_test_dataset, self.preparator, self.writer, steps, "OOD_Projector")
+            print_projector(conf, self.model, self.combined_ood_test_dataset, self.preparator, self.writer, steps, "OOD_Projector")
 
         # Unfreeze base model
         ModelEvaluator.unfreeze(self.model)
 
         return {
-            'id_merics': id_metrics,
+            'id_metrics': id_metrics,
             'ood_metrics': ood_metrics
         }
 
@@ -578,7 +617,7 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
     alpha = conf.alpha
 
     print_projector(conf, model, test_dataset, preparator, writer, steps=0)
-    evaluator(steps = 0, epoch_fraction = .1)
+    evaluator(steps = 0, epoch_fraction = .5)
     
     for epoch in range(conf.epochs):
         pbar = tqdm(dataset, disable=not dist.is_primary())
@@ -626,7 +665,7 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
 
         # Epoch finished, test it
         print_projector(conf, model, test_dataset, preparator, writer, steps=step)
-        evaluator(steps = step, epoch_fraction = 1.)
+        evaluator(steps = step, epoch_fraction = .5)
 
 
 class ListDataset(Dataset):
@@ -652,8 +691,16 @@ def make_ood_dataset(conf: Config, id_dataset, ood_dataset):
     dataset = ListDataset(dataset)
     return dataset
 
-def get_hparms(conf: Config):
-    pass # CONTINUE HERE
+def log_params(conf: Config, writer: SummaryWriter, metrics: dict[str, float]):
+    def flatten_dict(d: dict, out = {}, path = 'hparams/'):
+        for k in d:
+            if isinstance(d[k], dict):
+                flatten_dict(d[k], out, f'{path}{k}/')
+            else:
+                out[f'{path}{k}'] = d[k]
+        return out
+
+    writer.add_hparams(conf.hp(), flatten_dict(metrics))
 
 def main(conf: Config):
     logging.info("Setting base config")
@@ -708,23 +755,22 @@ def main(conf: Config):
     writer = SummaryWriter() if dist.is_primary() else None
     evaluator = ModelEvaluator(conf, model, train_dataset, test_dataset, combined_ood_train_dataset, combined_ood_test_dataset, prep, writer)
 
-    writer.add_hparams()
-
-    print_projector(conf, model, combined_ood_test_dataset, prep, writer, 0, "OOD_Projector")
+    # print_projector(conf, model, combined_ood_test_dataset, prep, writer, 0, "OOD_Projector")
     fit(conf, model, prep, train_dataset, test_dataset, optim, scheduler, prototypes, writer, evaluator)
-
+    log_params(conf, writer, evaluator(steps=-1, epoch_fraction=.5))
 
 
 if __name__ == "__main__":
     logging.info("Starting")
-
     csv.field_size_limit(sys.maxsize)
+
     if dist.is_primary():
         nltk.download('averaged_perceptron_tagger')
         nltk.download('wordnet')
         nltk.download('omw-1.4')
 
     conf = Config.load(Path(f"configs/{sys.argv[1]}.yml"))
+    print(conf.hp())
     torch.multiprocessing.set_start_method('spawn')
     dist.launch(
         main,
