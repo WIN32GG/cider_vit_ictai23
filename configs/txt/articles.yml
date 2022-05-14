@@ -8,7 +8,7 @@ model:
 
   projector: simple
   projection_size: 64, 512, 256
-  backbone_network: '"roberta-base", "albert-base-v2", "bert-base-uncased", "distilbert-base-uncased"'
+  backbone_network: '"facebook/bart-base", "roberta-base", "albert-base-v2", "bert-base-uncased", "distilbert-base-uncased"'
 
 dataset:
   max_classes: 5
@@ -16,13 +16,14 @@ dataset:
   input_position: 1
   label_position: 0
   
-  ood_input_position: 1
-  ood_label_position: 0
+  ood_input_position: 0
+  ood_label_position: 1
 
   train_dataset: 
-    name: AG_NEWS
+    name: scientific_papers
+    task: arxiv
     root: ./dataset
   ood_detection_dataset: 
-    name: newspop
+    name: rotten_tomatoes
     root: ./dataset
 

@@ -1,5 +1,9 @@
 from __future__ import annotations
+from argparse import ArgumentParser
+import dataclasses
+import string
 from turtle import forward
+from cv2 import transform
 
 import tensorboard
 
@@ -16,12 +20,14 @@ except ImportError:
 
 import warnings
 warnings.filterwarnings("ignore")
+import rich
 from dataclasses import dataclass
-from typing import NewType
+from typing import NewType, Tuple
 from enum import Enum
 from itertools import chain
 from pathlib import Path
 import random
+import torchinfo
 from typing import Any, List, TypeVar, Union
 from torchbooster.dataset import Split
 from torch.nn.parallel import DistributedDataParallel
@@ -83,6 +89,8 @@ class MyDataset(BaseConfig):
     ood_input_position: int = 1
     ood_label_position: int = 0
 
+    target_size: list(int, int) = None
+
     max_classes: int = 2
     
 
@@ -92,6 +100,8 @@ class ModelParam(BaseConfig):
     projection_size: int
     projection_hidden: int
     dropout_p: float
+    projector: str = "mlp"
+    output_features: int = -1
 
 @dataclass
 class Config(BaseConfig):
@@ -104,6 +114,9 @@ class Config(BaseConfig):
     clip: float
     data_type: str
     force_make_table_dataset: bool
+
+    #Eval hp
+    eval_train_epoch_fraction: float
 
     #Cider param
     text_shift_stength: float
@@ -127,8 +140,8 @@ class Config(BaseConfig):
 
     def hp(self, prefix: str = "hparams"):
         return {
-            f'{prefix}/dataset/id_train': self.dataset.train_dataset.name,
-            f'{prefix}/dataset/ood_detection': self.dataset.ood_detection_dataset.name,
+            f'{prefix}/dataset/id_train': self.dataset.train_dataset.name + ("" if self.dataset.train_dataset.task is None else ':' + self.dataset.train_dataset.task),
+            f'{prefix}/dataset/ood_detection': self.dataset.ood_detection_dataset.name + ("" if self.dataset.ood_detection_dataset.task is None else ':' + self.dataset.ood_detection_dataset.task),
             f'{prefix}/dataset/tokenizer_max_length': self.tokenizer_max_length,
 
             f'{prefix}/trainer/batch_size': self.loader.batch_size,
@@ -137,6 +150,7 @@ class Config(BaseConfig):
 
             f'{prefix}/scheduler/name': self.scheduler.name if self.scheduler is not None else "None",
 
+            f'{prefix}/eval_train_epoch_fraction': self.eval_train_epoch_fraction,
             f'{prefix}/text_shift_stength': self.text_shift_stength,
             f'{prefix}/alpha': self.alpha,
             f'{prefix}/lambda_c': self.lambda_c,
@@ -189,7 +203,9 @@ class CustomModel(nn.Module):
 
         return F.normalize(o, dim=1)
 
-def get_backbone_model_output_features(backbone_model, conf):
+def get_backbone_model_output_features(backbone_model, conf: Config):
+    if conf.model.output_features > -1:
+        return conf.model.output_features
     if isinstance(backbone_model, DistributedDataParallel):
         backbone_model = backbone_model.module
     if hasattr(backbone_model, "config"): # probably a HuggingFace model
@@ -257,13 +273,24 @@ def get_projector(backbone_network: torch.Model, conf: Config) -> torch.Module:
     #     # nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
     # )
 
-    base_projector = nn.Sequential(
-        nn.Linear(get_backbone_model_output_features(backbone_network, conf), conf.model.projection_hidden), # TODO switch to baye
-        nn.SiLU(), #TODO param?
-        nn.Dropout(p = conf.model.dropout_p),
-        nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
-        nn.SiLU()
-    )
+    if conf.model.projector == "identity":
+        conf.model.projection_size = get_backbone_model_output_features(backbone_network, conf) # auto set
+        return nn.Identity()
+    elif conf.model.projector == "mlp":
+        base_projector = nn.Sequential(
+            nn.Linear(get_backbone_model_output_features(backbone_network, conf), conf.model.projection_hidden), # TODO switch to baye
+            nn.SiLU(), #TODO param?
+            nn.Dropout(p = conf.model.dropout_p),
+            nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
+            nn.SiLU()
+        )
+    elif conf.model.projector == 'simple':
+        base_projector = nn.Sequential(
+            nn.Linear(get_backbone_model_output_features(backbone_network, conf), conf.model.projection_size), # TODO switch to baye
+            nn.SiLU(),
+        )
+    else:
+        raise RuntimeError("Unknown projector")
     
     return base_projector # Bayesian projectors in a second time
     if conf.method == BayeMethod.FREQUENTIST.value or conf.method == BayeMethod.BAYESIAN_DROPOUT.value: # Train handles baye dropout
@@ -322,13 +349,17 @@ class DataPreparator():
         return data
 
 class ImageDataPreparator(DataPreparator):
-    def __init__(self, dataset_len, conf, max_classes=-1) -> None:
+    def __init__(self, dataset_len, conf, max_classes=-1, target_size: Tuple[int] = None) -> None:
         super().__init__(dataset_len, conf, max_classes)
+        self.resize_augmenter = [T.Resize(target_size)] if target_size is not None else []
         self.augmenter = self.get_augmenter()
-        self.id_augmenter = T.ToTensor()
+        self.id_augmenter = T.Compose( [ *self.resize_augmenter, T.ToTensor()])
+        if target_size is not None:
+            logging.info(f"Target size for image input is {target_size}")
 
     def get_augmenter(self):
         return T.Compose([
+            *self.resize_augmenter,
             T.RandomRotation(45),
             # T.RandomCrop(10),
             T.ToTensor()
@@ -374,6 +405,8 @@ class TextDataPreparator(DataPreparator):
             
         def mask_augment(inp: str, strength: float):
             tok = inp.split()
+            if len(tok) == 0:
+                return ''
             for i in random.sample(range(len(tok)), int(strength*len(tok))+1):
                 tok[i] = TOKENIZER_MASK
             return ' '.join(tok)
@@ -483,31 +516,40 @@ class ModelEvaluator():
             # CalibrationError(n_bins=10, norm='l2')
         ])
 
-    def __call__(self, steps: int = 0, epoch_fraction: float = .1) -> Any:
-        # ID EVALUATION
-        id_model = self.get_model_for_id_classification()
-        optim = torch.optim.AdamW(id_model.parameters())
-        self.train_model_for_id_classification(id_model, optim, epoch_fraction)
-        id_metrics = self.evaluate_id_performance(id_model, steps)
-        print(id_metrics)
+    def __call__(self, steps: int = 0, epoch_fraction: float = .1, iid: bool = True, ood: bool = True) -> Any:
+        id_metrics = {}
+        ood_metrics = {}
 
-        # OOD evaluation
-        ood_model = self.get_model_for_ood_classification()
-        optim = torch.optim.AdamW(ood_model.parameters())
-        self.train_model_for_ood_classification(ood_model, optim, epoch_fraction)
-        ood_metrics = self.evaluate_ood_performance(ood_model, steps)
-        print(ood_metrics)
+        utils.freeze(self.model)
+
+        if iid:
+            # ID EVALUATION
+            id_model = self.get_model_for_id_classification()
+            optim = torch.optim.AdamW(id_model.parameters())
+            self.train_model_for_id_classification(id_model, optim, epoch_fraction)
+            id_metrics = self.evaluate_id_performance(id_model, steps)
+            print(id_metrics)
+
+        if ood:
+            # OOD evaluation
+            ood_model = self.get_model_for_ood_classification()
+            optim = torch.optim.AdamW(ood_model.parameters())
+            self.train_model_for_ood_classification(ood_model, optim, epoch_fraction)
+            ood_metrics = self.evaluate_ood_performance(ood_model, steps)
+            print(ood_metrics)
+            print_projector(conf, self.model, self.combined_ood_test_dataset, self.preparator, self.writer, steps, "OOD_Projector")
 
         if steps >= 0:
-            self.writer.add_scalar(f'metrics/id_Accuracy', id_metrics['Accuracy'], global_step=steps)
-            self.writer.add_scalar(f'metrics/id_AUROC',    id_metrics['AUROC'],    global_step=steps)
-            self.writer.add_scalar(f'metrics/id_F1',       id_metrics['F1Score'],  global_step=steps)
+            if iid:
+                self.writer.add_scalar(f'metrics/id_Accuracy', id_metrics['Accuracy'], global_step=steps)
+                self.writer.add_scalar(f'metrics/id_AUROC',    id_metrics['AUROC'],    global_step=steps)
+                self.writer.add_scalar(f'metrics/id_F1',       id_metrics['F1Score'],  global_step=steps)
 
-            self.writer.add_scalar(f'metrics/ood_Accuracy', ood_metrics['Accuracy'], global_step=steps)
-            self.writer.add_scalar(f'metrics/ood_AUROC',    ood_metrics['AUROC'],    global_step=steps)
-            self.writer.add_scalar(f'metrics/ood_F1',       ood_metrics['F1Score'],  global_step=steps)
-
-            print_projector(conf, self.model, self.combined_ood_test_dataset, self.preparator, self.writer, steps, "OOD_Projector")
+            if ood:
+                self.writer.add_scalar(f'metrics/ood_Accuracy', ood_metrics['Accuracy'], global_step=steps)
+                self.writer.add_scalar(f'metrics/ood_AUROC',    ood_metrics['AUROC'],    global_step=steps)
+                self.writer.add_scalar(f'metrics/ood_F1',       ood_metrics['F1Score'],  global_step=steps)
+                
 
         # Unfreeze base model
         ModelEvaluator.unfreeze(self.model)
@@ -528,6 +570,7 @@ class ModelEvaluator():
             for batch in pbar:
                 x, y = self.preparator.augment_and_prepare_batch(batch)
                 out  = self.preparator.forward(model, x) # bs x max_classes
+                # out  = F.softmax(out) # necessary?
 
                 m = metrics(out.detach().cpu(), y.detach().cpu())
                 pbar.set_postfix(acc=f'{m["Accuracy"]}')
@@ -547,7 +590,7 @@ class ModelEvaluator():
         logging.info(msg)
         for i, batch in enumerate(pbar):
             if i >= len(pbar) * epoch_fraction: return # early stop
-            x, y = self.preparator.augment_and_prepare_batch(batch)
+            x, y = self.preparator.augment_and_prepare_batch(batch, augment=False)
             out  = self.preparator.forward(model, x) # bs x max_classes
     
             loss = self.crit(out, y)
@@ -563,14 +606,14 @@ class ModelEvaluator():
        
     def get_model_for_ood_classification(self) -> torch.Module:
         return self.conf.env.make(GeneralSequential(
-            utils.freeze(self.model),
+            self.model,
             nn.SiLU(inplace=True),
             nn.Linear(self.conf.model.projection_size, 2) # 0: ID 1: OOD
         ))
 
     def get_model_for_id_classification(self) -> torch.Module:
         return self.conf.env.make(GeneralSequential(
-            utils.freeze(self.model),
+            self.model,
             nn.SiLU(inplace=True),
             nn.Linear(self.conf.model.projection_size, self.preparator.max_classes)
         ))
@@ -582,32 +625,36 @@ def print_projector(conf: Config, model: torch.Module, test_dataset, preparator:
     model = model.eval()
     with torch.no_grad():
 
+        images = {}
         data_embeddings, labels = [], []
         inp = []
         pbar = tqdm(test_dataset)
         for _, batch in enumerate(pbar):
             x, y = preparator.augment_and_prepare_batch(batch, augment=False) 
             inp.append(x)
-            data_embeddings += [F.normalize(preparator.forward(model, x), dim=1)]
+            out = F.normalize(preparator.forward(model, x), dim=1)
+
+            # Separate images by labels 
+            for i in range(len(y)):
+                emb, lab = out[i], y[i]
+                lab = lab.detach().cpu().item()
+                if lab not in images:
+                    images[lab] = []
+                images[lab].append(emb)
+
+            data_embeddings += [out]
             labels += y
 
+        # Compute mean of activation by label and plot it
+        imgs = []
+        for l in images:
+            stacked = torch.stack(images[l])
+            imgs.append(torch.mean(stacked, dim=0))
+        print_last_layer_image(torch.stack(imgs), writer, conf)
+        
         mat = torch.cat(data_embeddings, dim=0)
-
         img_labels = None# torch.cat(inp) if isinstance(preparator, ImageDataPreparator) else None
         writer.add_embedding(mat, labels, tag=tag_name, global_step=steps, label_img=img_labels)
-
-    # os.makedirs(f'{LOG_DIR}/embeddings', exist_ok=True)
-    # with open(f'{LOG_DIR}/embeddings/feature_vecs.tsv', 'w') as fw:
-    #     csv_writer = csv.writer(fw, delimiter='\t')
-    #     csv_writer.writerows(tqdm(data_embeddings, desc="write::embedding"))
-    # with open(f'{LOG_DIR}/embeddings/metadata.tsv', 'w') as file: 
-    #     for label in tqdm(labels, desc="write::labels"):
-    #         file.write(f"{label}\n")
-
-
-    # pc = projector.ProjectorConfig()
-    # embedding = pc.embeddings.add()
-
 
 def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, optim, scheduler, prototypes, writer: SummaryWriter, evaluator: ModelEvaluator):
     logging.info("Start training")
@@ -617,7 +664,7 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
     alpha = conf.alpha
 
     print_projector(conf, model, test_dataset, preparator, writer, steps=0)
-    evaluator(steps = 0, epoch_fraction = .5)
+    evaluator(steps = 0, epoch_fraction = conf.eval_train_epoch_fraction)
     
     for epoch in range(conf.epochs):
         pbar = tqdm(dataset, disable=not dist.is_primary())
@@ -665,7 +712,7 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
 
         # Epoch finished, test it
         print_projector(conf, model, test_dataset, preparator, writer, steps=step)
-        evaluator(steps = step, epoch_fraction = .5)
+        evaluator(steps = step, epoch_fraction = conf.eval_train_epoch_fraction)
 
 
 class ListDataset(Dataset):
@@ -702,7 +749,34 @@ def log_params(conf: Config, writer: SummaryWriter, metrics: dict[str, float]):
 
     writer.add_hparams(conf.hp(), flatten_dict(metrics))
 
-def main(conf: Config):
+from typing import Dict, Any
+import hashlib
+import json
+
+def print_last_layer_image(data: torch.Tensor, writer: SummaryWriter, conf: Config, steps: int = 0) -> None:
+    logging.info("Plotting last activation image")
+    # data: batch_size x projector_size
+    if len(data.shape) != 2:
+        raise RuntimeError()
+    d = data.shape[1]
+    w = int(d**.5) + 1
+    if d%w != 0:
+        data = F.pad(data, (0, w**2 - d), 'constant', 0)
+    data = data.view((-1, 1, w, w))
+    writer.add_image("last_activation", torchvision.utils.make_grid(data, normalize=True), global_step=steps)    
+    
+
+def dict_hash(dictionary: Dict[str, Any]) -> str:
+    """MD5 hash of a dictionary."""
+    dhash = hashlib.md5()
+    # We need to sort arguments so {'a': 1, 'b': 2} is
+    # the same as {'b': 2, 'a': 1}
+    encoded = json.dumps(dictionary, sort_keys=True).encode()
+    dhash.update(encoded)
+    return dhash.hexdigest()
+
+
+def main(conf: Config, args):
     logging.info("Setting base config")
     utils.seed(conf.seed)
     utils.boost(not conf.debug)
@@ -716,16 +790,24 @@ def main(conf: Config):
 
     logging.info("Loading data preparator")
     if conf.data_type == "img":
-        prep = ImageDataPreparator(len(train_dataset), conf, max_classes=conf.dataset.max_classes)
+        prep = ImageDataPreparator(len(train_dataset), conf, max_classes=conf.dataset.max_classes, target_size=conf.dataset.target_size)
     else:
         logging.info(f'Loading tokenizer')
         tokenizer = torch.hub.load('huggingface/transformers', 'tokenizer', conf.model.backbone_network)
         prep = TextDataPreparator(len(train_dataset), tokenizer, conf, max_classes=conf.dataset.max_classes) 
 
-    logging.info(f'Loading dataset: Making Data Loaders')
     ood_train_dataset = conf.dataset.ood_detection_dataset.make(Split.TRAIN)
     ood_test_dataset  = conf.dataset.ood_detection_dataset.make(Split.TEST)
 
+    if args.dry_run:
+        logging.info("======================= TEST DATASET INPUT SAMPLE =======================")
+        print(prep.get_element(test_dataset[0], conf.dataset.input_position))
+        logging.info("======================= OOD DATASET INPUT SAMPLE =======================")
+        print(prep.get_element(ood_test_dataset[0], conf.dataset.ood_input_position))
+        logging.info("=============================================")
+
+
+    logging.info(f'Loading dataset: Making Data Loaders')
     combined_ood_train_dataset =  conf.loader.make(make_ood_dataset(conf, train_dataset, ood_train_dataset), shuffle=True,  distributed=conf.env.distributed, collate_fn=prep.collate_fn)
     combined_ood_test_dataset  =  conf.loader.make(make_ood_dataset(conf, test_dataset, ood_test_dataset),   shuffle=False, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
     
@@ -735,16 +817,23 @@ def main(conf: Config):
     # DistributedIterableDataset
 
     logging.info(f'Loading model')
-    if conf.data_type == "img":
-        logging.info("Loading CNN based backbone")
-        backbone_network = load_cnn_backbone(conf.model.backbone_network.split("cnn/")[1])
-    else:
-        logging.info("Loading Transformer based backbone")
+    # if conf.data_type == "img":
+    try:
+        logging.info("Trying: Loading CNN based backbone")
+        backbone_network = load_cnn_backbone(conf.model.backbone_network)
+    except:
+        logging.info("Trying: Loading Transformer based backbone")
         backbone_network = torch.hub.load('huggingface/transformers', 'model', conf.model.backbone_network)
 
     logging.info("Loading Full Model")
     backbone_network = conf.env.make(backbone_network)
     model = conf.env.make(CustomModel(conf, backbone_network, get_projector(backbone_network, conf), preparator=prep))
+
+    if args.dry_run:
+        print(conf.hp())
+        torchinfo.summary(model)
+        logging.warning("Dry run: exiting")
+        exit(0)
 
     # CIDER prototypes
     prototypes = [torch.nn.parameter.Parameter(conf.env.make(F.normalize(torch.rand(conf.model.projection_size), dim=0))) for _ in range(prep.max_classes)]
@@ -752,31 +841,44 @@ def main(conf: Config):
     optim = conf.optim.make(chain(model.parameters(), prototypes))
     scheduler = conf.scheduler.make(optim)
 
-    writer = SummaryWriter() if dist.is_primary() else None
+    run_name = dict_hash(dataclasses.asdict(conf))
+    print(f'Run Name {run_name}')
+    
+    rich.print_json(data=dataclasses.asdict(conf))
+    writer = SummaryWriter(f'runs/{run_name}') if dist.is_primary() else None
     evaluator = ModelEvaluator(conf, model, train_dataset, test_dataset, combined_ood_train_dataset, combined_ood_test_dataset, prep, writer)
 
     # print_projector(conf, model, combined_ood_test_dataset, prep, writer, 0, "OOD_Projector")
-    fit(conf, model, prep, train_dataset, test_dataset, optim, scheduler, prototypes, writer, evaluator)
-    log_params(conf, writer, evaluator(steps=-1, epoch_fraction=.5))
+    # fit(conf, model, prep, train_dataset, test_dataset, optim, scheduler, prototypes, writer, evaluator)
+    log_params(conf, writer, evaluator(steps=0, epoch_fraction=conf.eval_train_epoch_fraction, iid=False, ood=True))
 
 
 if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument("-d", "--dry_run", action="store_true", help="Dry run, print model architecture, dataset sample and exit")
+    parser.add_argument("-c", "--config", required=True, help="Config file path to use (e.g: configs/txt/reviews.yml)")
+
+    args = parser.parse_args()
+
     logging.info("Starting")
+    if args.dry_run:
+        logging.warning("Dry run ON")
     csv.field_size_limit(sys.maxsize)
+    torch.multiprocessing.set_start_method('spawn')
 
     if dist.is_primary():
         nltk.download('averaged_perceptron_tagger')
         nltk.download('wordnet')
         nltk.download('omw-1.4')
 
-    conf = Config.load(Path(f"configs/{sys.argv[1]}.yml"))
-    print(conf.hp())
-    torch.multiprocessing.set_start_method('spawn')
-    dist.launch(
-        main,
-        conf.env.n_gpu,
-        conf.env.n_machine,
-        conf.env.machine_rank,
-        conf.env.dist_url,
-        args=(conf, )
-    )
+    conf_gen = Config.load(Path(f"{args.config}"), hyperparams=True)
+    for conf in conf_gen:
+        conf: Config
+        dist.launch(
+            main,
+            conf.env.n_gpu,
+            conf.env.n_machine,
+            conf.env.machine_rank,
+            conf.env.dist_url,
+            args=(conf, args)
+        )

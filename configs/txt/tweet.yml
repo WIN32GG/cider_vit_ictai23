@@ -13,16 +13,18 @@ model:
 dataset:
   max_classes: 5
 
-  input_position: 1
-  label_position: 0
+  input_position: 0
+  label_position: 1
   
-  ood_input_position: 1
-  ood_label_position: 0
+  ood_input_position: 0
+  ood_label_position: 1
 
   train_dataset: 
-    name: AG_NEWS
+    name: tweet_eval
+    task: '"emotion", "hate", "irony"'
     root: ./dataset
   ood_detection_dataset: 
-    name: newspop
+    name: rotten_tomatoes
+    task: '"sentiment", "stance_feminist", "stance_abortion"'
     root: ./dataset
 
