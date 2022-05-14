@@ -1,8 +1,10 @@
 # Out of domain detection via text noise
 
-## Metrics
+## Quickstart
 
-## Datasets
+```
+python3 main.py -c configs/CONFIG.yml
+```
 
 
 ## Log
@@ -30,3 +32,7 @@ Problem seems to arise from the function mapping the noise level from text and c
 
 From top to bottom we try different loss scalers and schedulers for the strength of the the noise.
 The last loss is when we disable the noise alltogether. Note that this does not mean the model is learning, as we did not account for training collapse.
+
+---
+
+Language models are already capable of making distinction between datasets, further training lowers the OOD discrimination capability.
