@@ -36,7 +36,7 @@ model:
   backbone_network: google/vit-base-patch16-224-in21k #"microsoft/beit-base-patch16-224" # '"vgg16", "resnet18", 
 
 dataset:
-  max_classes: 5
+  max_classes: 10
 
   input_position: 0
   label_position: 1

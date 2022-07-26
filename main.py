@@ -10,7 +10,7 @@ import tensorboard
 try:
     from rich import pretty
     from rich.traceback import install
-    install(show_locals=True)
+    install(show_locals=False)
     pretty.install()
     from rich.progress import track
     from tqdm.rich import tqdm
@@ -452,9 +452,10 @@ class TextDataPreparator(DataPreparator):
 
         x, y = [], []
         for elem in new_batch:
-            x.append(self.get_element(elem, 0)) #self.conf.dataset.input_position))
-            y.append(self.get_element(elem, 1)) #self.conf.dataset.label_position))
+            x.append(self.get_element(elem, self.conf.dataset.input_position))
+            y.append(self.get_element(elem, self.conf.dataset.label_position))
 
+        print(y)
         return self.tokenize_and_make(x), conf.env.make(utils.to_tensor(y)) 
 
     def forward(self, model: torch.Module, data: Any):
@@ -592,7 +593,7 @@ class ModelEvaluator():
             if i >= len(pbar) * epoch_fraction: return # early stop
             x, y = self.preparator.augment_and_prepare_batch(batch, augment=False)
             out  = self.preparator.forward(model, x) # bs x max_classes
-    
+            # print(out); print(y)
             loss = self.crit(out, y)
             m = metrics(out.detach().cpu(), y.detach().cpu())
             pbar.set_postfix(acc=f'{m["Accuracy"]}')
@@ -663,7 +664,7 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
     C = preparator.max_classes
     alpha = conf.alpha
 
-    print_projector(conf, model, test_dataset, preparator, writer, steps=0)
+    # print_projector(conf, model, test_dataset, preparator, writer, steps=0)
     evaluator(steps = 0, epoch_fraction = conf.eval_train_epoch_fraction)
     
     for epoch in range(conf.epochs):
@@ -849,7 +850,7 @@ def main(conf: Config, args):
     evaluator = ModelEvaluator(conf, model, train_dataset, test_dataset, combined_ood_train_dataset, combined_ood_test_dataset, prep, writer)
 
     # print_projector(conf, model, combined_ood_test_dataset, prep, writer, 0, "OOD_Projector")
-    # fit(conf, model, prep, train_dataset, test_dataset, optim, scheduler, prototypes, writer, evaluator)
+    fit(conf, model, prep, train_dataset, test_dataset, optim, scheduler, prototypes, writer, evaluator)
     log_params(conf, writer, evaluator(steps=0, epoch_fraction=conf.eval_train_epoch_fraction, iid=False, ood=True))
 
 
