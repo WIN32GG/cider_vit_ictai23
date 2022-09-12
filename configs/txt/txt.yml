@@ -1,6 +1,6 @@
 debug: False
 seed: 43 # seed for reproductibility
-epochs: 1
+epochs: 10
 clip: 1.
 data_type: txt
 
@@ -9,9 +9,9 @@ text_shift_stength: .1
 
 # CIDER params
 temp: .3
-alpha: .95 # 1: anchors wont change
-lambda_c: 1.
-lambda_d: 1.5
+alpha: .98 # 1: anchors wont change
+lambda_c: .1
+lambda_d: .2
 
 freeze_backbone: False
 eval_train_epoch_fraction: .5
@@ -28,13 +28,13 @@ model:
   backbone_network: distilbert-base-uncased
   projection_hidden: 800 #10_152
   projection_size: 256 #5_576
-  dropout_p: .1
+  dropout_p: .2
 
 
 loader:
   num_workers: 0
-  batch_size: 32
-  pin_memory: false
+  batch_size: 16
+  pin_memory: true
   drop_last: true
 
 optim:

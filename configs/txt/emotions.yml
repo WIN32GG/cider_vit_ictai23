@@ -1,12 +1,12 @@
 #include txt.yml
 
-eval_train_epoch_fraction: arange(.1, .5, .1)
+eval_train_epoch_fraction: arange(2., 5.)
 
 model:
   dropout_p: .1           # N/A
   projection_hidden: 800  # N/A
 
-  projector: simple
+  projector: identity
   projection_size: 64, 512, 256
   backbone_network: '"roberta-base", "albert-base-v2", "bert-base-uncased", "distilbert-base-uncased"'
 

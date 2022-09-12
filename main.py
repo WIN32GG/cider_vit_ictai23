@@ -13,7 +13,8 @@ try:
     install(show_locals=False)
     pretty.install()
     from rich.progress import track
-    from tqdm.rich import tqdm
+    # from tqdm.rich import tqdm
+    from tqdm import tqdm
     
 except ImportError:
     from tqdm import tqdm
@@ -64,6 +65,10 @@ import torchbooster.utils as utils
 import torch.nn.functional as F
 import torchvision.transforms as T
 import transformers
+
+from typing import Dict, Any
+import hashlib
+import json
 
 TOKENIZER_MASK = '[MASK]'
 ZERO = torch.tensor(0.)
@@ -452,10 +457,13 @@ class TextDataPreparator(DataPreparator):
 
         x, y = [], []
         for elem in new_batch:
-            x.append(self.get_element(elem, self.conf.dataset.input_position))
-            y.append(self.get_element(elem, self.conf.dataset.label_position))
+            x.append(self.get_element(elem, 0))#self.conf.dataset.input_position))
+            y.append(self.get_element(elem, 1))#self.conf.dataset.label_position))
 
-        print(y)
+        # print(x) 
+        # print("- @ - @ - @ - @ - @ - @ - @ - @ - @ - @ - @ - @ - @ - @ - @ - @ - @  ")
+        # print(y)
+        # exit()
         return self.tokenize_and_make(x), conf.env.make(utils.to_tensor(y)) 
 
     def forward(self, model: torch.Module, data: Any):
@@ -496,6 +504,7 @@ class ModelEvaluator():
         self.combined_ood_test_dataset = combined_ood_test_dataset
         self.preparator: DataPreparator = preparator
         self.writer: SummaryWriter = writer
+        self.reducer = 64
 
         self.crit = nn.CrossEntropyLoss()
 
@@ -522,7 +531,7 @@ class ModelEvaluator():
         ood_metrics = {}
 
         utils.freeze(self.model)
-
+        
         if iid:
             # ID EVALUATION
             id_model = self.get_model_for_id_classification()
@@ -533,12 +542,14 @@ class ModelEvaluator():
 
         if ood:
             # OOD evaluation
+            
             ood_model = self.get_model_for_ood_classification()
             optim = torch.optim.AdamW(ood_model.parameters())
             self.train_model_for_ood_classification(ood_model, optim, epoch_fraction)
             ood_metrics = self.evaluate_ood_performance(ood_model, steps)
             print(ood_metrics)
             print_projector(conf, self.model, self.combined_ood_test_dataset, self.preparator, self.writer, steps, "OOD_Projector")
+            
 
         if steps >= 0:
             if iid:
@@ -554,6 +565,7 @@ class ModelEvaluator():
 
         # Unfreeze base model
         ModelEvaluator.unfreeze(self.model)
+       
 
         return {
             'id_metrics': id_metrics,
@@ -587,17 +599,22 @@ class ModelEvaluator():
         metrics.reset()
         model = model.train()
 
-        pbar = tqdm(dataset, desc=desc)
         logging.info(msg)
-        for i, batch in enumerate(pbar):
-            if i >= len(pbar) * epoch_fraction: return # early stop
-            x, y = self.preparator.augment_and_prepare_batch(batch, augment=False)
-            out  = self.preparator.forward(model, x) # bs x max_classes
-            # print(out); print(y)
-            loss = self.crit(out, y)
-            m = metrics(out.detach().cpu(), y.detach().cpu())
-            pbar.set_postfix(acc=f'{m["Accuracy"]}')
-            utils.step(loss, optim)
+        logging.warn("Epoch fraction works as epoch now, floating <1 will do a whole epoch")
+        epochs = int(epoch_fraction)
+        # epoch_fraction = float(epoch_fraction - (epochs - 1))
+        for e in range(epochs):
+            logging.info(f'{desc} Epoch #{e}')
+            pbar = tqdm(dataset, desc=desc)
+            for i, batch in enumerate(pbar):
+                # if i >= len(pbar) * epoch_fraction: return # early stop
+                x, y = self.preparator.augment_and_prepare_batch(batch, augment=False)
+                out  = self.preparator.forward(model, x) # bs x max_classes
+                # print(out); print(y)
+                loss = self.crit(out, y)
+                m = metrics(out.detach().cpu(), y.detach().cpu())
+                pbar.set_postfix(acc=f'{m["Accuracy"]:.2f}')
+                utils.step(loss, optim)
 
     def train_model_for_id_classification(self, model: torch.Module, optim, epoch_fraction: float = .1):
         return self._train(model, optim, self.metrics_id, self.train_dataset, "ID_FT", "Train head for ID metrics", epoch_fraction)
@@ -606,17 +623,39 @@ class ModelEvaluator():
         return self._train(model, optim, self.metrics_ood, self.combined_ood_train_dataset, "OOD_FT", "Train head for OOD task", epoch_fraction)
        
     def get_model_for_ood_classification(self) -> torch.Module:
+        # return self.conf.env.make(GeneralSequential(
+        #     self.model,
+        #     nn.SiLU(inplace=True),
+        #     nn.Linear(self.conf.model.projection_size, 2) # 0: ID 1: OOD
+        # ))
+        s = self.conf.model.projection_size//self.reducer
         return self.conf.env.make(GeneralSequential(
             self.model,
             nn.SiLU(inplace=True),
-            nn.Linear(self.conf.model.projection_size, 2) # 0: ID 1: OOD
+            nn.Dropout(self.conf.model.dropout_p),
+            nn.Linear(self.conf.model.projection_size, s),
+            nn.SiLU(inplace=True),
+            nn.Dropout(self.conf.model.dropout_p),
+            nn.Linear(s, s),
+            nn.SiLU(inplace=True),
+            nn.Dropout(self.conf.model.dropout_p),
+            nn.Linear(s, 2) # 0: ID, 1: OOD
         ))
 
     def get_model_for_id_classification(self) -> torch.Module:
+        # print(self.conf.model.projection_size//4); exit();
+        s = self.conf.model.projection_size//self.reducer
         return self.conf.env.make(GeneralSequential(
             self.model,
             nn.SiLU(inplace=True),
-            nn.Linear(self.conf.model.projection_size, self.preparator.max_classes)
+            nn.Dropout(self.conf.model.dropout_p),
+            nn.Linear(self.conf.model.projection_size, s),
+            nn.SiLU(inplace=True),
+            nn.Dropout(self.conf.model.dropout_p),
+            nn.Linear(s, s),
+            nn.SiLU(inplace=True),
+            nn.Dropout(self.conf.model.dropout_p),
+            nn.Linear(s, self.preparator.max_classes)
         ))
 
 def print_projector(conf: Config, model: torch.Module, test_dataset, preparator: DataPreparator, writer: SummaryWriter, steps: int = 0, tag_name = "Projector"):
@@ -647,11 +686,11 @@ def print_projector(conf: Config, model: torch.Module, test_dataset, preparator:
             labels += y
 
         # Compute mean of activation by label and plot it
-        imgs = []
-        for l in images:
-            stacked = torch.stack(images[l])
-            imgs.append(torch.mean(stacked, dim=0))
-        print_last_layer_image(torch.stack(imgs), writer, conf)
+        # imgs = []
+        # for l in images:
+        #     stacked = torch.stack(images[l])
+        #     imgs.append(torch.mean(stacked, dim=0))
+        # print_last_layer_image(torch.stack(imgs), writer, conf)
         
         mat = torch.cat(data_embeddings, dim=0)
         img_labels = None# torch.cat(inp) if isinstance(preparator, ImageDataPreparator) else None
@@ -670,6 +709,7 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
     for epoch in range(conf.epochs):
         pbar = tqdm(dataset, disable=not dist.is_primary())
         model = model.train()
+        model = ModelEvaluator.unfreeze(model)
         logging.info(f'Epoch {epoch}')
         for batch_num, batch in enumerate(pbar):
             step = len(dataset)*epoch + batch_num
@@ -712,8 +752,8 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
                 writer.add_scalar("proto/std", torch.stack(prototypes).std(0).mean().detach().item(), step)
 
         # Epoch finished, test it
-        print_projector(conf, model, test_dataset, preparator, writer, steps=step)
-        evaluator(steps = step, epoch_fraction = conf.eval_train_epoch_fraction)
+    # print_projector(conf, model, test_dataset, preparator, writer, steps=step)
+    evaluator(steps = step, epoch_fraction = conf.eval_train_epoch_fraction)
 
 
 class ListDataset(Dataset):
@@ -750,9 +790,7 @@ def log_params(conf: Config, writer: SummaryWriter, metrics: dict[str, float]):
 
     writer.add_hparams(conf.hp(), flatten_dict(metrics))
 
-from typing import Dict, Any
-import hashlib
-import json
+
 
 def print_last_layer_image(data: torch.Tensor, writer: SummaryWriter, conf: Config, steps: int = 0) -> None:
     logging.info("Plotting last activation image")

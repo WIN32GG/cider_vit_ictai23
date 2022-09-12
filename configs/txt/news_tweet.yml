@@ -1,6 +1,6 @@
 #include txt.yml
 
-eval_train_epoch_fraction: arange(.1, .5, .1)
+eval_train_epoch_fraction: arange(2., 5.)
 
 model:
   dropout_p: .1           # N/A

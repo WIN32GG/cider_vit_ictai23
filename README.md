@@ -36,3 +36,8 @@ The last loss is when we disable the noise alltogether. Note that this does not 
 ---
 
 Language models are already capable of making distinction between datasets, further training lowers the OOD discrimination capability.
+
+---
+
+Sometimes the OOD detection is not evident and further training might be required. In these cases, CIDER can be tried.
+The situations apparently arrise when datasets use the sort of etxt semantic (e.g tweets) while the content is different in nature.

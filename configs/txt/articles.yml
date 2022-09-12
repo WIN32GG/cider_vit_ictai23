@@ -1,6 +1,6 @@
 #include txt.yml
 
-eval_train_epoch_fraction: arange(.1, .5, .1)
+eval_train_epoch_fraction: arange(.5, .8, .9)
 
 model:
   dropout_p: .1           # N/A
@@ -8,7 +8,7 @@ model:
 
   projector: simple
   projection_size: 64, 512, 256
-  backbone_network: '"facebook/bart-base", "roberta-base", "albert-base-v2", "bert-base-uncased", "distilbert-base-uncased"'
+  backbone_network: "distilbert-base-uncased"
 
 dataset:
   max_classes: 5
