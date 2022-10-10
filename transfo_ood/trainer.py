@@ -1,3 +1,13 @@
+import logging
+import torch
+import torchbooster.utils as utils
+import torchbooster.distributed as dist
+
+from transfo_ood.config import Config
+from transfo_ood.evaluator import ModelEvaluator
+from transfo_ood.preparator import DataPreparator
+from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm
 
 
 def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, optim, scheduler, writer: SummaryWriter, evaluator: ModelEvaluator):
@@ -17,7 +27,7 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
             x, y = preparator.augment_and_prepare_batch(batch)
             out  = preparator.forward(model, x) # bs x ProjectorSize
 
-           
+            # TODO import cider loss
 
             loss = conf.lambda_d * l_dispersion + conf.lambda_c * l_compactness
 
@@ -30,7 +40,6 @@ def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, 
                 writer.add_scalar("loss/L_total",   loss.detach().item(), step)
                 writer.add_scalar("proto/std", torch.stack(prototypes).std(0).mean().detach().item(), step)
 
-        # Epoch finished, test it
     # print_projector(conf, model, test_dataset, preparator, writer, steps=step)
     evaluator(steps = step, epoch_fraction = conf.eval_train_epoch_fraction)
 

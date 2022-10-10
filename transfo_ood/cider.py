@@ -2,6 +2,7 @@ import torch
 
 from torch import Tensor
 from torch.nn.modules.loss import _Loss
+import torch.functional as F
 
 ### Compute CIDER Losses
 

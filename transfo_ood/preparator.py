@@ -1,5 +1,27 @@
 
-def dict_hash(dictionary: Dict[str, Any]) -> str:
+import torch
+import hashlib
+import json
+import logging
+import torchvision
+import torch.nn as nn
+import random
+import torch.functional as F
+import torchvision.transforms as T
+import nlpaug.augmenter.word as naw
+
+from torchbooster import utils
+from random import random as rand
+from torch.utils.data import Dataset
+from tqdm import tqdm
+from typing import Any, Tuple, List, Union
+from torch.utils.tensorboard import SummaryWriter
+from transfo_ood.config import Config
+from transfo_ood.utils import TOKENIZER_MASK
+
+
+
+def dict_hash(dictionary: dict[str, Any]) -> str:
     """MD5 hash of a dictionary."""
     dhash = hashlib.md5()
     # We need to sort arguments so {'a': 1, 'b': 2} is
@@ -21,18 +43,17 @@ def log_params(conf: Config, writer: SummaryWriter, metrics: dict[str, float]):
     writer.add_hparams(conf.hp(), flatten_dict(metrics))
 
 
-
-def print_last_layer_image(data: torch.Tensor, writer: SummaryWriter, conf: Config, steps: int = 0) -> None:
-    logging.info("Plotting last activation image")
-    # data: batch_size x projector_size
-    if len(data.shape) != 2:
-        raise RuntimeError()
-    d = data.shape[1]
-    w = int(d**.5) + 1
-    if d%w != 0:
-        data = F.pad(data, (0, w**2 - d), 'constant', 0)
-    data = data.view((-1, 1, w, w))
-    writer.add_image("last_activation", torchvision.utils.make_grid(data, normalize=True), global_step=steps)    
+# def print_last_layer_image(data: torch.Tensor, writer: SummaryWriter, conf: Config, steps: int = 0) -> None:
+#     logging.info("Plotting last activation image")
+#     # data: batch_size x projector_size
+#     if len(data.shape) != 2:
+#         raise RuntimeError()
+#     d = data.shape[1]
+#     w = int(d**.5) + 1
+#     if d%w != 0:
+#         data = F.pad(data, (0, w**2 - d), 'constant', 0)
+#     data = data.view((-1, 1, w, w))
+#     writer.add_image("last_activation", torchvision.utils.make_grid(data, normalize=True), global_step=steps)    
     
 
 def make_ood_dataset(conf: Config, id_dataset, ood_dataset):
@@ -120,18 +141,18 @@ class ImageDataPreparator(DataPreparator):
 
     def augment_and_prepare_batch(self, batch, augment=True):
         if augment:
-            new_batch = [ (conf.env.make(self.augmenter(self.get_element(a, conf.dataset.input_position))), 
-                            self.get_element(a, conf.dataset.label_position)) for a in batch ]
+            new_batch = [ (self.conf.env.make(self.augmenter(self.get_element(a, self.conf.dataset.input_position))), 
+                            self.get_element(a, self.conf.dataset.label_position)) for a in batch ]
         else:
-            new_batch = [ (conf.env.make(self.id_augmenter(self.get_element(a, conf.dataset.input_position))), 
-                            self.get_element(a, conf.dataset.label_position)) for a in batch ]
+            new_batch = [ (self.conf.env.make(self.id_augmenter(self.get_element(a, self.conf.dataset.input_position))), 
+                            self.get_element(a, self.conf.dataset.label_position)) for a in batch ]
 
         X, Y = [], []
         for e in new_batch:
             X.append(e[0])
             Y.append(e[1])
         
-        return conf.env.make(torch.stack(X)), conf.env.make(utils.to_tensor(Y)) 
+        return self.conf.env.make(torch.stack(X)), self.conf.env.make(utils.to_tensor(Y)) 
 
 class TextDataPreparator(DataPreparator):
     def __init__(self, dataset_len, tokenizer, conf, max_classes = -1) -> None:
@@ -209,7 +230,7 @@ class TextDataPreparator(DataPreparator):
         # print("- @ - @ - @ - @ - @ - @ - @ - @ - @ - @ - @ - @ - @ - @ - @ - @ - @  ")
         # print(y)
         # exit()
-        return self.tokenize_and_make(x), conf.env.make(utils.to_tensor(y)) 
+        return self.tokenize_and_make(x), self.conf.env.make(utils.to_tensor(y)) 
 
     def forward(self, model: torch.Module, data: Any):
         return model(**data)

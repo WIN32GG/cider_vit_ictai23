@@ -1,3 +1,4 @@
+from typing import Any
 import torch
 import torch.nn as nn
 import torch.functional as F
@@ -32,17 +33,17 @@ class ModelEvaluator():
         return module
 
     def __init__(self, conf: Config, model: torch.Module, train_dataset: DataLoader, test_dataset: DataLoader, combined_ood_train_dataset: DataLoader, combined_ood_test_dataset: Dataset, preparator: DataPreparator, writer: SummaryWriter) -> None:
-        self.conf: Config = conf
-        self.model = model
-        self.train_dataset = train_dataset
-        self.test_dataset = test_dataset
-        self.combined_ood_train_dataset = combined_ood_train_dataset
-        self.combined_ood_test_dataset = combined_ood_test_dataset
-        self.preparator: DataPreparator = preparator
-        self.writer: SummaryWriter = writer
-        self.reducer = 64
 
-        self.crit = nn.CrossEntropyLoss()
+        self.conf: Config                               = conf
+        self.model: torch.Module                        = model
+        self.train_dataset: DataLoader                  = train_dataset
+        self.test_dataset: DataLoader                   = test_dataset
+        self.combined_ood_train_dataset: DataLoader     = combined_ood_train_dataset
+        self.combined_ood_test_dataset: DataLoader      = combined_ood_test_dataset
+        self.preparator: DataPreparator                 = preparator
+        self.writer: SummaryWriter                      = writer
+        self.reducer: int                               = 64
+        self.crit: nn.Module                            = nn.CrossEntropyLoss()
 
         self.metrics_id = MetricCollection([
             Accuracy( num_classes=preparator.max_classes, average='macro'),
@@ -62,29 +63,28 @@ class ModelEvaluator():
             # CalibrationError(n_bins=10, norm='l2')
         ])
 
-    def __call__(self, steps: int = 0, epoch_fraction: float = .1, iid: bool = True, ood: bool = True) -> Any:
+    def __call__(self, steps: int = 0, epoch_fraction: float = .1, iid: bool = True, ood: bool = True) -> dict[str, float]:
         id_metrics = {}
         ood_metrics = {}
 
         utils.freeze(self.model)
         
         if iid:
-            # ID EVALUATION
-            id_model = self.get_model_for_id_classification()
-            optim = torch.optim.AdamW(id_model.parameters())
+            id_model    = self.get_model_for_id_classification()
+            optim       = torch.optim.AdamW(id_model.parameters())
+
             self.train_model_for_id_classification(id_model, optim, epoch_fraction)
             id_metrics = self.evaluate_id_performance(id_model, steps)
             print(id_metrics)
 
-        if ood:
-            # OOD evaluation
-            
-            ood_model = self.get_model_for_ood_classification()
-            optim = torch.optim.AdamW(ood_model.parameters())
+        if ood:            
+            ood_model   = self.get_model_for_ood_classification()
+            optim       = torch.optim.AdamW(ood_model.parameters())
+
             self.train_model_for_ood_classification(ood_model, optim, epoch_fraction)
             ood_metrics = self.evaluate_ood_performance(ood_model, steps)
             print(ood_metrics)
-            print_projector(conf, self.model, self.combined_ood_test_dataset, self.preparator, self.writer, steps, "OOD_Projector")
+            self.print_projector(steps, "OOD_Projector")
             
 
         if steps >= 0:
@@ -97,7 +97,6 @@ class ModelEvaluator():
                 self.writer.add_scalar(f'metrics/ood_Accuracy', ood_metrics['Accuracy'], global_step=steps)
                 self.writer.add_scalar(f'metrics/ood_AUROC',    ood_metrics['AUROC'],    global_step=steps)
                 self.writer.add_scalar(f'metrics/ood_F1',       ood_metrics['F1Score'],  global_step=steps)
-                
 
         # Unfreeze base model
         ModelEvaluator.unfreeze(self.model)
@@ -108,7 +107,7 @@ class ModelEvaluator():
             'ood_metrics': ood_metrics
         }
 
-    def _evaluate(self, model: torch.Module, dataset: DataLoader, msg: str, metrics: MetricCollection):
+    def _evaluate(self, model: torch.Module, dataset: DataLoader, msg: str, metrics: MetricCollection) -> float:
         if not dist.is_primary(): return
         metrics.reset()
         model = model.eval()
@@ -128,17 +127,16 @@ class ModelEvaluator():
     def evaluate_ood_performance(self, model: torch.Module, steps: int = 0) -> dict[str, float]:
         return self._evaluate(model, self.combined_ood_test_dataset, "Evaluating for OOD classificaiton", self.metrics_ood)
 
-    def evaluate_id_performance(self, model: torch.Module, steps: int = 0):
+    def evaluate_id_performance(self, model: torch.Module, steps: int = 0) -> dict[str, float]:
         return self._evaluate(model, self.test_dataset, "Evaluating for ID task", self.metrics_id)
 
-    def _train(self, model, optim, metrics: MetricCollection, dataset: DataLoader, desc: str, msg: str, epoch_fraction: float = .1):
+    def _train(self, model, optim, metrics: MetricCollection, dataset: DataLoader, desc: str, msg: str, epoch_fraction: float = .1) -> None:
         metrics.reset()
         model = model.train()
 
         logging.info(msg)
         logging.warn("Epoch fraction works as epoch now, floating <1 will do a whole epoch")
-        epochs = int(epoch_fraction)
-        # epoch_fraction = float(epoch_fraction - (epochs - 1))
+        epochs = int(epoch_fraction) #FIXME wrong logic
         for e in range(epochs):
             logging.info(f'{desc} Epoch #{e}')
             pbar = tqdm(dataset, desc=desc)
@@ -152,10 +150,10 @@ class ModelEvaluator():
                 pbar.set_postfix(acc=f'{m["Accuracy"]:.2f}')
                 utils.step(loss, optim)
 
-    def train_model_for_id_classification(self, model: torch.Module, optim, epoch_fraction: float = .1):
+    def train_model_for_id_classification(self, model: torch.Module, optim, epoch_fraction: float = .1) -> None:
         return self._train(model, optim, self.metrics_id, self.train_dataset, "ID_FT", "Train head for ID metrics", epoch_fraction)
 
-    def train_model_for_ood_classification(self, model: torch.Module, optim, epoch_fraction: float = .1):
+    def train_model_for_ood_classification(self, model: torch.Module, optim, epoch_fraction: float = .1) -> None:
         return self._train(model, optim, self.metrics_ood, self.combined_ood_train_dataset, "OOD_FT", "Train head for OOD task", epoch_fraction)
        
     def get_model_for_ood_classification(self) -> torch.Module:
@@ -194,40 +192,40 @@ class ModelEvaluator():
             nn.Linear(s, self.preparator.max_classes)
         ))
 
-def print_projector(conf: Config, model: torch.Module, test_dataset, preparator: DataPreparator, writer: SummaryWriter, steps: int = 0, tag_name = "Projector"):
-    if not dist.is_primary(): return
+    def print_projector(self, steps: int = 0, tag_name = "Projector") -> None:
+        if not dist.is_primary(): return
 
-    logging.info(f"Printing projector state to tensoboard with tag \"{tag_name}\"")
-    model = model.eval()
-    with torch.no_grad():
+        logging.info(f"Printing projector state to tensoboard with tag \"{tag_name}\"")
+        model = model.eval()
+        with torch.no_grad():
 
-        images = {}
-        data_embeddings, labels = [], []
-        inp = []
-        pbar = tqdm(test_dataset)
-        for _, batch in enumerate(pbar):
-            x, y = preparator.augment_and_prepare_batch(batch, augment=False) 
-            inp.append(x)
-            out = F.normalize(preparator.forward(model, x), dim=1)
+            images = {}
+            data_embeddings, labels = [], []
+            inp = []
+            pbar = tqdm(self.test_dataset)
+            for _, batch in enumerate(pbar):
+                x, y = self.preparator.augment_and_prepare_batch(batch, augment=False) 
+                inp.append(x)
+                out = F.normalize(self.preparator.forward(model, x), dim=1)
 
-            # Separate images by labels 
-            for i in range(len(y)):
-                emb, lab = out[i], y[i]
-                lab = lab.detach().cpu().item()
-                if lab not in images:
-                    images[lab] = []
-                images[lab].append(emb)
+                # Separate images by labels 
+                for i in range(len(y)):
+                    emb, lab = out[i], y[i]
+                    lab = lab.detach().cpu().item()
+                    if lab not in images:
+                        images[lab] = []
+                    images[lab].append(emb)
 
-            data_embeddings += [out]
-            labels += y
+                data_embeddings += [out]
+                labels += y
 
-        # Compute mean of activation by label and plot it
-        # imgs = []
-        # for l in images:
-        #     stacked = torch.stack(images[l])
-        #     imgs.append(torch.mean(stacked, dim=0))
-        # print_last_layer_image(torch.stack(imgs), writer, conf)
-        
-        mat = torch.cat(data_embeddings, dim=0)
-        img_labels = None# torch.cat(inp) if isinstance(preparator, ImageDataPreparator) else None
-        writer.add_embedding(mat, labels, tag=tag_name, global_step=steps, label_img=img_labels)
+            # Compute mean of activation by label and plot it
+            # imgs = []
+            # for l in images:
+            #     stacked = torch.stack(images[l])
+            #     imgs.append(torch.mean(stacked, dim=0))
+            # print_last_layer_image(torch.stack(imgs), writer, conf)
+            
+            mat = torch.cat(data_embeddings, dim=0)
+            img_labels = None# torch.cat(inp) if isinstance(preparator, ImageDataPreparator) else None
+            self.writer.add_embedding(mat, labels, tag=tag_name, global_step=steps, label_img=img_labels)
