@@ -49,4 +49,4 @@ env:
 scheduler:
   name: cycle
   decay: lin, cos
-  n_iter: 18_750
+  n_iter: 1008_750
