@@ -27,7 +27,7 @@ class MyDataset(BaseConfig):
     ood_input_position: int = 1
     ood_label_position: int = 0
 
-    target_size: list(int, int) = None
+    target_size: list[int, int] = None
 
     max_classes: int = 2
     

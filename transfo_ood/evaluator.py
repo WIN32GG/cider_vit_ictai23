@@ -27,15 +27,15 @@ from torchmetrics import (
 class ModelEvaluator():
 
     @staticmethod
-    def unfreeze(module: torch.Module) -> torch.Module:
+    def unfreeze(module: nn.Module) -> nn.Module:
         for param in module.parameters():
             param.requires_grad = True
         return module
 
-    def __init__(self, conf: Config, model: torch.Module, train_dataset: DataLoader, test_dataset: DataLoader, combined_ood_train_dataset: DataLoader, combined_ood_test_dataset: Dataset, preparator: DataPreparator, writer: SummaryWriter) -> None:
+    def __init__(self, conf: Config, model: nn.Module, train_dataset: DataLoader, test_dataset: DataLoader, combined_ood_train_dataset: DataLoader, combined_ood_test_dataset: Dataset, preparator: DataPreparator, writer: SummaryWriter) -> None:
 
         self.conf: Config                               = conf
-        self.model: torch.Module                        = model
+        self.model: nn.Module                        = model
         self.train_dataset: DataLoader                  = train_dataset
         self.test_dataset: DataLoader                   = test_dataset
         self.combined_ood_train_dataset: DataLoader     = combined_ood_train_dataset
@@ -107,7 +107,7 @@ class ModelEvaluator():
             'ood_metrics': ood_metrics
         }
 
-    def _evaluate(self, model: torch.Module, dataset: DataLoader, msg: str, metrics: MetricCollection) -> float:
+    def _evaluate(self, model: nn.Module, dataset: DataLoader, msg: str, metrics: MetricCollection) -> float:
         if not dist.is_primary(): return
         metrics.reset()
         model = model.eval()
@@ -124,10 +124,10 @@ class ModelEvaluator():
                 pbar.set_postfix(acc=f'{m["Accuracy"]}')
         return metrics.compute()
 
-    def evaluate_ood_performance(self, model: torch.Module, steps: int = 0) -> dict[str, float]:
+    def evaluate_ood_performance(self, model: nn.Module, steps: int = 0) -> dict[str, float]:
         return self._evaluate(model, self.combined_ood_test_dataset, "Evaluating for OOD classificaiton", self.metrics_ood)
 
-    def evaluate_id_performance(self, model: torch.Module, steps: int = 0) -> dict[str, float]:
+    def evaluate_id_performance(self, model: nn.Module, steps: int = 0) -> dict[str, float]:
         return self._evaluate(model, self.test_dataset, "Evaluating for ID task", self.metrics_id)
 
     def _train(self, model, optim, metrics: MetricCollection, dataset: DataLoader, desc: str, msg: str, epoch_fraction: float = .1) -> None:
@@ -150,13 +150,13 @@ class ModelEvaluator():
                 pbar.set_postfix(acc=f'{m["Accuracy"]:.2f}')
                 utils.step(loss, optim)
 
-    def train_model_for_id_classification(self, model: torch.Module, optim, epoch_fraction: float = .1) -> None:
+    def train_model_for_id_classification(self, model: nn.Module, optim, epoch_fraction: float = .1) -> None:
         return self._train(model, optim, self.metrics_id, self.train_dataset, "ID_FT", "Train head for ID metrics", epoch_fraction)
 
-    def train_model_for_ood_classification(self, model: torch.Module, optim, epoch_fraction: float = .1) -> None:
+    def train_model_for_ood_classification(self, model: nn.Module, optim, epoch_fraction: float = .1) -> None:
         return self._train(model, optim, self.metrics_ood, self.combined_ood_train_dataset, "OOD_FT", "Train head for OOD task", epoch_fraction)
        
-    def get_model_for_ood_classification(self) -> torch.Module:
+    def get_model_for_ood_classification(self) -> nn.Module:
         # return self.conf.env.make(GeneralSequential(
         #     self.model,
         #     nn.SiLU(inplace=True),
@@ -176,7 +176,7 @@ class ModelEvaluator():
             nn.Linear(s, 2) # 0: ID, 1: OOD
         ))
 
-    def get_model_for_id_classification(self) -> torch.Module:
+    def get_model_for_id_classification(self) -> nn.Module:
         # print(self.conf.model.projection_size//4); exit();
         s = self.conf.model.projection_size//self.reducer
         return self.conf.env.make(GeneralSequential(

@@ -113,7 +113,7 @@ class DataPreparator():
         """
         raise NotImplementedError("Not Implemented")
 
-    def forward(self, model: torch.Module, data: Any):
+    def forward(self, model: nn.Module, data: Any):
         return model(data)
 
     def collate_fn(self, data):
@@ -136,7 +136,7 @@ class ImageDataPreparator(DataPreparator):
             T.ToTensor()
         ])
 
-    def forward(self, model: torch.Module, data: Any):
+    def forward(self, model: nn.Module, data: Any):
         return model(data)
 
     def augment_and_prepare_batch(self, batch, augment=True):
@@ -232,7 +232,7 @@ class TextDataPreparator(DataPreparator):
         # exit()
         return self.tokenize_and_make(x), self.conf.env.make(utils.to_tensor(y)) 
 
-    def forward(self, model: torch.Module, data: Any):
+    def forward(self, model: nn.Module, data: Any):
         return model(**data)
 
     def collate_fn(self, data):

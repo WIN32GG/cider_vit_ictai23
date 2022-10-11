@@ -16,7 +16,7 @@ class Cider():
         self.max_classes: int         = conf.dataset.max_classes
         self.prototypes: list[Tensor] = [torch.nn.parameter.Parameter(conf.env.make(F.normalize(torch.rand(conf.model.projection_size), dim=0))) for _ in range(self.max_classes)]
 
-    def __call__(self, out: Tensor, y: list[Tensor]) -> tuple(float, float):
+    def __call__(self, out: Tensor, y: list[Tensor]) -> tuple[float, float]:
 
         for i, label in enumerate(y):
             # Update class prototype

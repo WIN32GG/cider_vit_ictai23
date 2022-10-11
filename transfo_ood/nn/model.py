@@ -77,7 +77,7 @@ class ModelFactory():
         backbone_network = self.conf.env.make(backbone_network)
         return self.conf.env.make(CustomModel(self.conf, backbone_network, self.get_projector(backbone_network, self.conf), preparator=self.prep))
 
-    def load_cnn_backbone(self, model_name: str) -> torch.Module:
+    def load_cnn_backbone(self, model_name: str) -> nn.Module:
         if model_name == "raw_small":
             return nn.Sequential(
                 nn.Conv2d(self.conf.dataset.input_features, 50, (3, 3)),
@@ -103,21 +103,21 @@ class ModelFactory():
         raise RuntimeError("CNN model not found")
 
 
-    def get_projector(self, backbone_network: torch.Model, conf: Config) -> torch.Module:
+    def get_projector(self, backbone_network: nn.Module, conf: Config) -> nn.Module:
         """get_projector
 
         Return untrained projector with the appropriate method
 
         Parameters
         ----------
-        backbone_network : torch.Model
+        backbone_network : nn.Module
             The base backbone model that will be used, passed to return a matching projector
         conf : Config
             The torchbooster config
 
         Returns
         -------
-        torch.Module
+        nn.Module
             The Projector model
 
         Raises
