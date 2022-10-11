@@ -1,7 +1,7 @@
 import logging
 import torch
 import torch.nn as nn
-import torch.functional as F
+import torch.nn.functional as F
 
 from torch.nn.parallel import DistributedDataParallel
 
@@ -75,7 +75,7 @@ class ModelFactory():
 
         logging.info("Loading Full Model")
         backbone_network = self.conf.env.make(backbone_network)
-        return self.conf.env.make(CustomModel(self.conf, backbone_network, self.get_projector(backbone_network, self.conf), preparator=self.prep))
+        return self.conf.env.make(CustomModel(self.conf, backbone_network, self.get_projector(backbone_network), preparator=self.preparator))
 
     def load_cnn_backbone(self, model_name: str) -> nn.Module:
         if model_name == "raw_small":
@@ -103,7 +103,7 @@ class ModelFactory():
         raise RuntimeError("CNN model not found")
 
 
-    def get_projector(self, backbone_network: nn.Module, conf: Config) -> nn.Module:
+    def get_projector(self, backbone_network: nn.Module) -> nn.Module:
         """get_projector
 
         Return untrained projector with the appropriate method
@@ -134,20 +134,20 @@ class ModelFactory():
         #     # nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
         # )
 
-        if conf.model.projector == "identity":
-            conf.model.projection_size = ModelFactory.get_backbone_model_output_features(backbone_network, conf) # auto set
+        if self.conf.model.projector == "identity":
+            self.conf.model.projection_size = ModelFactory.get_backbone_model_output_features(backbone_network, self.conf) # auto set
             return nn.Identity()
-        elif conf.model.projector == "mlp":
+        elif self.conf.model.projector == "mlp":
             base_projector = nn.Sequential(
-                nn.Linear(ModelFactory.get_backbone_model_output_features(backbone_network, conf), conf.model.projection_hidden), # TODO switch to baye
+                nn.Linear(ModelFactory.get_backbone_model_output_features(backbone_network, self.conf), self.conf.model.projection_hidden), # TODO switch to baye
                 nn.SiLU(), #TODO param?
-                nn.Dropout(p = conf.model.dropout_p),
-                nn.Linear(conf.model.projection_hidden, conf.model.projection_size), # TODO switch to baye
+                nn.Dropout(p = self.conf.model.dropout_p),
+                nn.Linear(self.conf.model.projection_hidden, self.conf.model.projection_size), # TODO switch to baye
                 nn.SiLU()
             )
-        elif conf.model.projector == 'simple':
+        elif self.conf.model.projector == 'simple':
             base_projector = nn.Sequential(
-                nn.Linear(ModelFactory.get_backbone_model_output_features(backbone_network, conf), conf.model.projection_size), # TODO switch to baye
+                nn.Linear(ModelFactory.get_backbone_model_output_features(backbone_network, self.conf), self.conf.model.projection_size), # TODO switch to baye
                 nn.SiLU(),
             )
         else:

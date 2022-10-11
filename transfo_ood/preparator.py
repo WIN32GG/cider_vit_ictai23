@@ -6,7 +6,7 @@ import logging
 import torchvision
 import torch.nn as nn
 import random
-import torch.functional as F
+import torch.nn.functional as F
 import torchvision.transforms as T
 import nlpaug.augmenter.word as naw
 

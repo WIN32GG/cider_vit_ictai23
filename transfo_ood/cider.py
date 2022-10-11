@@ -2,7 +2,7 @@ import torch
 
 from torch import Tensor
 from torch.nn.modules.loss import _Loss
-import torch.functional as F
+import torch.nn.functional as F
 
 from transfo_ood.config import Config
 
@@ -21,19 +21,19 @@ class Cider():
         for i, label in enumerate(y):
             # Update class prototype
             l =  label - 1
-            self.prototyoes[l].data = F.normalize(self.prototyoes[l] * self.alpha + (1 - self.alpha) * out.select(0, i), dim=0)
+            self.prototypes[l].data = F.normalize(self.prototypes[l] * self.alpha + (1 - self.alpha) * out.select(0, i), dim=0)
 
         # compute L_compactness
         l_compactness = 0.
         for i in range(len(out)):
-            l_compactness += torch.log(torch.exp(torch.dot(out.select(0, i), self.prototyoes[y[i] - 1].detach())/self.temp) / torch.sum(torch.stack([torch.exp(torch.dot(out.select(0, i), self.prototyoes[j])/self.temp) for j in range(self.max_classes)]), dim=0))
+            l_compactness += torch.log(torch.exp(torch.dot(out.select(0, i), self.prototypes[y[i] - 1].detach())/self.temp) / torch.sum(torch.stack([torch.exp(torch.dot(out.select(0, i), self.prototypes[j])/self.temp) for j in range(self.max_classes)]), dim=0))
         l_compactness *= -1.
         
         # compute L_dispersion
         l_dispersion = 1/self.max_classes * torch.sum(
             torch.stack([ torch.log(1/(self.max_classes-1) * torch.sum(
                 torch.stack([ torch.exp(
-                        torch.dot(self.prototyoes[i], self.prototyoes[j]) / self.temp
+                        torch.dot(self.prototypes[i], self.prototypes[j]) / self.temp
                     ) for j in range(self.max_classes) if i != j ]
                 )
             , dim=0)

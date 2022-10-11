@@ -131,7 +131,7 @@ def main(conf: Config, args):
     evaluator = ModelEvaluator(conf, model, train_dataset, test_dataset, combined_ood_train_dataset, combined_ood_test_dataset, prep, writer)
 
     # print_projector(conf, model, combined_ood_test_dataset, prep, writer, 0, "OOD_Projector")
-    fit(conf, model, prep, train_dataset, test_dataset, optim, scheduler, prototypes, writer, evaluator)
+    fit(conf, model, prep, train_dataset, test_dataset, optim, scheduler, writer, evaluator)
     log_params(conf, writer, evaluator(steps=0, epoch_fraction=conf.eval_train_epoch_fraction, iid=False, ood=True))
 
 

@@ -1,7 +1,7 @@
 from typing import Any
 import torch
 import torch.nn as nn
-import torch.functional as F
+import torch.nn.functional as F
 import torchbooster.utils as utils
 import torchbooster.distributed as dist
 import logging
@@ -130,7 +130,7 @@ class ModelEvaluator():
     def evaluate_id_performance(self, model: nn.Module, steps: int = 0) -> dict[str, float]:
         return self._evaluate(model, self.test_dataset, "Evaluating for ID task", self.metrics_id)
 
-    def _train(self, model, optim, metrics: MetricCollection, dataset: DataLoader, desc: str, msg: str, epoch_fraction: float = .1) -> None:
+    def _train(self, model: nn.Module, optim, metrics: MetricCollection, dataset: DataLoader, desc: str, msg: str, epoch_fraction: float = .1) -> None:
         metrics.reset()
         model = model.train()
 
@@ -196,7 +196,7 @@ class ModelEvaluator():
         if not dist.is_primary(): return
 
         logging.info(f"Printing projector state to tensoboard with tag \"{tag_name}\"")
-        model = model.eval()
+        model = self.model.eval()
         with torch.no_grad():
 
             images = {}
