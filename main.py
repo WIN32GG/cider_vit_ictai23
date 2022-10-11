@@ -1,56 +1,14 @@
-from __future__ import annotations
-from argparse import ArgumentParser
+import warnings
+from transfo_ood.evaluator import ModelEvaluator
+from transfo_ood.nn.model import ModelFactory
+
+from transfo_ood.preparator import ImageDataPreparator, TextDataPreparator, dict_hash, log_params, make_ood_dataset
+from transfo_ood.trainer import fit
+warnings.filterwarnings("ignore")
 import dataclasses
 import string
-from turtle import forward
-from cv2 import transform
-
-import tensorboard
-
-from transfo_ood.config import Config
-
-try:
-    from rich import pretty
-    from rich.traceback import install
-    install(show_locals=False)
-    pretty.install()
-    from rich.progress import track
-    # from tqdm.rich import tqdm
-    from tqdm import tqdm
-    
-except ImportError:
-    from tqdm import tqdm
-
-import warnings
-warnings.filterwarnings("ignore")
-import rich
-from dataclasses import dataclass
-from typing import NewType, Tuple
-from enum import Enum
-from itertools import chain
-from pathlib import Path
 import random
 import torchinfo
-from typing import Any, List, TypeVar, Union
-from torchbooster.dataset import Split
-from torch.nn.parallel import DistributedDataParallel
-from tensorboard.plugins import projector
-from torchbooster.config import (
-    BaseConfig,
-    DatasetConfig,
-    EnvironementConfig,
-    LoaderConfig,
-    OptimizerConfig,
-    SchedulerConfig,
-)
-
-
-from torch.utils.tensorboard import SummaryWriter
-from random import random as rand
-from torch.utils.data import DataLoader, Dataset
-from torchmetrics import MetricCollection, Accuracy, Precision, Recall, F1Score, AUROC, CalibrationError
-from torchtext.data.functional import to_map_style_dataset
-
 import os
 import csv
 import sys
@@ -67,20 +25,47 @@ import torchbooster.utils as utils
 import torch.nn.functional as F
 import torchvision.transforms as T
 import transformers
-
-from typing import Dict, Any
 import hashlib
 import json
+import rich
 
+from argparse import ArgumentParser
+from transfo_ood.config import Config
+from dataclasses import dataclass
+from typing import NewType, Tuple
+from enum import Enum
+from itertools import chain
+from pathlib import Path
+from typing import Any, List, TypeVar, Union
+from torchbooster.dataset import Split
+from torch.nn.parallel import DistributedDataParallel
+from tensorboard.plugins import projector
+from torchbooster.config import (
+    BaseConfig,
+    DatasetConfig,
+    EnvironementConfig,
+    LoaderConfig,
+    OptimizerConfig,
+    SchedulerConfig,
+)
+from random import random as rand
+from torch.utils.data import DataLoader, Dataset
+from torchmetrics import MetricCollection, Accuracy, Precision, Recall, F1Score, AUROC, CalibrationError
+from torchtext.data.functional import to_map_style_dataset
+from typing import Dict, Any
+from torch.utils.tensorboard import SummaryWriter
 
-
-# def get_model(backbone_network, conf: Config):
-#     #! Add classification head for testing 
-
-#     return torch.nn.Sequential(
-#         backbone_network,
-#         get_projector(backbone_network, conf)
-#     )
+try:
+    from rich import pretty
+    from rich.traceback import install
+    install(show_locals=False)
+    pretty.install()
+    from rich.progress import track
+    # from tqdm.rich import tqdm
+    from tqdm import tqdm
+    
+except ImportError:
+    from tqdm import tqdm
 
 
 
@@ -124,18 +109,7 @@ def main(conf: Config, args):
     # iid_test_dataset = test_dataset
     # DistributedIterableDataset
 
-    logging.info(f'Loading model')
-    # if conf.data_type == "img":
-    try:
-        logging.info("Trying: Loading CNN based backbone")
-        backbone_network = load_cnn_backbone(conf.model.backbone_network)
-    except:
-        logging.info("Trying: Loading Transformer based backbone")
-        backbone_network = torch.hub.load('huggingface/transformers', 'model', conf.model.backbone_network)
-
-    logging.info("Loading Full Model")
-    backbone_network = conf.env.make(backbone_network)
-    model = conf.env.make(CustomModel(conf, backbone_network, get_projector(backbone_network, conf), preparator=prep))
+    model = ModelFactory(conf, prep)()
 
     if args.dry_run:
         print(conf.hp())

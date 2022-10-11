@@ -4,17 +4,19 @@ from torch import Tensor
 from torch.nn.modules.loss import _Loss
 import torch.functional as F
 
+from transfo_ood.config import Config
+
 ### Compute CIDER Losses
 
-class Cider(_Loss):
+class Cider():
 
-    def __init__(self, prototypes, alpha: float, temp: float, max_classes: int) -> None:
-        self.prototypes: list[Tensor] = prototypes
-        self.alpha: float             = alpha
-        self.temp:float               = temp
-        self.max_classes:int          = max_classes
+    def __init__(self, conf: Config) -> None:
+        self.alpha: float             = conf.alpha
+        self.temp: float              = conf.temp
+        self.max_classes: int         = conf.dataset.max_classes
+        self.prototypes: list[Tensor] = [torch.nn.parameter.Parameter(conf.env.make(F.normalize(torch.rand(conf.model.projection_size), dim=0))) for _ in range(self.max_classes)]
 
-    def forward(self, out: Tensor, y: list[Tensor]) -> tuple(float, float):
+    def __call__(self, out: Tensor, y: list[Tensor]) -> tuple(float, float):
 
         for i, label in enumerate(y):
             # Update class prototype
