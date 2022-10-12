@@ -41,3 +41,11 @@ Language models are already capable of making distinction between datasets, furt
 
 Sometimes the OOD detection is not evident and further training might be required. In these cases, CIDER can be tried.
 The situations apparently arrise when datasets use the sort of etxt semantic (e.g tweets) while the content is different in nature.
+
+---
+
+Further analysis of the circumstances under which the ODD property is present are required:
+- [ ] Similarity measure between datasets
+- [ ] Retrain models from scratch on the specific datasets
+- [ ] plus d'exemples de transformers/ modalités et architectures différentes
+- [ ] Plus de variétés dans le nombre de poids
