@@ -45,7 +45,19 @@ The situations apparently arrise when datasets use the sort of etxt semantic (e.
 ---
 
 Further analysis of the circumstances under which the ODD property is present are required:
-- [ ] Similarity measure between datasets
+- [ ] Similarity measure between datasets: 
+     - Measure distance for ID / OOD after training: measures ditance for data sample pairs
+     - Wasserstein on VAE encoder
+     - Specific modality distance: edition distance etc...
+     - Dataset/Dataset, pair/pair
+     - Model output -> t-SNE/UMAP -> Euclidian/L2/Manathan
 - [ ] Retrain models from scratch on the specific datasets
-- [ ] plus d'exemples de transformers/ modalités et architectures différentes
-- [ ] Plus de variétés dans le nombre de poids
+- [ ] More examples of transformers/ modalities and different architectures
+- [ ] More varieties in the number of weights
+
+---
+ Imagenet réduit, Core50
+
+Utiliser d'autres comme:
+
+![](research_logs/datasets.png)

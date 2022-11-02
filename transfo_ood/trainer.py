@@ -9,39 +9,98 @@ from transfo_ood.evaluator import ModelEvaluator
 from transfo_ood.preparator import DataPreparator
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
+import torch.nn as nn
+from torch.utils.data import DataLoader
+from torch.optim import Optimizer
 
 
-def fit(conf: Config, model, preparator: DataPreparator, dataset, test_dataset, optim, scheduler, writer: SummaryWriter, evaluator: ModelEvaluator):
-    logging.info("Start training")
-    model = conf.env.make(model)
 
-    cider_loss = Cider(conf)
-    evaluator(steps = 0, epoch_fraction = conf.eval_train_epoch_fraction)
-    
-    for epoch in range(conf.epochs):
-        pbar = tqdm(dataset, disable=not dist.is_primary())
-        model = ModelEvaluator.unfreeze(model.train())
-        logging.info(f'Epoch {epoch}')
+class Trainer:
+
+    def __init__(self, conf: Config, model, preparator: DataPreparator, dataset, test_dataset, optim, scheduler, writer: SummaryWriter, evaluator: ModelEvaluator,
+                 
+                ) -> None:
+        self.conf: Config                    = conf
+        self.model: nn.Module                = model
+        self.preparator: DataPreparator      = preparator
+        self.dataset: DataLoader             = dataset
+        self.test_dataset: DataLoader        = test_dataset
+        self.optimizer: Optimizer            = optim
+        self.scheduler                       = scheduler
+        self.writer: SummaryWriter           = writer
+        self.evaluator: ModelEvaluator       = evaluator
+
+    def reset_model(self) -> "Trainer":
+        def _reset_model(m):
+            if hasattr(m, "reset_parameters"):
+                m.reset_parameters()
+        self.model.apply(_reset_model)
+        return self
+
+    def fit(self) -> None:
+        raise NotImplementedError()
+
+
+class ScratchTrainer(Trainer):
+    """ScratchTrainer
+
+    Train the model from scratch by reseting the parameters
+    """
+    def __init__(self, conf: Config, model, preparator: DataPreparator, dataset, test_dataset, optim, scheduler, writer: SummaryWriter, evaluator: ModelEvaluator) -> None:
+        super().__init__(conf, model, preparator, dataset, test_dataset, optim, scheduler, writer, evaluator)
+        self.reset_model()
+
+    def fit(self) -> None:
+        logging.info("Start training")
+        model = self.conf.env.make(model)
         
-        for batch_num, batch in enumerate(pbar):
+        for epoch in range(self.conf.epochs):
+            pbar = tqdm(self.dataset, disable=not dist.is_primary())
+            logging.info(f'Epoch {epoch}')
+            
+            for batch_num, batch in enumerate(pbar):
 
-            step = len(dataset)*epoch + batch_num
-            x, y = preparator.augment_and_prepare_batch(batch)
-            out  = preparator.forward(model, x) # bs x ProjectorSize
+                step = len(self.dataset)*epoch + batch_num
+                x, y = self.preparator.augment_and_prepare_batch(batch)
+                out  = self.preparator.forward(model, x) # bs x ProjectorSize
 
-            l_dispersion, l_compactness = cider_loss(out, y)
-            loss = conf.lambda_d * l_dispersion + conf.lambda_c * l_compactness
+class CiderTrainer(Trainer):
+    """CiderTrainer
 
-            utils.step(loss, optim, scheduler, clip=conf.clip)
-            pbar.set_postfix(l_d=l_dispersion.detach().item(), l_c=l_compactness.detach().item())
+    FineTune model with the cider loss
+    """
 
-            if dist.is_primary():
-                writer.add_scalar("loss/L_disper",  l_dispersion.detach().item(), step)
-                writer.add_scalar("loss/L_compact", l_compactness.detach().item(), step)
-                writer.add_scalar("loss/L_total",   loss.detach().item(), step)
-                writer.add_scalar("proto/std", torch.stack(cider_loss.prototypes).std(0).mean().detach().item(), step)
+    def fit(self):
+        logging.info("Start training")
+        model = self.conf.env.make(model)
 
-    # print_projector(conf, model, test_dataset, preparator, writer, steps=step)
-    evaluator(steps = step, epoch_fraction = conf.eval_train_epoch_fraction)
+        cider_loss = Cider(self.conf)
+        self.evaluator(steps = 0, epoch_fraction = self.conf.eval_train_epoch_fraction)
+        
+        for epoch in range(self.conf.epochs):
+            pbar = tqdm(self.dataset, disable=not dist.is_primary())
+            model = ModelEvaluator.unfreeze(model.train())
+            logging.info(f'Epoch {epoch}')
+            
+            for batch_num, batch in enumerate(pbar):
+
+                step = len(self.dataset)*epoch + batch_num
+                x, y = self.preparator.augment_and_prepare_batch(batch)
+                out  = self.preparator.forward(model, x) # bs x ProjectorSize
+
+                l_dispersion, l_compactness = cider_loss(out, y)
+                loss = self.conf.lambda_d * l_dispersion + self.conf.lambda_c * l_compactness
+
+                utils.step(loss, self.optim, self.scheduler, clip=self.conf.clip)
+                pbar.set_postfix(l_d=l_dispersion.detach().item(), l_c=l_compactness.detach().item())
+
+                if dist.is_primary():
+                    self.writer.add_scalar("loss/L_disper",  l_dispersion.detach().item(), step)
+                    self.writer.add_scalar("loss/L_compact", l_compactness.detach().item(), step)
+                    self.writer.add_scalar("loss/L_total",   loss.detach().item(), step)
+                    self.writer.add_scalar("proto/std", torch.stack(cider_loss.prototypes).std(0).mean().detach().item(), step)
+
+        # print_projector(conf, model, test_dataset, preparator, writer, steps=step)
+        self.evaluator(steps = step, epoch_fraction = self.conf.eval_train_epoch_fraction)
 
 
