@@ -14,12 +14,16 @@ from torch.utils.data import DataLoader
 from torch.optim import Optimizer
 
 
+"""
+Trainer is the strategy and what we want to test
+
+CiderTrainer: Test cider loss for OOD detection improvment on textual/visual data
+ScratchTrainer: Test LM OOD detection capabilities over time of training
+"""
 
 class Trainer:
 
-    def __init__(self, conf: Config, model, preparator: DataPreparator, dataset, test_dataset, optim, scheduler, writer: SummaryWriter, evaluator: ModelEvaluator,
-                 
-                ) -> None:
+    def __init__(self, conf: Config, model, preparator: DataPreparator, dataset, test_dataset, optim, scheduler, writer: SummaryWriter, evaluator: ModelEvaluator) -> None:
         self.conf: Config                    = conf
         self.model: nn.Module                = model
         self.preparator: DataPreparator      = preparator
@@ -36,6 +40,9 @@ class Trainer:
                 m.reset_parameters()
         self.model.apply(_reset_model)
         return self
+
+    def __call__(self, *args: Any, **kwds: Any) -> Any:
+        self.fit()
 
     def fit(self) -> None:
         raise NotImplementedError()

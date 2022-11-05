@@ -82,10 +82,10 @@ class ListDataset(Dataset):
 
 
 class DataPreparator():
-    def __init__(self, dataset_len, conf, max_classes = -1) -> None:
+    def __init__(self, conf, max_classes = -1) -> None:
         self.batch_num = 0
         self.conf: Config = conf
-        self.dataset_len = dataset_len
+        # self.dataset_len = dataset_len
         self.max_classes = max_classes
 
     @staticmethod
@@ -118,10 +118,30 @@ class DataPreparator():
 
     def collate_fn(self, data):
         return data
+    
+    def __call__(self, batch: tuple(torch.Tensor, torch.Tensor), model: nn.Module, augment: bool = False) -> tuple(torch.Tensor, torch.Tensor):
+        """Forward call for the batch
+
+        Parameters
+        ----------
+        batch : tuple
+            The batch
+        model : nn.Module
+            The model
+        augment : bool, optional
+            Augment the data?, by default False
+
+        Returns
+        -------
+        tuple(torch.Tensor, torch.Tensor)
+            ŷ, y: the computer output and the true output from the batch
+        """
+        x, y = self.augment_and_prepare_batch(batch, augment)
+        return self.forward(model, x), y
 
 class ImageDataPreparator(DataPreparator):
-    def __init__(self, dataset_len, conf, max_classes=-1, target_size: Tuple[int] = None) -> None:
-        super().__init__(dataset_len, conf, max_classes)
+    def __init__(self, conf, max_classes=-1, target_size: Tuple[int] = None) -> None:
+        super().__init__(conf, max_classes)
         self.resize_augmenter = [T.Resize(target_size)] if target_size is not None else []
         self.augmenter = self.get_augmenter()
         self.id_augmenter = T.Compose( [ *self.resize_augmenter, T.ToTensor()])
@@ -155,12 +175,9 @@ class ImageDataPreparator(DataPreparator):
         return self.conf.env.make(torch.stack(X)), self.conf.env.make(utils.to_tensor(Y)) 
 
 class TextDataPreparator(DataPreparator):
-    def __init__(self, dataset_len, tokenizer, conf, max_classes = -1) -> None:
-        self.batch_num = 0
-        self.dataset_len: int = dataset_len
+    def __init__(self, tokenizer, conf, max_classes = -1) -> None:
+        super().__init__(conf, max_classes)
         self.tokenizer = tokenizer
-        self.conf: Config = conf
-        self.max_classes = max_classes
 
     def tokenize_and_make(self, strs: Union[str, List[str]], **kwargs) -> torch.Tensor:
         if isinstance(strs, str):

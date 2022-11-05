@@ -1,9 +1,9 @@
 import warnings
 from transfo_ood.evaluator import ModelEvaluator
 from transfo_ood.nn.model import ModelFactory
+from transfo_ood.trainer import ScratchTrainer, CiderTrainer
 
 from transfo_ood.preparator import ImageDataPreparator, TextDataPreparator, dict_hash, log_params, make_ood_dataset
-from transfo_ood.trainer import fit
 warnings.filterwarnings("ignore")
 import dataclasses
 import string
@@ -83,11 +83,11 @@ def main(conf: Config, args):
 
     logging.info("Loading data preparator")
     if conf.data_type == "img":
-        prep = ImageDataPreparator(len(train_dataset), conf, max_classes=conf.dataset.max_classes, target_size=conf.dataset.target_size)
+        prep = ImageDataPreparator(conf, max_classes=conf.dataset.max_classes, target_size=conf.dataset.target_size)
     else:
         logging.info(f'Loading tokenizer')
         tokenizer = torch.hub.load('huggingface/transformers', 'tokenizer', conf.model.backbone_network)
-        prep = TextDataPreparator(len(train_dataset), tokenizer, conf, max_classes=conf.dataset.max_classes) 
+        prep = TextDataPreparator(tokenizer, conf, max_classes=conf.dataset.max_classes) 
 
     ood_train_dataset = conf.dataset.ood_detection_dataset.make(Split.TRAIN)
     ood_test_dataset  = conf.dataset.ood_detection_dataset.make(Split.TEST)
@@ -117,7 +117,7 @@ def main(conf: Config, args):
         logging.warning("Dry run: exiting")
         exit(0)
 
-    # CIDER prototypes
+    # CIDER prototypes TODO: move to loss
     prototypes = [torch.nn.parameter.Parameter(conf.env.make(F.normalize(torch.rand(conf.model.projection_size), dim=0))) for _ in range(prep.max_classes)]
 
     optim = conf.optim.make(chain(model.parameters(), prototypes))
@@ -129,9 +129,9 @@ def main(conf: Config, args):
     rich.print_json(data=dataclasses.asdict(conf))
     writer = SummaryWriter(f'runs/{run_name}') if dist.is_primary() else None
     evaluator = ModelEvaluator(conf, model, train_dataset, test_dataset, combined_ood_train_dataset, combined_ood_test_dataset, prep, writer)
+    trainer = ScratchTrainer(conf, model, prep, train_dataset, test_dataset, optim, scheduler, writer, evaluator)
 
-    # print_projector(conf, model, combined_ood_test_dataset, prep, writer, 0, "OOD_Projector")
-    fit(conf, model, prep, train_dataset, test_dataset, optim, scheduler, writer, evaluator)
+    trainer()
     log_params(conf, writer, evaluator(steps=0, epoch_fraction=conf.eval_train_epoch_fraction, iid=False, ood=True))
 
 

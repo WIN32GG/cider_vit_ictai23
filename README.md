@@ -48,10 +48,13 @@ Further analysis of the circumstances under which the ODD property is present ar
 - [ ] Similarity measure between datasets: 
      - Measure distance for ID / OOD after training: measures ditance for data sample pairs
      - Wasserstein on VAE encoder
-     - Specific modality distance: edition distance etc...
-     - Dataset/Dataset, pair/pair
-     - Model output -> t-SNE/UMAP -> Euclidian/L2/Manathan
-- [ ] Retrain models from scratch on the specific datasets
+     - Specific modality distance: edition distance etc... 
+     - Dataset/Dataset, pair/pair **Pairs number is too high to be computed in reasonable time**
+     - Model output -> t-SNE/UMAP -> Euclidian/L2/Manathan: **OK**
+
+
+- [ ] Retrain models from scratch on the specific datasets 
+     **retrain with what objective? Word masking?**
 - [ ] More examples of transformers/ modalities and different architectures
 - [ ] More varieties in the number of weights
 
