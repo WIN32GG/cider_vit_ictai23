@@ -33,8 +33,8 @@ class Similarity:
 
 class FeatureDistanceSimilarity(Similarity):
 
-    def __init__(self, modality: Modality, dataset1: DataLoader, dataset2: DataLoader, comparator: nn.Module = None) -> None:
-        super().__init__(modality, dataset1, dataset2)
+    def __init__(self, modality: Modality, preparator: DataPreparator, dataset1: DataLoader, dataset2: DataLoader, comparator: nn.Module = None) -> None:
+        super().__init__(modality, preparator, dataset1, dataset2)
         if comparator is not None:
             self.comparator = comparator
 
@@ -42,7 +42,7 @@ class FeatureDistanceSimilarity(Similarity):
         self.comparator = comparator.eval()
         return self
 
-    def _dataset_high_level_stats(self, dataset: DataLoader, model: nn.Module) -> tuple(torch.Tensor, torch.Tensor):   
+    def _dataset_high_level_stats(self, dataset: DataLoader, model: nn.Module) -> tuple[torch.Tensor, torch.Tensor]:
         outputs = torch.stack([self.preparator(batch, model, augment=False)[0].detach().cpu() for batch in tqdm(dataset)])
         return outputs.mean(0), outputs.std(0)
     
@@ -54,13 +54,13 @@ class FeatureDistanceSimilarity(Similarity):
         return torch.sqrt(torch.pow(m1 - m2, 2)).mean()
 
 class TextBertFeaturesDistanceSimilarity(FeatureDistanceSimilarity):
-    def __init__(self, modality: Modality, dataset1: DataLoader, dataset2: DataLoader, conf: Config) -> None:
-        super().__init__(modality, dataset1, dataset2)
+    def __init__(self, prep: DataPreparator, dataset1: DataLoader, dataset2: DataLoader, conf: Config) -> None:
+        super().__init__(Modality.TEXTUAL, prep, dataset1, dataset2)
 
         comparator_backbone = "bert-base-uncased"
         self.preparator = TextDataPreparator(torch.hub.load('huggingface/transformers', 'tokenizer', comparator_backbone), conf) 
         self.set_comparator(torch.hub.load('huggingface/transformers', 'model', comparator_backbone))
 
 class ImageVGG16FeaturesDistanceSimilarity(FeatureDistanceSimilarity):
-    def __init__(self, dataset1: DataLoader, dataset2: DataLoader) -> None:
-        super().__init__(Modality.VISUAL, dataset1, dataset2, vgg16(weights = VGG16_Weights.DEFAULT).features)
+    def __init__(self, prep: DataPreparator, dataset1: DataLoader, dataset2: DataLoader) -> None:
+        super().__init__(Modality.VISUAL, prep, dataset1, dataset2, vgg16(weights = VGG16_Weights.DEFAULT).features)

@@ -1,3 +1,4 @@
+print("Starting...")
 import warnings
 from transfo_ood.evaluator import ModelEvaluator
 from transfo_ood.nn.model import ModelFactory
@@ -28,6 +29,9 @@ import transformers
 import hashlib
 import json
 import rich
+import transfo_ood.trainer
+import argparse
+import transfo_ood.similarity as sim
 
 from argparse import ArgumentParser
 from transfo_ood.config import Config
@@ -69,7 +73,7 @@ except ImportError:
 
 
 
-def main(conf: Config, args):
+def main(conf: Config, args) -> None:
     logging.info("Setting base config")
     utils.seed(conf.seed)
     utils.boost(not conf.debug)
@@ -111,11 +115,13 @@ def main(conf: Config, args):
 
     model = ModelFactory(conf, prep)()
 
+    print(conf.hp())
     if args.dry_run:
-        print(conf.hp())
         torchinfo.summary(model)
         logging.warning("Dry run: exiting")
         exit(0)
+
+    
 
     # CIDER prototypes TODO: move to loss
     prototypes = [torch.nn.parameter.Parameter(conf.env.make(F.normalize(torch.rand(conf.model.projection_size), dim=0))) for _ in range(prep.max_classes)]
@@ -129,7 +135,20 @@ def main(conf: Config, args):
     rich.print_json(data=dataclasses.asdict(conf))
     writer = SummaryWriter(f'runs/{run_name}') if dist.is_primary() else None
     evaluator = ModelEvaluator(conf, model, train_dataset, test_dataset, combined_ood_train_dataset, combined_ood_test_dataset, prep, writer)
-    trainer = ScratchTrainer(conf, model, prep, train_dataset, test_dataset, optim, scheduler, writer, evaluator)
+
+    if args.similarity:
+        print(f'Running similarity')
+        
+        if conf.data_type == "img":
+            val = sim.ImageVGG16FeaturesDistanceSimilarity(prep, test_dataset, ood_test_dataset)()
+        else:
+            val = sim.TextBertFeaturesDistanceSimilarity(prep, test_dataset, ood_test_dataset, conf)()
+        print(f'Similarity is: {val}')
+        writer.add_scalar("similarity", val)
+        return
+
+    trainer_class = getattr(transfo_ood.trainer, conf.trainer)
+    trainer = trainer_class(conf, model, prep, train_dataset, test_dataset, optim, scheduler, writer, evaluator)
 
     trainer()
     log_params(conf, writer, evaluator(steps=0, epoch_fraction=conf.eval_train_epoch_fraction, iid=False, ood=True))
@@ -137,8 +156,10 @@ def main(conf: Config, args):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
+    
     parser.add_argument("-d", "--dry_run", action="store_true", help="Dry run, print model architecture, dataset sample and exit")
     parser.add_argument("-c", "--config", required=True, help="Config file path to use (e.g: configs/txt/reviews.yml)")
+    parser.add_argument("-s", "--similarity", action=argparse.BooleanOptionalAction)
 
     args = parser.parse_args()
 

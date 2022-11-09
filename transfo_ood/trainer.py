@@ -1,9 +1,10 @@
 import logging
-import torch
 import torchbooster.utils as utils
 import torchbooster.distributed as dist
-from transfo_ood.cider import Cider
+import torch
 
+from typing import Any
+from transfo_ood.cider import Cider
 from transfo_ood.config import Config
 from transfo_ood.evaluator import ModelEvaluator
 from transfo_ood.preparator import DataPreparator
@@ -33,6 +34,7 @@ class Trainer:
         self.scheduler                       = scheduler
         self.writer: SummaryWriter           = writer
         self.evaluator: ModelEvaluator       = evaluator
+        self.setup()
 
     def reset_model(self) -> "Trainer":
         def _reset_model(m):
@@ -41,6 +43,9 @@ class Trainer:
         self.model.apply(_reset_model)
         return self
 
+    def setup(self) -> None:
+        pass
+
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         self.fit()
 
@@ -48,13 +53,22 @@ class Trainer:
         raise NotImplementedError()
 
 
+class IdentityTrainer(Trainer):
+    """IdentityTrainer
+    Keep the models as is and perform OOD evaluation_
+    """
+
+    def fit(self) -> None:
+        pass
+
 class ScratchTrainer(Trainer):
     """ScratchTrainer
 
     Train the model from scratch by reseting the parameters
+    Traininig objective is wordmasking on "dataset" 
+    TODO: implement other strategies? 
     """
-    def __init__(self, conf: Config, model, preparator: DataPreparator, dataset, test_dataset, optim, scheduler, writer: SummaryWriter, evaluator: ModelEvaluator) -> None:
-        super().__init__(conf, model, preparator, dataset, test_dataset, optim, scheduler, writer, evaluator)
+    def setup(self):
         self.reset_model()
 
     def fit(self) -> None:
@@ -82,7 +96,7 @@ class CiderTrainer(Trainer):
         model = self.conf.env.make(model)
 
         cider_loss = Cider(self.conf)
-        self.evaluator(steps = 0, epoch_fraction = self.conf.eval_train_epoch_fraction)
+        self.evaluator(steps = 0, epoch_fraction = self.conf.eval_train_epoch_fraction) # FIXME: move out
         
         for epoch in range(self.conf.epochs):
             pbar = tqdm(self.dataset, disable=not dist.is_primary())
@@ -108,6 +122,6 @@ class CiderTrainer(Trainer):
                     self.writer.add_scalar("proto/std", torch.stack(cider_loss.prototypes).std(0).mean().detach().item(), step)
 
         # print_projector(conf, model, test_dataset, preparator, writer, steps=step)
-        self.evaluator(steps = step, epoch_fraction = self.conf.eval_train_epoch_fraction)
+        self.evaluator(steps = step, epoch_fraction = self.conf.eval_train_epoch_fraction) # FIXME: mlive out
 
 

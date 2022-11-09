@@ -119,7 +119,7 @@ class DataPreparator():
     def collate_fn(self, data):
         return data
     
-    def __call__(self, batch: tuple(torch.Tensor, torch.Tensor), model: nn.Module, augment: bool = False) -> tuple(torch.Tensor, torch.Tensor):
+    def __call__(self, batch: tuple[torch.Tensor, torch.Tensor], model: nn.Module, augment: bool = False) -> tuple[torch.Tensor, torch.Tensor]:
         """Forward call for the batch
 
         Parameters

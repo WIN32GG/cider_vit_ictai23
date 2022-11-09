@@ -54,6 +54,7 @@ class Config(BaseConfig):
     clip: float
     data_type: str
     force_make_table_dataset: bool
+    trainer: str
 
     #Eval hp
     eval_train_epoch_fraction: float
@@ -87,6 +88,7 @@ class Config(BaseConfig):
             f'{prefix}/trainer/batch_size': self.loader.batch_size,
             f'{prefix}/trainer/epochs': self.epochs,
             f'{prefix}/trainer/seed': self.seed,
+            f'{prefix}/trainer/name': self.trainer,
 
             f'{prefix}/scheduler/name': self.scheduler.name if self.scheduler is not None else "None",
 
@@ -107,4 +109,5 @@ class Config(BaseConfig):
             f'{prefix}/model/projection_size': self.model.projection_size,
             f'{prefix}/model/dropout_p': self.model.dropout_p,
         }
+
 
