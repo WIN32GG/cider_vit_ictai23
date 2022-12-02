@@ -12,7 +12,7 @@ model:
   projector: simple
   projection_size: 64, 512, 256
   # backbone_network: '"facebook/bart-base", "roberta-base", "albert-base-v2", "bert-base-uncased", "distilbert-base-uncased"'
-  backbone_network: '"distilroberta-base","roberta-base", "roberta-large","roberta-large-mnli","albert-base-v1","albert-large-v1","albert-base-v2", "albert-large-v2","t5-small","t5-base","t5-large,""facebook/bart-base","facebook/bart-large","reformer-enwik8","allenai/longformer-base-4096","distilbert-base-uncased","bert-base-uncased", "bert-large-uncased", "bert-base-multilingual-uncased", "bert-large-cased-whole-word-masking","openai-gpt","distilgpt2","gpt2","gpt2-medium","gpt2-large","xlnet-base-cased","xlnet-large-cased","xlm-mlm-en-2048","xlm-mlm-17-1280"'
+  backbone_network: '"distilroberta-base","roberta-base", "roberta-large","roberta-large-mnli","albert-base-v1","albert-large-v1","albert-base-v2", "albert-large-v2","t5-small","t5-base","t5-large,""facebook/bart-base","facebook/bart-large","google/reformer-enwik8","allenai/longformer-base-4096","distilbert-base-uncased","bert-base-uncased", "bert-large-uncased", "bert-base-multilingual-uncased", "bert-large-cased-whole-word-masking","openai-gpt","distilgpt2","gpt2","gpt2-medium","gpt2-large","xlnet-base-cased","xlnet-large-cased","xlm-mlm-en-2048","xlm-mlm-17-1280"'
 
 dataset:
   max_classes: 5

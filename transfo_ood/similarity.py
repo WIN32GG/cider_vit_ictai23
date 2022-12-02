@@ -48,8 +48,8 @@ class FeatureDistanceSimilarity(Similarity):
     
     def similarity(self):
         assert self.comparator is not None, "Comparator undefined"
-        m1, s1  = self._dataset_high_level_stats(self.dataset1, self.comparator)
-        m2, s2  = self._dataset_high_level_stats(self.dataset2, self.comparator)
+        m1, s1  = self._dataset_high_level_stats(self.dataset1, self.comparator) #FIXME: do something with s1
+        m2, s2  = self._dataset_high_level_stats(self.dataset2, self.comparator) #FIXME: do something with s2
 
         return torch.sqrt(torch.pow(m1 - m2, 2)).mean()
 

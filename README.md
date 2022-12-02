@@ -55,12 +55,42 @@ Further analysis of the circumstances under which the ODD property is present ar
 
 - [ ] Retrain models from scratch on the specific datasets 
      **retrain with what objective? Word masking?**
+     - [ ] Follow property evolution with training
+          On EnWiki/ReducedImageNet for example w/ comparisons with OOD datasets
 - [X] More examples of transformers/ modalities and different architectures **OK see below**
 - [X] More varieties in the number of weights **OK see below**
 
 TODO: when multimodel use microsoft/layoutlm-base-uncased
 
-'"distilroberta-base","roberta-base", "roberta-large","roberta-large-mnli","albert-base-v1","albert-large-v1","albert-base-v2", "albert-large-v2","t5-small","t5-base","t5-large,""facebook/bart-base","facebook/bart-large","reformer-enwik8","allenai/longformer-base-4096","distilbert-base-uncased","bert-base-uncased", "bert-large-uncased", "bert-base-multilingual-uncased", "bert-large-cased-whole-word-masking","openai-gpt","distilgpt2","gpt2","gpt2-medium","gpt2-large","xlnet-base-cased","xlnet-large-cased","xlm-mlm-en-2048","xlm-mlm-17-1280"'
+"distilroberta-base"
+"roberta-base"
+"roberta-large"
+"roberta-large-mnli"
+"albert-base-v1"
+"albert-large-v1"
+"albert-base-v2"
+"albert-large-v2"
+"t5-small"
+"t5-base"
+"t5-large"
+"facebook/bart-base"
+"facebook/bart-large"
+"reformer-enwik8"
+"allenai/longformer-base-4096"
+"distilbert-base-uncased"
+"bert-base-uncased"
+"bert-large-uncased"
+"bert-base-multilingual-uncased"
+"bert-large-cased-whole-word-masking"
+"openai-gpt"
+"distilgpt2"
+"gpt2"
+"gpt2-medium"
+"gpt2-large"
+"xlnet-base-cased"
+"xlnet-large-cased"
+"xlm-mlm-en-2048"
+"xlm-mlm-17-1280"
 
 ---
  Imagenet réduit, Core50
