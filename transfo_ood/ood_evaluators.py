@@ -59,6 +59,7 @@ class LLR(OODEvaluator):
     def __init__(self, config: Config, preparator: DataPreparator, model: nn.Model, model_background: nn.Model, id_dataset: DataLoader, ood_dataset: DataLoader, **kwargs) -> None:
         super().__init__(config, preparator, model, id_dataset, ood_dataset, **kwargs)
         self.model_background = model_background
+        self.threshold = .1
     
     
     def _iter_dataaset(self, dataset) -> Generator[torch.Tensor, torch.Tensor]:
@@ -81,6 +82,9 @@ class LLR(OODEvaluator):
             c = self.count_ood(ratios)
             tp += c; fp += ratios.size(0) - c
         return tp, fp, tn, fn
+
+    def count_ood(self, ratios: torch.Tensor) -> int:
+        return (ratios > self.threshold).sum()
 
 class MaxProb(OODEvaluator):
     def __init__(self, config: Config, preparator: DataPreparator, model: nn.Model, id_dataset: DataLoader, ood_dataset: DataLoader, **kwargs) -> None:

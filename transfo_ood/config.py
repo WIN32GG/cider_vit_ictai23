@@ -56,6 +56,9 @@ class Config(BaseConfig):
     force_make_table_dataset: bool
     trainer: str
 
+    # OOD eval:
+    ood_evaluator: str
+
     #Eval hp
     eval_train_epoch_fraction: float
 
@@ -89,6 +92,7 @@ class Config(BaseConfig):
             f'{prefix}/trainer/epochs': self.epochs,
             f'{prefix}/trainer/seed': self.seed,
             f'{prefix}/trainer/name': self.trainer,
+            f'{prefix}/ood_evaluator': self.ood_evaluator,
 
             f'{prefix}/scheduler/name': self.scheduler.name if self.scheduler is not None else "None",
 

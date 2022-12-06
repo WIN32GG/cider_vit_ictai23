@@ -105,8 +105,8 @@ def main(conf: Config, args) -> None:
 
 
     logging.info(f'Loading dataset: Making Data Loaders')
-    combined_ood_train_dataset =  conf.loader.make(make_ood_dataset(conf, train_dataset, ood_train_dataset), shuffle=True,  distributed=conf.env.distributed, collate_fn=prep.collate_fn)
-    combined_ood_test_dataset  =  conf.loader.make(make_ood_dataset(conf, test_dataset, ood_test_dataset),   shuffle=False, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
+    # combined_ood_train_dataset =  conf.loader.make(make_ood_dataset(conf, train_dataset, ood_train_dataset), shuffle=True,  distributed=conf.env.distributed, collate_fn=prep.collate_fn)
+    # combined_ood_test_dataset  =  conf.loader.make(make_ood_dataset(conf, test_dataset, ood_test_dataset),   shuffle=False, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
     
     train_dataset = conf.loader.make(train_dataset, shuffle=not conf.env.distributed, distributed=conf.env.distributed, collate_fn=prep.collate_fn)
     test_dataset  = conf.loader.make(test_dataset, shuffle=False, distributed=conf.env.distributed, collate_fn=prep.collate_fn)

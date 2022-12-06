@@ -25,6 +25,9 @@ from torchmetrics import (
 
 
 class ModelEvaluator():
+    """
+    V2: Use ood_evaluators
+    """
 
     @staticmethod
     def unfreeze(module: nn.Module) -> nn.Module:
@@ -32,14 +35,14 @@ class ModelEvaluator():
             param.requires_grad = True
         return module
 
-    def __init__(self, conf: Config, model: nn.Module, train_dataset: DataLoader, test_dataset: DataLoader, combined_ood_train_dataset: DataLoader, combined_ood_test_dataset: Dataset, preparator: DataPreparator, writer: SummaryWriter) -> None:
+    def __init__(self, conf: Config, model: nn.Module, train_dataset: DataLoader, test_dataset: DataLoader, preparator: DataPreparator, writer: SummaryWriter) -> None:
 
         self.conf: Config                               = conf
         self.model: nn.Module                        = model
         self.train_dataset: DataLoader                  = train_dataset
         self.test_dataset: DataLoader                   = test_dataset
-        self.combined_ood_train_dataset: DataLoader     = combined_ood_train_dataset
-        self.combined_ood_test_dataset: DataLoader      = combined_ood_test_dataset
+        # self.combined_ood_train_dataset: DataLoader     = combined_ood_train_dataset
+        # self.combined_ood_test_dataset: DataLoader      = combined_ood_test_dataset
         self.preparator: DataPreparator                 = preparator
         self.writer: SummaryWriter                      = writer
         self.reducer: int                               = 64
@@ -67,8 +70,10 @@ class ModelEvaluator():
         id_metrics = {}
         ood_metrics = {}
 
-        utils.freeze(self.model)
+        # TODO test if re-training setting
+        # utils.freeze(self.model)
         
+        # train on id data to get task perforamance statistics
         if iid:
             id_model    = self.get_model_for_id_classification()
             optim       = torch.optim.AdamW(id_model.parameters())
@@ -77,14 +82,20 @@ class ModelEvaluator():
             id_metrics = self.evaluate_id_performance(id_model, steps)
             print(id_metrics)
 
-        if ood:            
-            ood_model   = self.get_model_for_ood_classification()
-            optim       = torch.optim.AdamW(ood_model.parameters())
+        #NOTE: wrong: train on joint id/ood data to evaluate calssifier
+        #      this is incorrect, we use ood_classifier now
+        # if ood:            
+        #     ood_model   = self.get_model_for_ood_classification()
+        #     optim       = torch.optim.AdamW(ood_model.parameters())
 
-            self.train_model_for_ood_classification(ood_model, optim, epoch_fraction)
-            ood_metrics = self.evaluate_ood_performance(ood_model, steps)
-            print(ood_metrics)
-            self.print_projector(steps, "OOD_Projector")
+        #     self.train_model_for_ood_classification(ood_model, optim, epoch_fraction)
+        #     ood_metrics = self.evaluate_ood_performance(ood_model, steps)
+        #     print(ood_metrics)
+        #     self.print_projector(steps, "OOD_Projector")
+
+        if ood:
+            ood_model    = self.get_model_for_id_classification() # same model as 
+
             
 
         if steps >= 0:
@@ -154,6 +165,7 @@ class ModelEvaluator():
         return self._train(model, optim, self.metrics_id, self.train_dataset, "ID_FT", "Train head for ID metrics", epoch_fraction)
 
     def train_model_for_ood_classification(self, model: nn.Module, optim, epoch_fraction: float = .1) -> None:
+        raise NotImplementedError() #NOTE no longer train model on ood data
         return self._train(model, optim, self.metrics_ood, self.combined_ood_train_dataset, "OOD_FT", "Train head for OOD task", epoch_fraction)
        
     def get_model_for_ood_classification(self) -> nn.Module:

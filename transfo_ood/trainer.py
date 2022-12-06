@@ -84,6 +84,7 @@ class ScratchTrainer(Trainer):
                 step = len(self.dataset)*epoch + batch_num
                 x, y = self.preparator.augment_and_prepare_batch(batch)
                 out  = self.preparator.forward(model, x) # bs x ProjectorSize
+                #TODO
 
 class CiderTrainer(Trainer):
     """CiderTrainer
