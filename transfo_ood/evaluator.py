@@ -66,7 +66,7 @@ class ModelEvaluator():
             # CalibrationError(n_bins=10, norm='l2')
         ])
 
-    def __call__(self, steps: int = 0, epoch_fraction: float = .1, iid: bool = True, ood: bool = True) -> dict[str, float]:
+    def __call__(self, steps: int = 0, epoch_fraction: float = .1) -> dict[str, float]:
         id_metrics = {}
         ood_metrics = {}
 
@@ -74,13 +74,12 @@ class ModelEvaluator():
         # utils.freeze(self.model)
         
         # train on id data to get task perforamance statistics
-        if iid:
-            id_model    = self.get_model_for_id_classification()
-            optim       = torch.optim.AdamW(id_model.parameters())
+        id_model    = self.get_model_for_id_classification()
+        optim       = torch.optim.AdamW(id_model.parameters())
 
-            self.train_model_for_id_classification(id_model, optim, epoch_fraction)
-            id_metrics = self.evaluate_id_performance(id_model, steps)
-            print(id_metrics)
+        self.train_model_for_id_classification(id_model, optim, epoch_fraction)
+        id_metrics = self.evaluate_id_performance(id_model, steps)
+        print(id_metrics)
 
         #NOTE: wrong: train on joint id/ood data to evaluate calssifier
         #      this is incorrect, we use ood_classifier now
@@ -93,8 +92,7 @@ class ModelEvaluator():
         #     print(ood_metrics)
         #     self.print_projector(steps, "OOD_Projector")
 
-        if ood:
-            ood_model    = self.get_model_for_id_classification() # same model as 
+        ood_model    = self.get_model_for_id_classification() # same model as ID classification
 
             
 

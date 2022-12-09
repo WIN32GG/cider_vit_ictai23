@@ -21,16 +21,16 @@ class OODEvaluator():
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         pass
 
-    def _iter_dataaset(self, dataset) -> Generator[torch.Tensor, torch.Tensor]:
+    def _iter_dataset(self, dataset) -> Generator[torch.Tensor, torch.Tensor]:
         for x, y in tqdm(dataset):
             probs = self.preparator.forward(self.model, x)
             yield probs, y
     
     def _iter_id_probs(self) -> Generator[torch.Tensor, torch.Tensor]:
-        return self._iter_dataaset(self.id_dataset)
+        return self._iter_dataset(self.id_dataset)
 
     def _iter_ood_probs(self) -> Generator[torch.Tensor, torch.Tensor]:
-        return self._iter_dataaset(self.ood_dataset)
+        return self._iter_dataset(self.ood_dataset)
         
     def compute_ood_stats(self) -> tuple[int, int, int, int]: # tp, fp, tn, fn
         tp, fp, tn, fn = 0
@@ -62,7 +62,7 @@ class LLR(OODEvaluator):
         self.threshold = .1
     
     
-    def _iter_dataaset(self, dataset) -> Generator[torch.Tensor, torch.Tensor]:
+    def _iter_dataset(self, dataset) -> Generator[torch.Tensor, torch.Tensor]:
         # NOTE Redefinition to yield probas for model1 and model_background
         for x, y in tqdm(dataset):
             probs_model      = self.preparator.forward(self.model, x)
