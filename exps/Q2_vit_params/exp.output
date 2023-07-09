@@ -1,0 +1,31 @@
+===================== vit_h_14 =====================
+Trainable params: 630447370
+Features: 1280
+Files already downloaded and verified
+Files already downloaded and verified
+Time to initialize prototypes: 3584.957
+{'Accuracy': tensor(0.3800), 'Precision': tensor(0.3747), 'Recall': tensor(0.3800), 'F1Score': tensor(0.3757), 'AUROC': tensor(0.8040)}
+{'Accuracy': tensor(0.5472), 'Precision': tensor(0.5437), 'Recall': tensor(0.5472), 'F1Score': tensor(0.5448), 'AUROC': tensor(0.8805)}
+{'Accuracy': tensor(0.6101), 'Precision': tensor(0.6076), 'Recall': tensor(0.6101), 'F1Score': tensor(0.6085), 'AUROC': tensor(0.9029)}
+{'Accuracy': tensor(0.6519), 'Precision': tensor(0.6502), 'Recall': tensor(0.6519), 'F1Score': tensor(0.6509), 'AUROC': tensor(0.9158)}
+{'Accuracy': tensor(0.6821), 'Precision': tensor(0.6802), 'Recall': tensor(0.6821), 'F1Score': tensor(0.6809), 'AUROC': tensor(0.9256)}
+{'Accuracy': tensor(0.7129), 'Precision': tensor(0.7118), 'Recall': tensor(0.7129), 'F1Score': tensor(0.7122), 'AUROC': tensor(0.9337)}
+{'Accuracy': tensor(0.7402), 'Precision': tensor(0.7392), 'Recall': tensor(0.7402), 'F1Score': tensor(0.7395), 'AUROC': tensor(0.9417)}
+{'Accuracy': tensor(0.7658), 'Precision': tensor(0.7653), 'Recall': tensor(0.7658), 'F1Score': tensor(0.7654), 'AUROC': tensor(0.9484)}
+{'Accuracy': tensor(0.7927), 'Precision': tensor(0.7920), 'Recall': tensor(0.7927), 'F1Score': tensor(0.7922), 'AUROC': tensor(0.9549)}
+{'Accuracy': tensor(0.8150), 'Precision': tensor(0.8146), 'Recall': tensor(0.8150), 'F1Score': tensor(0.8147), 'AUROC': tensor(0.9604)}
+{'Accuracy': tensor(0.8393), 'Precision': tensor(0.8391), 'Recall': tensor(0.8393), 'F1Score': tensor(0.8392), 'AUROC': tensor(0.9653)}
+{'Accuracy': tensor(0.8586), 'Precision': tensor(0.8585), 'Recall': tensor(0.8586), 'F1Score': tensor(0.8585), 'AUROC': tensor(0.9692)}
+{'Accuracy': tensor(0.8780), 'Precision': tensor(0.8779), 'Recall': tensor(0.8780), 'F1Score': tensor(0.8779), 'AUROC': tensor(0.9731)}
+{'Accuracy': tensor(0.8961), 'Precision': tensor(0.8961), 'Recall': tensor(0.8961), 'F1Score': tensor(0.8960), 'AUROC': tensor(0.9771)}
+{'Accuracy': tensor(0.9105), 'Precision': tensor(0.9104), 'Recall': tensor(0.9105), 'F1Score': tensor(0.9104), 'AUROC': tensor(0.9802)}
+{'Accuracy': tensor(0.9245), 'Precision': tensor(0.9244), 'Recall': tensor(0.9245), 'F1Score': tensor(0.9244), 'AUROC': tensor(0.9835)}
+{'Accuracy': tensor(0.9343), 'Precision': tensor(0.9342), 'Recall': tensor(0.9343), 'F1Score': tensor(0.9342), 'AUROC': tensor(0.9858)}
+{'Accuracy': tensor(0.9437), 'Precision': tensor(0.9437), 'Recall': tensor(0.9437), 'F1Score': tensor(0.9437), 'AUROC': tensor(0.9881)}
+{'Accuracy': tensor(0.9522), 'Precision': tensor(0.9522), 'Recall': tensor(0.9522), 'F1Score': tensor(0.9522), 'AUROC': tensor(0.9894)}
+{'Accuracy': tensor(0.9587), 'Precision': tensor(0.9587), 'Recall': tensor(0.9587), 'F1Score': tensor(0.9587), 'AUROC': tensor(0.9910)}
+{'Accuracy': tensor(0.9635), 'Precision': tensor(0.9635), 'Recall': tensor(0.9635), 'F1Score': tensor(0.9635), 'AUROC': tensor(0.9917)}
+{'Accuracy': tensor(0.9685), 'Precision': tensor(0.9685), 'Recall': tensor(0.9685), 'F1Score': tensor(0.9685), 'AUROC': tensor(0.9926)}
+{'Accuracy': tensor(0.9715), 'Precision': tensor(0.9715), 'Recall': tensor(0.9715), 'F1Score': tensor(0.9715), 'AUROC': tensor(0.9935)}
+{'Accuracy': tensor(0.9759), 'Precision': tensor(0.9759), 'Recall': tensor(0.9759), 'F1Score': tensor(0.9759), 'AUROC': tensor(0.9941)}
+{'Accuracy': tensor(0.9765), 'Precision': tensor(0.9765), 'Recall': tensor(0.9765), 'F1Score': tensor(0.9765), 'AUROC': tensor(0.9943)}

@@ -93,7 +93,7 @@ class ModelEvaluator():
         #     self.print_projector(steps, "OOD_Projector")
 
         ood_model    = self.get_model_for_id_classification() # same model as ID classification
-
+        
             
 
         if steps >= 0:

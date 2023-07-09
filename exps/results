@@ -1,0 +1,18 @@
+CNN
+
+MODEL       #param          Scratch                 Pre-trained
+                        F1 test     F1 train    F1 test     F1 Train 
+resnet18    11689512    0.8463      0.9899      0.9029      0.9943
+resnet34    21797672    0.8212      0.9900      0.8933      0.9929
+resnet50    25557032    0.8408      0.9848      0.8825      0.9906
+resnet101   44549160    0.8374      0.9847      0.8837      0.9863
+resnet152   60192808    0.8518      0.9854      0.8857      0.9847
+
+VIT
+
+MODEL       #param          Scratch                 Pre-trained
+                        F1 test     F1 train    F1 test     F1 Train 
+vit_h_14    630447370                           ?           0.9765
+vit_l_16    303109130                           0.9433      0.9969      
+vit_b_32    87423754                            0.9739      1.0000
+vit_b_16    85654282                            0.9785      1.0000

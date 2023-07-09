@@ -1,0 +1,1770 @@
+===================== resnet18 =====================
+Trainable params: 11689512
+Features: 512
+Train from scratch: True
+Files already downloaded and verified
+Files already downloaded and verified
+Adjusting learning rate of group 0 to 1.0000e-03.
+Time to initialize prototypes: 13.081
+TRAIN={'Accuracy': tensor(0.0612), 'Precision': tensor(0.0472), 'Recall': tensor(0.0612), 'F1Score': tensor(0.0474), 'AUROC': tensor(0.7409)}
+Adjusting learning rate of group 0 to 9.0000e-04.
+EVAL={'Accuracy': tensor(0.0934), 'Precision': tensor(0.0830), 'Recall': tensor(0.0934), 'F1Score': tensor(0.0628), 'AUROC': tensor(0.7952)}
+TRAIN={'Accuracy': tensor(0.1077), 'Precision': tensor(0.0876), 'Recall': tensor(0.1077), 'F1Score': tensor(0.0861), 'AUROC': tensor(0.8047)}
+Adjusting learning rate of group 0 to 8.1000e-04.
+EVAL={'Accuracy': tensor(0.1380), 'Precision': tensor(0.1320), 'Recall': tensor(0.1380), 'F1Score': tensor(0.1156), 'AUROC': tensor(0.8326)}
+TRAIN={'Accuracy': tensor(0.1448), 'Precision': tensor(0.1239), 'Recall': tensor(0.1448), 'F1Score': tensor(0.1237), 'AUROC': tensor(0.8371)}
+Adjusting learning rate of group 0 to 7.2900e-04.
+EVAL={'Accuracy': tensor(0.1615), 'Precision': tensor(0.1481), 'Recall': tensor(0.1615), 'F1Score': tensor(0.1347), 'AUROC': tensor(0.8515)}
+TRAIN={'Accuracy': tensor(0.1798), 'Precision': tensor(0.1567), 'Recall': tensor(0.1798), 'F1Score': tensor(0.1589), 'AUROC': tensor(0.8596)}
+Adjusting learning rate of group 0 to 6.5610e-04.
+EVAL={'Accuracy': tensor(0.1990), 'Precision': tensor(0.1886), 'Recall': tensor(0.1990), 'F1Score': tensor(0.1737), 'AUROC': tensor(0.8739)}
+TRAIN={'Accuracy': tensor(0.2083), 'Precision': tensor(0.1883), 'Recall': tensor(0.2083), 'F1Score': tensor(0.1897), 'AUROC': tensor(0.8754)}
+Adjusting learning rate of group 0 to 5.9049e-04.
+EVAL={'Accuracy': tensor(0.2214), 'Precision': tensor(0.2175), 'Recall': tensor(0.2214), 'F1Score': tensor(0.1985), 'AUROC': tensor(0.8833)}
+TRAIN={'Accuracy': tensor(0.2307), 'Precision': tensor(0.2109), 'Recall': tensor(0.2307), 'F1Score': tensor(0.2136), 'AUROC': tensor(0.8864)}
+Adjusting learning rate of group 0 to 5.3144e-04.
+EVAL={'Accuracy': tensor(0.2438), 'Precision': tensor(0.2372), 'Recall': tensor(0.2438), 'F1Score': tensor(0.2186), 'AUROC': tensor(0.8903)}
+TRAIN={'Accuracy': tensor(0.2519), 'Precision': tensor(0.2313), 'Recall': tensor(0.2519), 'F1Score': tensor(0.2352), 'AUROC': tensor(0.8944)}
+Adjusting learning rate of group 0 to 4.7830e-04.
+EVAL={'Accuracy': tensor(0.2687), 'Precision': tensor(0.2584), 'Recall': tensor(0.2687), 'F1Score': tensor(0.2470), 'AUROC': tensor(0.8990)}
+TRAIN={'Accuracy': tensor(0.2679), 'Precision': tensor(0.2500), 'Recall': tensor(0.2679), 'F1Score': tensor(0.2528), 'AUROC': tensor(0.9008)}
+Adjusting learning rate of group 0 to 4.3047e-04.
+EVAL={'Accuracy': tensor(0.2651), 'Precision': tensor(0.2610), 'Recall': tensor(0.2651), 'F1Score': tensor(0.2492), 'AUROC': tensor(0.8964)}
+TRAIN={'Accuracy': tensor(0.2830), 'Precision': tensor(0.2653), 'Recall': tensor(0.2830), 'F1Score': tensor(0.2685), 'AUROC': tensor(0.9061)}
+Adjusting learning rate of group 0 to 3.8742e-04.
+EVAL={'Accuracy': tensor(0.2997), 'Precision': tensor(0.2890), 'Recall': tensor(0.2997), 'F1Score': tensor(0.2829), 'AUROC': tensor(0.9082)}
+TRAIN={'Accuracy': tensor(0.2972), 'Precision': tensor(0.2802), 'Recall': tensor(0.2972), 'F1Score': tensor(0.2834), 'AUROC': tensor(0.9113)}
+Adjusting learning rate of group 0 to 3.4868e-04.
+EVAL={'Accuracy': tensor(0.3107), 'Precision': tensor(0.3012), 'Recall': tensor(0.3107), 'F1Score': tensor(0.2918), 'AUROC': tensor(0.9113)}
+TRAIN={'Accuracy': tensor(0.3131), 'Precision': tensor(0.2963), 'Recall': tensor(0.3131), 'F1Score': tensor(0.2997), 'AUROC': tensor(0.9151)}
+Adjusting learning rate of group 0 to 3.1381e-04.
+EVAL={'Accuracy': tensor(0.3192), 'Precision': tensor(0.3076), 'Recall': tensor(0.3192), 'F1Score': tensor(0.3020), 'AUROC': tensor(0.9139)}
+TRAIN={'Accuracy': tensor(0.3227), 'Precision': tensor(0.3064), 'Recall': tensor(0.3227), 'F1Score': tensor(0.3098), 'AUROC': tensor(0.9190)}
+Adjusting learning rate of group 0 to 2.8243e-04.
+EVAL={'Accuracy': tensor(0.3326), 'Precision': tensor(0.3269), 'Recall': tensor(0.3326), 'F1Score': tensor(0.3207), 'AUROC': tensor(0.9174)}
+TRAIN={'Accuracy': tensor(0.3367), 'Precision': tensor(0.3205), 'Recall': tensor(0.3367), 'F1Score': tensor(0.3241), 'AUROC': tensor(0.9225)}
+Adjusting learning rate of group 0 to 2.5419e-04.
+EVAL={'Accuracy': tensor(0.3421), 'Precision': tensor(0.3386), 'Recall': tensor(0.3421), 'F1Score': tensor(0.3280), 'AUROC': tensor(0.9201)}
+TRAIN={'Accuracy': tensor(0.3492), 'Precision': tensor(0.3336), 'Recall': tensor(0.3492), 'F1Score': tensor(0.3371), 'AUROC': tensor(0.9250)}
+Adjusting learning rate of group 0 to 2.2877e-04.
+EVAL={'Accuracy': tensor(0.3536), 'Precision': tensor(0.3459), 'Recall': tensor(0.3536), 'F1Score': tensor(0.3389), 'AUROC': tensor(0.9229)}
+TRAIN={'Accuracy': tensor(0.3589), 'Precision': tensor(0.3438), 'Recall': tensor(0.3589), 'F1Score': tensor(0.3473), 'AUROC': tensor(0.9277)}
+Adjusting learning rate of group 0 to 2.0589e-04.
+EVAL={'Accuracy': tensor(0.3529), 'Precision': tensor(0.3492), 'Recall': tensor(0.3529), 'F1Score': tensor(0.3401), 'AUROC': tensor(0.9203)}
+TRAIN={'Accuracy': tensor(0.3653), 'Precision': tensor(0.3511), 'Recall': tensor(0.3653), 'F1Score': tensor(0.3544), 'AUROC': tensor(0.9301)}
+Adjusting learning rate of group 0 to 1.8530e-04.
+EVAL={'Accuracy': tensor(0.3657), 'Precision': tensor(0.3666), 'Recall': tensor(0.3657), 'F1Score': tensor(0.3563), 'AUROC': tensor(0.9258)}
+TRAIN={'Accuracy': tensor(0.3747), 'Precision': tensor(0.3598), 'Recall': tensor(0.3747), 'F1Score': tensor(0.3633), 'AUROC': tensor(0.9315)}
+Adjusting learning rate of group 0 to 1.6677e-04.
+EVAL={'Accuracy': tensor(0.3748), 'Precision': tensor(0.3698), 'Recall': tensor(0.3748), 'F1Score': tensor(0.3624), 'AUROC': tensor(0.9270)}
+TRAIN={'Accuracy': tensor(0.3832), 'Precision': tensor(0.3698), 'Recall': tensor(0.3832), 'F1Score': tensor(0.3729), 'AUROC': tensor(0.9335)}
+Adjusting learning rate of group 0 to 1.5009e-04.
+EVAL={'Accuracy': tensor(0.3779), 'Precision': tensor(0.3704), 'Recall': tensor(0.3779), 'F1Score': tensor(0.3681), 'AUROC': tensor(0.9278)}
+TRAIN={'Accuracy': tensor(0.3895), 'Precision': tensor(0.3766), 'Recall': tensor(0.3895), 'F1Score': tensor(0.3797), 'AUROC': tensor(0.9352)}
+Adjusting learning rate of group 0 to 1.3509e-04.
+EVAL={'Accuracy': tensor(0.3869), 'Precision': tensor(0.3753), 'Recall': tensor(0.3869), 'F1Score': tensor(0.3743), 'AUROC': tensor(0.9308)}
+TRAIN={'Accuracy': tensor(0.3955), 'Precision': tensor(0.3828), 'Recall': tensor(0.3955), 'F1Score': tensor(0.3860), 'AUROC': tensor(0.9362)}
+Adjusting learning rate of group 0 to 1.2158e-04.
+EVAL={'Accuracy': tensor(0.3883), 'Precision': tensor(0.3834), 'Recall': tensor(0.3883), 'F1Score': tensor(0.3788), 'AUROC': tensor(0.9308)}
+TRAIN={'Accuracy': tensor(0.4044), 'Precision': tensor(0.3921), 'Recall': tensor(0.4044), 'F1Score': tensor(0.3950), 'AUROC': tensor(0.9378)}
+Adjusting learning rate of group 0 to 1.0942e-04.
+EVAL={'Accuracy': tensor(0.3994), 'Precision': tensor(0.3940), 'Recall': tensor(0.3994), 'F1Score': tensor(0.3889), 'AUROC': tensor(0.9330)}
+TRAIN={'Accuracy': tensor(0.4054), 'Precision': tensor(0.3931), 'Recall': tensor(0.4054), 'F1Score': tensor(0.3962), 'AUROC': tensor(0.9385)}
+Adjusting learning rate of group 0 to 9.8477e-05.
+EVAL={'Accuracy': tensor(0.4017), 'Precision': tensor(0.3897), 'Recall': tensor(0.4017), 'F1Score': tensor(0.3906), 'AUROC': tensor(0.9342)}
+TRAIN={'Accuracy': tensor(0.4134), 'Precision': tensor(0.4017), 'Recall': tensor(0.4134), 'F1Score': tensor(0.4044), 'AUROC': tensor(0.9395)}
+Adjusting learning rate of group 0 to 8.8629e-05.
+EVAL={'Accuracy': tensor(0.4049), 'Precision': tensor(0.3987), 'Recall': tensor(0.4049), 'F1Score': tensor(0.3958), 'AUROC': tensor(0.9340)}
+TRAIN={'Accuracy': tensor(0.4188), 'Precision': tensor(0.4063), 'Recall': tensor(0.4188), 'F1Score': tensor(0.4096), 'AUROC': tensor(0.9406)}
+Adjusting learning rate of group 0 to 7.9766e-05.
+EVAL={'Accuracy': tensor(0.4078), 'Precision': tensor(0.3970), 'Recall': tensor(0.4078), 'F1Score': tensor(0.3973), 'AUROC': tensor(0.9336)}
+TRAIN={'Accuracy': tensor(0.4218), 'Precision': tensor(0.4100), 'Recall': tensor(0.4218), 'F1Score': tensor(0.4130), 'AUROC': tensor(0.9413)}
+Adjusting learning rate of group 0 to 7.1790e-05.
+EVAL={'Accuracy': tensor(0.4136), 'Precision': tensor(0.4054), 'Recall': tensor(0.4136), 'F1Score': tensor(0.4032), 'AUROC': tensor(0.9345)}
+TRAIN={'Accuracy': tensor(0.4263), 'Precision': tensor(0.4155), 'Recall': tensor(0.4263), 'F1Score': tensor(0.4180), 'AUROC': tensor(0.9419)}
+Adjusting learning rate of group 0 to 6.4611e-05.
+EVAL={'Accuracy': tensor(0.4093), 'Precision': tensor(0.4039), 'Recall': tensor(0.4093), 'F1Score': tensor(0.4017), 'AUROC': tensor(0.9355)}
+TRAIN={'Accuracy': tensor(0.4304), 'Precision': tensor(0.4193), 'Recall': tensor(0.4304), 'F1Score': tensor(0.4220), 'AUROC': tensor(0.9425)}
+Adjusting learning rate of group 0 to 5.8150e-05.
+EVAL={'Accuracy': tensor(0.4123), 'Precision': tensor(0.4052), 'Recall': tensor(0.4123), 'F1Score': tensor(0.4049), 'AUROC': tensor(0.9348)}
+TRAIN={'Accuracy': tensor(0.4315), 'Precision': tensor(0.4210), 'Recall': tensor(0.4315), 'F1Score': tensor(0.4234), 'AUROC': tensor(0.9429)}
+Adjusting learning rate of group 0 to 5.2335e-05.
+EVAL={'Accuracy': tensor(0.4120), 'Precision': tensor(0.4032), 'Recall': tensor(0.4120), 'F1Score': tensor(0.4029), 'AUROC': tensor(0.9346)}
+TRAIN={'Accuracy': tensor(0.4367), 'Precision': tensor(0.4252), 'Recall': tensor(0.4367), 'F1Score': tensor(0.4284), 'AUROC': tensor(0.9437)}
+Adjusting learning rate of group 0 to 4.7101e-05.
+EVAL={'Accuracy': tensor(0.4186), 'Precision': tensor(0.4088), 'Recall': tensor(0.4186), 'F1Score': tensor(0.4085), 'AUROC': tensor(0.9349)}
+TRAIN={'Accuracy': tensor(0.4402), 'Precision': tensor(0.4287), 'Recall': tensor(0.4402), 'F1Score': tensor(0.4316), 'AUROC': tensor(0.9436)}
+Adjusting learning rate of group 0 to 4.2391e-05.
+EVAL={'Accuracy': tensor(0.4184), 'Precision': tensor(0.4126), 'Recall': tensor(0.4184), 'F1Score': tensor(0.4114), 'AUROC': tensor(0.9358)}
+Using downloaded and verified file: data/train_32x32.mat
+Evaluating for SVHN
+Metrics for Mahalanobis
+{'AUROC': 0.46407830715179443, 'AUPR-IN': 0.8449752330780029, 'AUPR-OUT': 0.14997893571853638, 'ACC95TPR': 0.8488775491714478, 'FPR95TPR': 0.8920000195503235}
+Metrics for MaxLogit
+{'AUROC': 0.6748688220977783, 'AUPR-IN': 0.923068642616272, 'AUPR-OUT': 0.3369765281677246, 'ACC95TPR': 0.8667259216308594, 'FPR95TPR': 0.743399977684021}
+Metrics for MaxSoftmax
+{'AUROC': 0.613323450088501, 'AUPR-IN': 0.9104117751121521, 'AUPR-OUT': 0.22986309230327606, 'ACC95TPR': 0.8549551367759705, 'FPR95TPR': 0.8414000272750854}
+Metrics for ODIN
+{'AUROC': 0.5954645872116089, 'AUPR-IN': 0.9057392477989197, 'AUPR-OUT': 0.19472333788871765, 'ACC95TPR': 0.8507633209228516, 'FPR95TPR': 0.8762999773025513}
+Metrics for OpenMax
+{'AUROC': 0.6799304485321045, 'AUPR-IN': 0.9208547472953796, 'AUPR-OUT': 0.31029200553894043, 'ACC95TPR': 0.8701130151748657, 'FPR95TPR': 0.7152000069618225}
+Metrics for EnergyBased
+{'AUROC': 0.6732689738273621, 'AUPR-IN': 0.9164153337478638, 'AUPR-OUT': 0.36713936924934387, 'ACC95TPR': 0.8715183138847351, 'FPR95TPR': 0.703499972820282}
+Metrics for KLMatching
+{'AUROC': 0.5848502516746521, 'AUPR-IN': 0.9070361852645874, 'AUPR-OUT': 0.1398715078830719, 'ACC95TPR': 0.8399294018745422, 'FPR95TPR': 0.9664999842643738}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|46.41|84.50|15.00|84.89|89.20|
+|MaxLogit|67.49|92.31|33.70|86.67|74.34|
+|MaxSoftmax|61.33|91.04|22.99|85.50|84.14|
+|ODIN|59.55|90.57|19.47|85.08|87.63|
+|OpenMax|67.99|92.09|31.03|87.01|71.52|
+|EnergyBased|67.33|91.64|36.71|87.15|70.35|
+|KLMatching|58.49|90.70|13.99|83.99|96.65|
+Evaluating for LSUNCrop
+Metrics for Mahalanobis
+{'AUROC': 0.4772462546825409, 'AUPR-IN': 0.49087512493133545, 'AUPR-OUT': 0.48368170857429504, 'ACC95TPR': 0.498199999332428, 'FPR95TPR': 0.9535999894142151}
+Metrics for MaxLogit
+{'AUROC': 0.7603970766067505, 'AUPR-IN': 0.7365738749504089, 'AUPR-OUT': 0.7715116143226624, 'ACC95TPR': 0.630299985408783, 'FPR95TPR': 0.6894000172615051}
+Metrics for MaxSoftmax
+{'AUROC': 0.6021243929862976, 'AUPR-IN': 0.5788755416870117, 'AUPR-OUT': 0.6164251565933228, 'ACC95TPR': 0.5473499894142151, 'FPR95TPR': 0.8553000092506409}
+Metrics for ODIN
+{'AUROC': 0.5967497825622559, 'AUPR-IN': 0.5794627070426941, 'AUPR-OUT': 0.596447229385376, 'ACC95TPR': 0.5317000150680542, 'FPR95TPR': 0.8866000175476074}
+Metrics for OpenMax
+{'AUROC': 0.7193823456764221, 'AUPR-IN': 0.7065652012825012, 'AUPR-OUT': 0.6612218022346497, 'ACC95TPR': 0.5274500250816345, 'FPR95TPR': 0.8950999975204468}
+Metrics for EnergyBased
+{'AUROC': 0.7667058706283569, 'AUPR-IN': 0.7429549694061279, 'AUPR-OUT': 0.7775927782058716, 'ACC95TPR': 0.6361500024795532, 'FPR95TPR': 0.6776999831199646}
+Metrics for KLMatching
+{'AUROC': 0.6115559339523315, 'AUPR-IN': 0.5995217561721802, 'AUPR-OUT': 0.5886493921279907, 'ACC95TPR': 0.5192999839782715, 'FPR95TPR': 0.9114000201225281}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|47.72|49.09|48.37|49.82|95.36|
+|MaxLogit|76.04|73.66|77.15|63.03|68.94|
+|MaxSoftmax|60.21|57.89|61.64|54.73|85.53|
+|ODIN|59.67|57.95|59.64|53.17|88.66|
+|OpenMax|71.94|70.66|66.12|52.75|89.51|
+|EnergyBased|76.67|74.30|77.76|63.62|67.77|
+|KLMatching|61.16|59.95|58.86|51.93|91.14|
+Evaluating for LSUNResize
+Metrics for Mahalanobis
+{'AUROC': 0.4789072275161743, 'AUPR-IN': 0.4704715311527252, 'AUPR-OUT': 0.5012235045433044, 'ACC95TPR': 0.5067499876022339, 'FPR95TPR': 0.9365000128746033}
+Metrics for MaxLogit
+{'AUROC': 0.6422990560531616, 'AUPR-IN': 0.5652225017547607, 'AUPR-OUT': 0.691433846950531, 'ACC95TPR': 0.5936499834060669, 'FPR95TPR': 0.7627000212669373}
+Metrics for MaxSoftmax
+{'AUROC': 0.680267333984375, 'AUPR-IN': 0.6456444263458252, 'AUPR-OUT': 0.7024018168449402, 'ACC95TPR': 0.5870500206947327, 'FPR95TPR': 0.7759000062942505}
+Metrics for ODIN
+{'AUROC': 0.5199843645095825, 'AUPR-IN': 0.5000565052032471, 'AUPR-OUT': 0.5502455234527588, 'ACC95TPR': 0.5227500200271606, 'FPR95TPR': 0.9045000076293945}
+Metrics for OpenMax
+{'AUROC': 0.6168593764305115, 'AUPR-IN': 0.5420297980308533, 'AUPR-OUT': 0.674760639667511, 'ACC95TPR': 0.5906000137329102, 'FPR95TPR': 0.7688000202178955}
+Metrics for EnergyBased
+{'AUROC': 0.5959639549255371, 'AUPR-IN': 0.5234237313270569, 'AUPR-OUT': 0.6582129597663879, 'ACC95TPR': 0.580049991607666, 'FPR95TPR': 0.789900004863739}
+Metrics for KLMatching
+{'AUROC': 0.6646556854248047, 'AUPR-IN': 0.6211521625518799, 'AUPR-OUT': 0.6728641986846924, 'ACC95TPR': 0.5654500126838684, 'FPR95TPR': 0.819100022315979}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|47.89|47.05|50.12|50.67|93.65|
+|MaxLogit|64.23|56.52|69.14|59.36|76.27|
+|MaxSoftmax|68.03|64.56|70.24|58.71|77.59|
+|ODIN|52.00|50.01|55.02|52.28|90.45|
+|OpenMax|61.69|54.20|67.48|59.06|76.88|
+|EnergyBased|59.60|52.34|65.82|58.00|78.99|
+|KLMatching|66.47|62.12|67.29|56.55|81.91|
+Evaluating for Textures
+Metrics for Mahalanobis
+{'AUROC': 0.9375371932983398, 'AUPR-IN': 0.9163476228713989, 'AUPR-OUT': 0.9571273922920227, 'ACC95TPR': 0.7507672905921936, 'FPR95TPR': 0.36160001158714294}
+Metrics for MaxLogit
+{'AUROC': 0.5998908877372742, 'AUPR-IN': 0.47735971212387085, 'AUPR-OUT': 0.7162342071533203, 'ACC95TPR': 0.4067775011062622, 'FPR95TPR': 0.8996000289916992}
+Metrics for MaxSoftmax
+{'AUROC': 0.2742534875869751, 'AUPR-IN': 0.2509521245956421, 'AUPR-OUT': 0.5034501552581787, 'ACC95TPR': 0.34712275862693787, 'FPR95TPR': 0.992900013923645}
+Metrics for ODIN
+{'AUROC': 0.28788188099861145, 'AUPR-IN': 0.2549169063568115, 'AUPR-OUT': 0.5111798048019409, 'ACC95TPR': 0.3490409255027771, 'FPR95TPR': 0.9898999929428101}
+Metrics for OpenMax
+{'AUROC': 0.42162662744522095, 'AUPR-IN': 0.36216193437576294, 'AUPR-OUT': 0.5507925748825073, 'ACC95TPR': 0.3431585729122162, 'FPR95TPR': 0.9991000294685364}
+Metrics for EnergyBased
+{'AUROC': 0.6997065544128418, 'AUPR-IN': 0.5809949636459351, 'AUPR-OUT': 0.779449462890625, 'ACC95TPR': 0.4335038363933563, 'FPR95TPR': 0.8578000068664551}
+Metrics for KLMatching
+{'AUROC': 0.588011622428894, 'AUPR-IN': 0.4382888376712799, 'AUPR-OUT': 0.749251663684845, 'ACC95TPR': 0.49098464846611023, 'FPR95TPR': 0.7678999900817871}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|93.75|91.63|95.71|75.08|36.16|
+|MaxLogit|59.99|47.74|71.62|40.68|89.96|
+|MaxSoftmax|27.43|25.10|50.35|34.71|99.29|
+|ODIN|28.79|25.49|51.12|34.90|98.99|
+|OpenMax|42.16|36.22|55.08|34.32|99.91|
+|EnergyBased|69.97|58.10|77.94|43.35|85.78|
+|KLMatching|58.80|43.83|74.93|49.10|76.79|
+Evaluating for TinyImageNetCrop
+Metrics for Mahalanobis
+{'AUROC': 0.5105583667755127, 'AUPR-IN': 0.5181654691696167, 'AUPR-OUT': 0.50731360912323, 'ACC95TPR': 0.5014500021934509, 'FPR95TPR': 0.9470999836921692}
+Metrics for MaxLogit
+{'AUROC': 0.6789727807044983, 'AUPR-IN': 0.608200192451477, 'AUPR-OUT': 0.7222354412078857, 'ACC95TPR': 0.6142500042915344, 'FPR95TPR': 0.7214999794960022}
+Metrics for MaxSoftmax
+{'AUROC': 0.6315401792526245, 'AUPR-IN': 0.6019408702850342, 'AUPR-OUT': 0.6401739120483398, 'ACC95TPR': 0.5514000058174133, 'FPR95TPR': 0.8471999764442444}
+Metrics for ODIN
+{'AUROC': 0.5216245055198669, 'AUPR-IN': 0.5096996426582336, 'AUPR-OUT': 0.5417944192886353, 'ACC95TPR': 0.5178499817848206, 'FPR95TPR': 0.9143000245094299}
+Metrics for OpenMax
+{'AUROC': 0.6657086610794067, 'AUPR-IN': 0.598455548286438, 'AUPR-OUT': 0.684674084186554, 'ACC95TPR': 0.5976999998092651, 'FPR95TPR': 0.7545999884605408}
+Metrics for EnergyBased
+{'AUROC': 0.6649844646453857, 'AUPR-IN': 0.5897119641304016, 'AUPR-OUT': 0.7165224552154541, 'ACC95TPR': 0.616349995136261, 'FPR95TPR': 0.7172999978065491}
+Metrics for KLMatching
+{'AUROC': 0.6586793661117554, 'AUPR-IN': 0.6304091811180115, 'AUPR-OUT': 0.655565619468689, 'ACC95TPR': 0.5553500056266785, 'FPR95TPR': 0.8392999768257141}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|51.06|51.82|50.73|50.15|94.71|
+|MaxLogit|67.90|60.82|72.22|61.43|72.15|
+|MaxSoftmax|63.15|60.19|64.02|55.14|84.72|
+|ODIN|52.16|50.97|54.18|51.78|91.43|
+|OpenMax|66.57|59.85|68.47|59.77|75.46|
+|EnergyBased|66.50|58.97|71.65|61.63|71.73|
+|KLMatching|65.87|63.04|65.56|55.54|83.93|
+Evaluating for TinyImageNetResize
+Metrics for Mahalanobis
+{'AUROC': 0.5688011646270752, 'AUPR-IN': 0.5516780018806458, 'AUPR-OUT': 0.5688764452934265, 'ACC95TPR': 0.5200499892234802, 'FPR95TPR': 0.9099000096321106}
+Metrics for MaxLogit
+{'AUROC': 0.6461944580078125, 'AUPR-IN': 0.5766525268554688, 'AUPR-OUT': 0.6899552941322327, 'ACC95TPR': 0.5956500172615051, 'FPR95TPR': 0.7587000131607056}
+Metrics for MaxSoftmax
+{'AUROC': 0.6213525533676147, 'AUPR-IN': 0.5894157290458679, 'AUPR-OUT': 0.6418331265449524, 'ACC95TPR': 0.5568000078201294, 'FPR95TPR': 0.8363999724388123}
+Metrics for ODIN
+{'AUROC': 0.4811270833015442, 'AUPR-IN': 0.47177180647850037, 'AUPR-OUT': 0.5148504376411438, 'ACC95TPR': 0.5131000280380249, 'FPR95TPR': 0.923799991607666}
+Metrics for OpenMax
+{'AUROC': 0.641473114490509, 'AUPR-IN': 0.575589656829834, 'AUPR-OUT': 0.6693423390388489, 'ACC95TPR': 0.5867999792098999, 'FPR95TPR': 0.7764000296592712}
+Metrics for EnergyBased
+{'AUROC': 0.6364405751228333, 'AUPR-IN': 0.5658046007156372, 'AUPR-OUT': 0.6840177178382874, 'ACC95TPR': 0.5917500257492065, 'FPR95TPR': 0.7664999961853027}
+Metrics for KLMatching
+{'AUROC': 0.6766784191131592, 'AUPR-IN': 0.6509526968002319, 'AUPR-OUT': 0.6775515079498291, 'ACC95TPR': 0.5663999915122986, 'FPR95TPR': 0.8172000050544739}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|56.88|55.17|56.89|52.00|90.99|
+|MaxLogit|64.62|57.67|69.00|59.57|75.87|
+|MaxSoftmax|62.14|58.94|64.18|55.68|83.64|
+|ODIN|48.11|47.18|51.49|51.31|92.38|
+|OpenMax|64.15|57.56|66.93|58.68|77.64|
+|EnergyBased|63.64|56.58|68.40|59.18|76.65|
+|KLMatching|67.67|65.10|67.76|56.64|81.72|
+Files already downloaded and verified
+Evaluating for CIFAR10
+Metrics for Mahalanobis
+{'AUROC': 0.43271327018737793, 'AUPR-IN': 0.7929762005805969, 'AUPR-OUT': 0.14613406360149384, 'ACC95TPR': 0.79871666431427, 'FPR95TPR': 0.9577000141143799}
+Metrics for MaxLogit
+{'AUROC': 0.6037826538085938, 'AUPR-IN': 0.8687057495117188, 'AUPR-OUT': 0.2891525328159332, 'ACC95TPR': 0.819100022315979, 'FPR95TPR': 0.8353999853134155}
+Metrics for MaxSoftmax
+{'AUROC': 0.638035774230957, 'AUPR-IN': 0.8812800049781799, 'AUPR-OUT': 0.3303568661212921, 'ACC95TPR': 0.8239833116531372, 'FPR95TPR': 0.8061000108718872}
+Metrics for ODIN
+{'AUROC': 0.5963878631591797, 'AUPR-IN': 0.868903636932373, 'AUPR-OUT': 0.2592697739601135, 'ACC95TPR': 0.8142666816711426, 'FPR95TPR': 0.8644000291824341}
+Metrics for OpenMax
+{'AUROC': 0.5724279880523682, 'AUPR-IN': 0.8541456460952759, 'AUPR-OUT': 0.23539109528064728, 'ACC95TPR': 0.8146166801452637, 'FPR95TPR': 0.8622999787330627}
+Metrics for EnergyBased
+{'AUROC': 0.5706959962844849, 'AUPR-IN': 0.8552547693252563, 'AUPR-OUT': 0.261857271194458, 'ACC95TPR': 0.8155500292778015, 'FPR95TPR': 0.8567000031471252}
+Metrics for KLMatching
+{'AUROC': 0.5794482231140137, 'AUPR-IN': 0.8586009740829468, 'AUPR-OUT': 0.24760185182094574, 'ACC95TPR': 0.8133833408355713, 'FPR95TPR': 0.869700014591217}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|43.27|79.30|14.61|79.87|95.77|
+|MaxLogit|60.38|86.87|28.92|81.91|83.54|
+|MaxSoftmax|63.80|88.13|33.04|82.40|80.61|
+|ODIN|59.64|86.89|25.93|81.43|86.44|
+|OpenMax|57.24|85.41|23.54|81.46|86.23|
+|EnergyBased|57.07|85.53|26.19|81.56|85.67|
+|KLMatching|57.94|85.86|24.76|81.34|86.97|
+--------- CUT HERE ---------
+### Results
+```
+PRETRAINED=False
+MODEL=resnet18
+TRAINABLE_PARAMS=11689512
+EPOCHS=30
+LR=0.001
+USE_CIDER=False
+ALPHA=0.95
+TEMPERATURE=0.1
+COMPACT_SCALER=2.0
+CIDER_GLOBAL_SCALE=0.1
+MOMENTUM=0.9
+```
+#### SVHN
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|46.41|84.50|15.00|84.89|89.20|
+|MaxLogit|67.49|92.31|33.70|86.67|74.34|
+|MaxSoftmax|61.33|91.04|22.99|85.50|84.14|
+|ODIN|59.55|90.57|19.47|85.08|87.63|
+|OpenMax|67.99|92.09|31.03|87.01|71.52|
+|EnergyBased|67.33|91.64|36.71|87.15|70.35|
+|KLMatching|58.49|90.70|13.99|83.99|96.65|
+#### LSUNCrop
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|47.72|49.09|48.37|49.82|95.36|
+|MaxLogit|76.04|73.66|77.15|63.03|68.94|
+|MaxSoftmax|60.21|57.89|61.64|54.73|85.53|
+|ODIN|59.67|57.95|59.64|53.17|88.66|
+|OpenMax|71.94|70.66|66.12|52.75|89.51|
+|EnergyBased|76.67|74.30|77.76|63.62|67.77|
+|KLMatching|61.16|59.95|58.86|51.93|91.14|
+#### LSUNResize
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|47.89|47.05|50.12|50.67|93.65|
+|MaxLogit|64.23|56.52|69.14|59.36|76.27|
+|MaxSoftmax|68.03|64.56|70.24|58.71|77.59|
+|ODIN|52.00|50.01|55.02|52.28|90.45|
+|OpenMax|61.69|54.20|67.48|59.06|76.88|
+|EnergyBased|59.60|52.34|65.82|58.00|78.99|
+|KLMatching|66.47|62.12|67.29|56.55|81.91|
+#### Textures
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|93.75|91.63|95.71|75.08|36.16|
+|MaxLogit|59.99|47.74|71.62|40.68|89.96|
+|MaxSoftmax|27.43|25.10|50.35|34.71|99.29|
+|ODIN|28.79|25.49|51.12|34.90|98.99|
+|OpenMax|42.16|36.22|55.08|34.32|99.91|
+|EnergyBased|69.97|58.10|77.94|43.35|85.78|
+|KLMatching|58.80|43.83|74.93|49.10|76.79|
+#### TinyImageNetCrop
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|51.06|51.82|50.73|50.15|94.71|
+|MaxLogit|67.90|60.82|72.22|61.43|72.15|
+|MaxSoftmax|63.15|60.19|64.02|55.14|84.72|
+|ODIN|52.16|50.97|54.18|51.78|91.43|
+|OpenMax|66.57|59.85|68.47|59.77|75.46|
+|EnergyBased|66.50|58.97|71.65|61.63|71.73|
+|KLMatching|65.87|63.04|65.56|55.54|83.93|
+#### TinyImageNetResize
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|56.88|55.17|56.89|52.00|90.99|
+|MaxLogit|64.62|57.67|69.00|59.57|75.87|
+|MaxSoftmax|62.14|58.94|64.18|55.68|83.64|
+|ODIN|48.11|47.18|51.49|51.31|92.38|
+|OpenMax|64.15|57.56|66.93|58.68|77.64|
+|EnergyBased|63.64|56.58|68.40|59.18|76.65|
+|KLMatching|67.67|65.10|67.76|56.64|81.72|
+#### CIFAR10
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|43.27|79.30|14.61|79.87|95.77|
+|MaxLogit|60.38|86.87|28.92|81.91|83.54|
+|MaxSoftmax|63.80|88.13|33.04|82.40|80.61|
+|ODIN|59.64|86.89|25.93|81.43|86.44|
+|OpenMax|57.24|85.41|23.54|81.46|86.23|
+|EnergyBased|57.07|85.53|26.19|81.56|85.67|
+|KLMatching|57.94|85.86|24.76|81.34|86.97|
+--------- CUT HERE ---------
+===================== resnet34 =====================
+Trainable params: 21797672
+Features: 512
+Train from scratch: True
+Files already downloaded and verified
+Files already downloaded and verified
+Adjusting learning rate of group 0 to 1.0000e-03.
+Time to initialize prototypes: 12.733
+TRAIN={'Accuracy': tensor(0.0491), 'Precision': tensor(0.0384), 'Recall': tensor(0.0491), 'F1Score': tensor(0.0373), 'AUROC': tensor(0.7192)}
+Adjusting learning rate of group 0 to 9.0000e-04.
+EVAL={'Accuracy': tensor(0.0673), 'Precision': tensor(0.0382), 'Recall': tensor(0.0673), 'F1Score': tensor(0.0370), 'AUROC': tensor(0.7617)}
+TRAIN={'Accuracy': tensor(0.0936), 'Precision': tensor(0.0754), 'Recall': tensor(0.0936), 'F1Score': tensor(0.0741), 'AUROC': tensor(0.7915)}
+Adjusting learning rate of group 0 to 8.1000e-04.
+EVAL={'Accuracy': tensor(0.1254), 'Precision': tensor(0.1074), 'Recall': tensor(0.1254), 'F1Score': tensor(0.0965), 'AUROC': tensor(0.8261)}
+TRAIN={'Accuracy': tensor(0.1284), 'Precision': tensor(0.1068), 'Recall': tensor(0.1284), 'F1Score': tensor(0.1080), 'AUROC': tensor(0.8232)}
+Adjusting learning rate of group 0 to 7.2900e-04.
+EVAL={'Accuracy': tensor(0.1439), 'Precision': tensor(0.1284), 'Recall': tensor(0.1439), 'F1Score': tensor(0.1161), 'AUROC': tensor(0.8429)}
+TRAIN={'Accuracy': tensor(0.1588), 'Precision': tensor(0.1360), 'Recall': tensor(0.1588), 'F1Score': tensor(0.1386), 'AUROC': tensor(0.8441)}
+Adjusting learning rate of group 0 to 6.5610e-04.
+EVAL={'Accuracy': tensor(0.1800), 'Precision': tensor(0.1666), 'Recall': tensor(0.1800), 'F1Score': tensor(0.1525), 'AUROC': tensor(0.8609)}
+TRAIN={'Accuracy': tensor(0.1862), 'Precision': tensor(0.1643), 'Recall': tensor(0.1862), 'F1Score': tensor(0.1666), 'AUROC': tensor(0.8613)}
+Adjusting learning rate of group 0 to 5.9049e-04.
+EVAL={'Accuracy': tensor(0.2029), 'Precision': tensor(0.2091), 'Recall': tensor(0.2029), 'F1Score': tensor(0.1806), 'AUROC': tensor(0.8750)}
+TRAIN={'Accuracy': tensor(0.2090), 'Precision': tensor(0.1879), 'Recall': tensor(0.2090), 'F1Score': tensor(0.1902), 'AUROC': tensor(0.8743)}
+Adjusting learning rate of group 0 to 5.3144e-04.
+EVAL={'Accuracy': tensor(0.2296), 'Precision': tensor(0.2292), 'Recall': tensor(0.2296), 'F1Score': tensor(0.2064), 'AUROC': tensor(0.8831)}
+TRAIN={'Accuracy': tensor(0.2328), 'Precision': tensor(0.2119), 'Recall': tensor(0.2328), 'F1Score': tensor(0.2144), 'AUROC': tensor(0.8862)}
+Adjusting learning rate of group 0 to 4.7830e-04.
+EVAL={'Accuracy': tensor(0.2483), 'Precision': tensor(0.2423), 'Recall': tensor(0.2483), 'F1Score': tensor(0.2263), 'AUROC': tensor(0.8913)}
+TRAIN={'Accuracy': tensor(0.2584), 'Precision': tensor(0.2382), 'Recall': tensor(0.2584), 'F1Score': tensor(0.2413), 'AUROC': tensor(0.8950)}
+Adjusting learning rate of group 0 to 4.3047e-04.
+EVAL={'Accuracy': tensor(0.2856), 'Precision': tensor(0.2756), 'Recall': tensor(0.2856), 'F1Score': tensor(0.2631), 'AUROC': tensor(0.9030)}
+TRAIN={'Accuracy': tensor(0.2815), 'Precision': tensor(0.2613), 'Recall': tensor(0.2815), 'F1Score': tensor(0.2650), 'AUROC': tensor(0.9031)}
+Adjusting learning rate of group 0 to 3.8742e-04.
+EVAL={'Accuracy': tensor(0.3009), 'Precision': tensor(0.2853), 'Recall': tensor(0.3009), 'F1Score': tensor(0.2802), 'AUROC': tensor(0.9090)}
+TRAIN={'Accuracy': tensor(0.2974), 'Precision': tensor(0.2796), 'Recall': tensor(0.2974), 'F1Score': tensor(0.2828), 'AUROC': tensor(0.9094)}
+Adjusting learning rate of group 0 to 3.4868e-04.
+EVAL={'Accuracy': tensor(0.3130), 'Precision': tensor(0.3058), 'Recall': tensor(0.3130), 'F1Score': tensor(0.2923), 'AUROC': tensor(0.9132)}
+TRAIN={'Accuracy': tensor(0.3160), 'Precision': tensor(0.2985), 'Recall': tensor(0.3160), 'F1Score': tensor(0.3017), 'AUROC': tensor(0.9153)}
+Adjusting learning rate of group 0 to 3.1381e-04.
+EVAL={'Accuracy': tensor(0.3226), 'Precision': tensor(0.3345), 'Recall': tensor(0.3226), 'F1Score': tensor(0.3103), 'AUROC': tensor(0.9178)}
+TRAIN={'Accuracy': tensor(0.3286), 'Precision': tensor(0.3116), 'Recall': tensor(0.3286), 'F1Score': tensor(0.3151), 'AUROC': tensor(0.9194)}
+Adjusting learning rate of group 0 to 2.8243e-04.
+EVAL={'Accuracy': tensor(0.3373), 'Precision': tensor(0.3354), 'Recall': tensor(0.3373), 'F1Score': tensor(0.3222), 'AUROC': tensor(0.9216)}
+TRAIN={'Accuracy': tensor(0.3430), 'Precision': tensor(0.3269), 'Recall': tensor(0.3430), 'F1Score': tensor(0.3303), 'AUROC': tensor(0.9232)}
+Adjusting learning rate of group 0 to 2.5419e-04.
+EVAL={'Accuracy': tensor(0.3524), 'Precision': tensor(0.3511), 'Recall': tensor(0.3524), 'F1Score': tensor(0.3383), 'AUROC': tensor(0.9248)}
+TRAIN={'Accuracy': tensor(0.3600), 'Precision': tensor(0.3440), 'Recall': tensor(0.3600), 'F1Score': tensor(0.3473), 'AUROC': tensor(0.9266)}
+Adjusting learning rate of group 0 to 2.2877e-04.
+EVAL={'Accuracy': tensor(0.3614), 'Precision': tensor(0.3572), 'Recall': tensor(0.3614), 'F1Score': tensor(0.3471), 'AUROC': tensor(0.9272)}
+TRAIN={'Accuracy': tensor(0.3705), 'Precision': tensor(0.3544), 'Recall': tensor(0.3705), 'F1Score': tensor(0.3584), 'AUROC': tensor(0.9293)}
+Adjusting learning rate of group 0 to 2.0589e-04.
+EVAL={'Accuracy': tensor(0.3781), 'Precision': tensor(0.3761), 'Recall': tensor(0.3781), 'F1Score': tensor(0.3654), 'AUROC': tensor(0.9309)}
+TRAIN={'Accuracy': tensor(0.3794), 'Precision': tensor(0.3649), 'Recall': tensor(0.3794), 'F1Score': tensor(0.3684), 'AUROC': tensor(0.9324)}
+Adjusting learning rate of group 0 to 1.8530e-04.
+EVAL={'Accuracy': tensor(0.3823), 'Precision': tensor(0.3792), 'Recall': tensor(0.3823), 'F1Score': tensor(0.3685), 'AUROC': tensor(0.9324)}
+TRAIN={'Accuracy': tensor(0.3918), 'Precision': tensor(0.3787), 'Recall': tensor(0.3918), 'F1Score': tensor(0.3815), 'AUROC': tensor(0.9348)}
+Adjusting learning rate of group 0 to 1.6677e-04.
+EVAL={'Accuracy': tensor(0.3933), 'Precision': tensor(0.3869), 'Recall': tensor(0.3933), 'F1Score': tensor(0.3801), 'AUROC': tensor(0.9340)}
+TRAIN={'Accuracy': tensor(0.3983), 'Precision': tensor(0.3841), 'Recall': tensor(0.3983), 'F1Score': tensor(0.3877), 'AUROC': tensor(0.9365)}
+Adjusting learning rate of group 0 to 1.5009e-04.
+EVAL={'Accuracy': tensor(0.3966), 'Precision': tensor(0.3903), 'Recall': tensor(0.3966), 'F1Score': tensor(0.3846), 'AUROC': tensor(0.9343)}
+TRAIN={'Accuracy': tensor(0.4091), 'Precision': tensor(0.3959), 'Recall': tensor(0.4091), 'F1Score': tensor(0.3992), 'AUROC': tensor(0.9384)}
+Adjusting learning rate of group 0 to 1.3509e-04.
+EVAL={'Accuracy': tensor(0.4012), 'Precision': tensor(0.4046), 'Recall': tensor(0.4012), 'F1Score': tensor(0.3930), 'AUROC': tensor(0.9369)}
+TRAIN={'Accuracy': tensor(0.4186), 'Precision': tensor(0.4062), 'Recall': tensor(0.4186), 'F1Score': tensor(0.4093), 'AUROC': tensor(0.9406)}
+Adjusting learning rate of group 0 to 1.2158e-04.
+EVAL={'Accuracy': tensor(0.4183), 'Precision': tensor(0.4099), 'Recall': tensor(0.4183), 'F1Score': tensor(0.4073), 'AUROC': tensor(0.9395)}
+TRAIN={'Accuracy': tensor(0.4212), 'Precision': tensor(0.4089), 'Recall': tensor(0.4212), 'F1Score': tensor(0.4120), 'AUROC': tensor(0.9420)}
+Adjusting learning rate of group 0 to 1.0942e-04.
+EVAL={'Accuracy': tensor(0.4188), 'Precision': tensor(0.4112), 'Recall': tensor(0.4188), 'F1Score': tensor(0.4068), 'AUROC': tensor(0.9397)}
+TRAIN={'Accuracy': tensor(0.4309), 'Precision': tensor(0.4200), 'Recall': tensor(0.4309), 'F1Score': tensor(0.4224), 'AUROC': tensor(0.9434)}
+Adjusting learning rate of group 0 to 9.8477e-05.
+EVAL={'Accuracy': tensor(0.4209), 'Precision': tensor(0.4187), 'Recall': tensor(0.4209), 'F1Score': tensor(0.4138), 'AUROC': tensor(0.9412)}
+TRAIN={'Accuracy': tensor(0.4361), 'Precision': tensor(0.4246), 'Recall': tensor(0.4361), 'F1Score': tensor(0.4276), 'AUROC': tensor(0.9447)}
+Adjusting learning rate of group 0 to 8.8629e-05.
+EVAL={'Accuracy': tensor(0.4269), 'Precision': tensor(0.4219), 'Recall': tensor(0.4269), 'F1Score': tensor(0.4164), 'AUROC': tensor(0.9419)}
+TRAIN={'Accuracy': tensor(0.4419), 'Precision': tensor(0.4306), 'Recall': tensor(0.4419), 'F1Score': tensor(0.4334), 'AUROC': tensor(0.9460)}
+Adjusting learning rate of group 0 to 7.9766e-05.
+EVAL={'Accuracy': tensor(0.4286), 'Precision': tensor(0.4322), 'Recall': tensor(0.4286), 'F1Score': tensor(0.4223), 'AUROC': tensor(0.9416)}
+TRAIN={'Accuracy': tensor(0.4471), 'Precision': tensor(0.4358), 'Recall': tensor(0.4471), 'F1Score': tensor(0.4388), 'AUROC': tensor(0.9468)}
+Adjusting learning rate of group 0 to 7.1790e-05.
+EVAL={'Accuracy': tensor(0.4335), 'Precision': tensor(0.4312), 'Recall': tensor(0.4335), 'F1Score': tensor(0.4249), 'AUROC': tensor(0.9438)}
+TRAIN={'Accuracy': tensor(0.4505), 'Precision': tensor(0.4399), 'Recall': tensor(0.4505), 'F1Score': tensor(0.4425), 'AUROC': tensor(0.9479)}
+Adjusting learning rate of group 0 to 6.4611e-05.
+EVAL={'Accuracy': tensor(0.4353), 'Precision': tensor(0.4310), 'Recall': tensor(0.4353), 'F1Score': tensor(0.4253), 'AUROC': tensor(0.9441)}
+TRAIN={'Accuracy': tensor(0.4570), 'Precision': tensor(0.4463), 'Recall': tensor(0.4570), 'F1Score': tensor(0.4491), 'AUROC': tensor(0.9490)}
+Adjusting learning rate of group 0 to 5.8150e-05.
+EVAL={'Accuracy': tensor(0.4443), 'Precision': tensor(0.4404), 'Recall': tensor(0.4443), 'F1Score': tensor(0.4364), 'AUROC': tensor(0.9460)}
+TRAIN={'Accuracy': tensor(0.4636), 'Precision': tensor(0.4533), 'Recall': tensor(0.4636), 'F1Score': tensor(0.4560), 'AUROC': tensor(0.9499)}
+Adjusting learning rate of group 0 to 5.2335e-05.
+EVAL={'Accuracy': tensor(0.4457), 'Precision': tensor(0.4435), 'Recall': tensor(0.4457), 'F1Score': tensor(0.4383), 'AUROC': tensor(0.9448)}
+TRAIN={'Accuracy': tensor(0.4630), 'Precision': tensor(0.4534), 'Recall': tensor(0.4630), 'F1Score': tensor(0.4557), 'AUROC': tensor(0.9503)}
+Adjusting learning rate of group 0 to 4.7101e-05.
+EVAL={'Accuracy': tensor(0.4480), 'Precision': tensor(0.4430), 'Recall': tensor(0.4480), 'F1Score': tensor(0.4386), 'AUROC': tensor(0.9464)}
+TRAIN={'Accuracy': tensor(0.4696), 'Precision': tensor(0.4599), 'Recall': tensor(0.4696), 'F1Score': tensor(0.4623), 'AUROC': tensor(0.9512)}
+Adjusting learning rate of group 0 to 4.2391e-05.
+EVAL={'Accuracy': tensor(0.4515), 'Precision': tensor(0.4479), 'Recall': tensor(0.4515), 'F1Score': tensor(0.4450), 'AUROC': tensor(0.9465)}
+Using downloaded and verified file: data/train_32x32.mat
+Evaluating for SVHN
+Metrics for Mahalanobis
+{'AUROC': 0.6548985242843628, 'AUPR-IN': 0.9250432848930359, 'AUPR-OUT': 0.2053816020488739, 'ACC95TPR': 0.8519644141197205, 'FPR95TPR': 0.8662999868392944}
+Metrics for MaxLogit
+{'AUROC': 0.618981659412384, 'AUPR-IN': 0.9057482481002808, 'AUPR-OUT': 0.2474464476108551, 'ACC95TPR': 0.8557478785514832, 'FPR95TPR': 0.8348000049591064}
+Metrics for MaxSoftmax
+{'AUROC': 0.5156233310699463, 'AUPR-IN': 0.8829947710037231, 'AUPR-OUT': 0.13973768055438995, 'ACC95TPR': 0.844313383102417, 'FPR95TPR': 0.9300000071525574}
+Metrics for ODIN
+{'AUROC': 0.6390893459320068, 'AUPR-IN': 0.9225599765777588, 'AUPR-OUT': 0.1952323615550995, 'ACC95TPR': 0.8496342897415161, 'FPR95TPR': 0.885699987411499}
+Metrics for OpenMax
+{'AUROC': 0.629613995552063, 'AUPR-IN': 0.9063124060630798, 'AUPR-OUT': 0.19412662088871002, 'ACC95TPR': 0.8527090549468994, 'FPR95TPR': 0.8600999712944031}
+Metrics for EnergyBased
+{'AUROC': 0.64760822057724, 'AUPR-IN': 0.9096322655677795, 'AUPR-OUT': 0.27544495463371277, 'ACC95TPR': 0.8584863543510437, 'FPR95TPR': 0.8119999766349792}
+Metrics for KLMatching
+{'AUROC': 0.5456072092056274, 'AUPR-IN': 0.9054615497589111, 'AUPR-OUT': 0.12452206760644913, 'ACC95TPR': 0.8401815891265869, 'FPR95TPR': 0.9643999934196472}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|65.49|92.50|20.54|85.20|86.63|
+|MaxLogit|61.90|90.57|24.74|85.57|83.48|
+|MaxSoftmax|51.56|88.30|13.97|84.43|93.00|
+|ODIN|63.91|92.26|19.52|84.96|88.57|
+|OpenMax|62.96|90.63|19.41|85.27|86.01|
+|EnergyBased|64.76|90.96|27.54|85.85|81.20|
+|KLMatching|54.56|90.55|12.45|84.02|96.44|
+Evaluating for LSUNCrop
+Metrics for Mahalanobis
+{'AUROC': 0.5834263563156128, 'AUPR-IN': 0.550987720489502, 'AUPR-OUT': 0.5755678415298462, 'ACC95TPR': 0.519349992275238, 'FPR95TPR': 0.911300003528595}
+Metrics for MaxLogit
+{'AUROC': 0.716562032699585, 'AUPR-IN': 0.6809192895889282, 'AUPR-OUT': 0.7317481637001038, 'ACC95TPR': 0.6011499762535095, 'FPR95TPR': 0.7476999759674072}
+Metrics for MaxSoftmax
+{'AUROC': 0.5661936402320862, 'AUPR-IN': 0.5496267676353455, 'AUPR-OUT': 0.5880340337753296, 'ACC95TPR': 0.5446500182151794, 'FPR95TPR': 0.8607000112533569}
+Metrics for ODIN
+{'AUROC': 0.5651335716247559, 'AUPR-IN': 0.5495511293411255, 'AUPR-OUT': 0.5566898584365845, 'ACC95TPR': 0.5147500038146973, 'FPR95TPR': 0.9204999804496765}
+Metrics for OpenMax
+{'AUROC': 0.6981567144393921, 'AUPR-IN': 0.66588294506073, 'AUPR-OUT': 0.6722533702850342, 'ACC95TPR': 0.5594000220298767, 'FPR95TPR': 0.8312000036239624}
+Metrics for EnergyBased
+{'AUROC': 0.7406986951828003, 'AUPR-IN': 0.7003188133239746, 'AUPR-OUT': 0.7540178894996643, 'ACC95TPR': 0.614300012588501, 'FPR95TPR': 0.7214000225067139}
+Metrics for KLMatching
+{'AUROC': 0.5999627709388733, 'AUPR-IN': 0.6150397062301636, 'AUPR-OUT': 0.5640548467636108, 'ACC95TPR': 0.5051500201225281, 'FPR95TPR': 0.9397000074386597}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|58.34|55.10|57.56|51.93|91.13|
+|MaxLogit|71.66|68.09|73.17|60.11|74.77|
+|MaxSoftmax|56.62|54.96|58.80|54.47|86.07|
+|ODIN|56.51|54.96|55.67|51.48|92.05|
+|OpenMax|69.82|66.59|67.23|55.94|83.12|
+|EnergyBased|74.07|70.03|75.40|61.43|72.14|
+|KLMatching|60.00|61.50|56.41|50.52|93.97|
+Evaluating for LSUNResize
+Metrics for Mahalanobis
+{'AUROC': 0.4374312460422516, 'AUPR-IN': 0.44076624512672424, 'AUPR-OUT': 0.5022966861724854, 'ACC95TPR': 0.5192499756813049, 'FPR95TPR': 0.9114999771118164}
+Metrics for MaxLogit
+{'AUROC': 0.6891144514083862, 'AUPR-IN': 0.6070643663406372, 'AUPR-OUT': 0.7432586550712585, 'ACC95TPR': 0.6370499730110168, 'FPR95TPR': 0.6758999824523926}
+Metrics for MaxSoftmax
+{'AUROC': 0.6892882585525513, 'AUPR-IN': 0.6504269242286682, 'AUPR-OUT': 0.7114605903625488, 'ACC95TPR': 0.5956000089645386, 'FPR95TPR': 0.7588000297546387}
+Metrics for ODIN
+{'AUROC': 0.513080894947052, 'AUPR-IN': 0.4903832972049713, 'AUPR-OUT': 0.5393590927124023, 'ACC95TPR': 0.5199000239372253, 'FPR95TPR': 0.9101999998092651}
+Metrics for OpenMax
+{'AUROC': 0.663529634475708, 'AUPR-IN': 0.5787116289138794, 'AUPR-OUT': 0.7221918106079102, 'ACC95TPR': 0.6343500018119812, 'FPR95TPR': 0.6812999844551086}
+Metrics for EnergyBased
+{'AUROC': 0.6523393988609314, 'AUPR-IN': 0.5652776956558228, 'AUPR-OUT': 0.7232639193534851, 'ACC95TPR': 0.6322000026702881, 'FPR95TPR': 0.6855999827384949}
+Metrics for KLMatching
+{'AUROC': 0.7030590176582336, 'AUPR-IN': 0.671045184135437, 'AUPR-OUT': 0.702578067779541, 'ACC95TPR': 0.5734000205993652, 'FPR95TPR': 0.8032000064849854}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|43.74|44.08|50.23|51.92|91.15|
+|MaxLogit|68.91|60.71|74.33|63.70|67.59|
+|MaxSoftmax|68.93|65.04|71.15|59.56|75.88|
+|ODIN|51.31|49.04|53.94|51.99|91.02|
+|OpenMax|66.35|57.87|72.22|63.44|68.13|
+|EnergyBased|65.23|56.53|72.33|63.22|68.56|
+|KLMatching|70.31|67.10|70.26|57.34|80.32|
+Evaluating for Textures
+Metrics for Mahalanobis
+{'AUROC': 0.7057734131813049, 'AUPR-IN': 0.6422752737998962, 'AUPR-OUT': 0.7392982244491577, 'ACC95TPR': 0.3699488639831543, 'FPR95TPR': 0.9571999907493591}
+Metrics for MaxLogit
+{'AUROC': 0.5449920296669006, 'AUPR-IN': 0.42589932680130005, 'AUPR-OUT': 0.6610348224639893, 'ACC95TPR': 0.3759590685367584, 'FPR95TPR': 0.9477999806404114}
+Metrics for MaxSoftmax
+{'AUROC': 0.31305214762687683, 'AUPR-IN': 0.2671564221382141, 'AUPR-OUT': 0.5131025314331055, 'ACC95TPR': 0.343989759683609, 'FPR95TPR': 0.9977999925613403}
+Metrics for ODIN
+{'AUROC': 0.250747412443161, 'AUPR-IN': 0.24686723947525024, 'AUPR-OUT': 0.48667407035827637, 'ACC95TPR': 0.3436061441898346, 'FPR95TPR': 0.9983999729156494}
+Metrics for OpenMax
+{'AUROC': 0.49057286977767944, 'AUPR-IN': 0.4071314334869385, 'AUPR-OUT': 0.5871009826660156, 'ACC95TPR': 0.3430946171283722, 'FPR95TPR': 0.9991999864578247}
+Metrics for EnergyBased
+{'AUROC': 0.6174394488334656, 'AUPR-IN': 0.5027615427970886, 'AUPR-OUT': 0.7037148475646973, 'ACC95TPR': 0.38216111063957214, 'FPR95TPR': 0.9380999803543091}
+Metrics for KLMatching
+{'AUROC': 0.5491566061973572, 'AUPR-IN': 0.4442269206047058, 'AUPR-OUT': 0.7041044235229492, 'ACC95TPR': 0.43913042545318604, 'FPR95TPR': 0.8489999771118164}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|70.58|64.23|73.93|36.99|95.72|
+|MaxLogit|54.50|42.59|66.10|37.60|94.78|
+|MaxSoftmax|31.31|26.72|51.31|34.40|99.78|
+|ODIN|25.07|24.69|48.67|34.36|99.84|
+|OpenMax|49.06|40.71|58.71|34.31|99.92|
+|EnergyBased|61.74|50.28|70.37|38.22|93.81|
+|KLMatching|54.92|44.42|70.41|43.91|84.90|
+Evaluating for TinyImageNetCrop
+Metrics for Mahalanobis
+{'AUROC': 0.4854021668434143, 'AUPR-IN': 0.48702916502952576, 'AUPR-OUT': 0.5099745392799377, 'ACC95TPR': 0.5091999769210815, 'FPR95TPR': 0.9315999746322632}
+Metrics for MaxLogit
+{'AUROC': 0.7172157168388367, 'AUPR-IN': 0.6558632850646973, 'AUPR-OUT': 0.7479819059371948, 'ACC95TPR': 0.6245999932289124, 'FPR95TPR': 0.7008000016212463}
+Metrics for MaxSoftmax
+{'AUROC': 0.6454296112060547, 'AUPR-IN': 0.6259287595748901, 'AUPR-OUT': 0.6420032382011414, 'ACC95TPR': 0.5566999912261963, 'FPR95TPR': 0.8366000056266785}
+Metrics for ODIN
+{'AUROC': 0.5182573795318604, 'AUPR-IN': 0.5093161463737488, 'AUPR-OUT': 0.5139079093933105, 'ACC95TPR': 0.49639999866485596, 'FPR95TPR': 0.9571999907493591}
+Metrics for OpenMax
+{'AUROC': 0.6980088949203491, 'AUPR-IN': 0.6369637846946716, 'AUPR-OUT': 0.6981727480888367, 'ACC95TPR': 0.5995500087738037, 'FPR95TPR': 0.7508999705314636}
+Metrics for EnergyBased
+{'AUROC': 0.7091513276100159, 'AUPR-IN': 0.6416978240013123, 'AUPR-OUT': 0.7488462924957275, 'ACC95TPR': 0.6308000087738037, 'FPR95TPR': 0.6883999705314636}
+Metrics for KLMatching
+{'AUROC': 0.6719053983688354, 'AUPR-IN': 0.6538475751876831, 'AUPR-OUT': 0.6597164869308472, 'ACC95TPR': 0.5514500141143799, 'FPR95TPR': 0.847100019454956}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|48.54|48.70|51.00|50.92|93.16|
+|MaxLogit|71.72|65.59|74.80|62.46|70.08|
+|MaxSoftmax|64.54|62.59|64.20|55.67|83.66|
+|ODIN|51.83|50.93|51.39|49.64|95.72|
+|OpenMax|69.80|63.70|69.82|59.96|75.09|
+|EnergyBased|70.92|64.17|74.88|63.08|68.84|
+|KLMatching|67.19|65.38|65.97|55.15|84.71|
+Evaluating for TinyImageNetResize
+Metrics for Mahalanobis
+{'AUROC': 0.5679113268852234, 'AUPR-IN': 0.5435646772384644, 'AUPR-OUT': 0.5760183930397034, 'ACC95TPR': 0.5218999981880188, 'FPR95TPR': 0.9061999917030334}
+Metrics for MaxLogit
+{'AUROC': 0.6747928857803345, 'AUPR-IN': 0.6126089692115784, 'AUPR-OUT': 0.711532473564148, 'ACC95TPR': 0.6039000153541565, 'FPR95TPR': 0.7422000169754028}
+Metrics for MaxSoftmax
+{'AUROC': 0.6172547936439514, 'AUPR-IN': 0.587043821811676, 'AUPR-OUT': 0.6227157711982727, 'ACC95TPR': 0.5478500127792358, 'FPR95TPR': 0.8543000221252441}
+Metrics for ODIN
+{'AUROC': 0.48448941111564636, 'AUPR-IN': 0.47714942693710327, 'AUPR-OUT': 0.4921201765537262, 'ACC95TPR': 0.4945000112056732, 'FPR95TPR': 0.9610000252723694}
+Metrics for OpenMax
+{'AUROC': 0.6496930122375488, 'AUPR-IN': 0.5910298228263855, 'AUPR-OUT': 0.6527020335197449, 'ACC95TPR': 0.5705000162124634, 'FPR95TPR': 0.8090000152587891}
+Metrics for EnergyBased
+{'AUROC': 0.6720452904701233, 'AUPR-IN': 0.6075958013534546, 'AUPR-OUT': 0.7143747210502625, 'ACC95TPR': 0.6147500276565552, 'FPR95TPR': 0.7204999923706055}
+Metrics for KLMatching
+{'AUROC': 0.6857193112373352, 'AUPR-IN': 0.6659822463989258, 'AUPR-OUT': 0.6810314059257507, 'ACC95TPR': 0.5669000148773193, 'FPR95TPR': 0.8162000179290771}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|56.79|54.36|57.60|52.19|90.62|
+|MaxLogit|67.48|61.26|71.15|60.39|74.22|
+|MaxSoftmax|61.73|58.70|62.27|54.79|85.43|
+|ODIN|48.45|47.71|49.21|49.45|96.10|
+|OpenMax|64.97|59.10|65.27|57.05|80.90|
+|EnergyBased|67.20|60.76|71.44|61.48|72.05|
+|KLMatching|68.57|66.60|68.10|56.69|81.62|
+Files already downloaded and verified
+Evaluating for CIFAR10
+Metrics for Mahalanobis
+{'AUROC': 0.4362218976020813, 'AUPR-IN': 0.7926346659660339, 'AUPR-OUT': 0.15171492099761963, 'ACC95TPR': 0.7995166778564453, 'FPR95TPR': 0.9528999924659729}
+Metrics for MaxLogit
+{'AUROC': 0.6365998983383179, 'AUPR-IN': 0.8827641606330872, 'AUPR-OUT': 0.3207706809043884, 'ACC95TPR': 0.8223000168800354, 'FPR95TPR': 0.8162000179290771}
+Metrics for MaxSoftmax
+{'AUROC': 0.6606766581535339, 'AUPR-IN': 0.890008807182312, 'AUPR-OUT': 0.3669913113117218, 'ACC95TPR': 0.8306000232696533, 'FPR95TPR': 0.7663999795913696}
+Metrics for ODIN
+{'AUROC': 0.6041619777679443, 'AUPR-IN': 0.8711071014404297, 'AUPR-OUT': 0.27255797386169434, 'ACC95TPR': 0.8155999779701233, 'FPR95TPR': 0.8564000129699707}
+Metrics for OpenMax
+{'AUROC': 0.6042255163192749, 'AUPR-IN': 0.8677279949188232, 'AUPR-OUT': 0.271903395652771, 'ACC95TPR': 0.8192333579063416, 'FPR95TPR': 0.8345999717712402}
+Metrics for EnergyBased
+{'AUROC': 0.6048307418823242, 'AUPR-IN': 0.8704736232757568, 'AUPR-OUT': 0.29254382848739624, 'ACC95TPR': 0.8190666437149048, 'FPR95TPR': 0.8356000185012817}
+Metrics for KLMatching
+{'AUROC': 0.6034512519836426, 'AUPR-IN': 0.8680442571640015, 'AUPR-OUT': 0.2592501938343048, 'ACC95TPR': 0.8144333362579346, 'FPR95TPR': 0.8633999824523926}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|43.62|79.26|15.17|79.95|95.29|
+|MaxLogit|63.66|88.28|32.08|82.23|81.62|
+|MaxSoftmax|66.07|89.00|36.70|83.06|76.64|
+|ODIN|60.42|87.11|27.26|81.56|85.64|
+|OpenMax|60.42|86.77|27.19|81.92|83.46|
+|EnergyBased|60.48|87.05|29.25|81.91|83.56|
+|KLMatching|60.35|86.80|25.93|81.44|86.34|
+--------- CUT HERE ---------
+### Results
+```
+PRETRAINED=False
+MODEL=resnet34
+TRAINABLE_PARAMS=21797672
+EPOCHS=30
+LR=0.001
+USE_CIDER=False
+ALPHA=0.95
+TEMPERATURE=0.1
+COMPACT_SCALER=2.0
+CIDER_GLOBAL_SCALE=0.1
+MOMENTUM=0.9
+```
+#### SVHN
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|65.49|92.50|20.54|85.20|86.63|
+|MaxLogit|61.90|90.57|24.74|85.57|83.48|
+|MaxSoftmax|51.56|88.30|13.97|84.43|93.00|
+|ODIN|63.91|92.26|19.52|84.96|88.57|
+|OpenMax|62.96|90.63|19.41|85.27|86.01|
+|EnergyBased|64.76|90.96|27.54|85.85|81.20|
+|KLMatching|54.56|90.55|12.45|84.02|96.44|
+#### LSUNCrop
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|58.34|55.10|57.56|51.93|91.13|
+|MaxLogit|71.66|68.09|73.17|60.11|74.77|
+|MaxSoftmax|56.62|54.96|58.80|54.47|86.07|
+|ODIN|56.51|54.96|55.67|51.48|92.05|
+|OpenMax|69.82|66.59|67.23|55.94|83.12|
+|EnergyBased|74.07|70.03|75.40|61.43|72.14|
+|KLMatching|60.00|61.50|56.41|50.52|93.97|
+#### LSUNResize
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|43.74|44.08|50.23|51.92|91.15|
+|MaxLogit|68.91|60.71|74.33|63.70|67.59|
+|MaxSoftmax|68.93|65.04|71.15|59.56|75.88|
+|ODIN|51.31|49.04|53.94|51.99|91.02|
+|OpenMax|66.35|57.87|72.22|63.44|68.13|
+|EnergyBased|65.23|56.53|72.33|63.22|68.56|
+|KLMatching|70.31|67.10|70.26|57.34|80.32|
+#### Textures
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|70.58|64.23|73.93|36.99|95.72|
+|MaxLogit|54.50|42.59|66.10|37.60|94.78|
+|MaxSoftmax|31.31|26.72|51.31|34.40|99.78|
+|ODIN|25.07|24.69|48.67|34.36|99.84|
+|OpenMax|49.06|40.71|58.71|34.31|99.92|
+|EnergyBased|61.74|50.28|70.37|38.22|93.81|
+|KLMatching|54.92|44.42|70.41|43.91|84.90|
+#### TinyImageNetCrop
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|48.54|48.70|51.00|50.92|93.16|
+|MaxLogit|71.72|65.59|74.80|62.46|70.08|
+|MaxSoftmax|64.54|62.59|64.20|55.67|83.66|
+|ODIN|51.83|50.93|51.39|49.64|95.72|
+|OpenMax|69.80|63.70|69.82|59.96|75.09|
+|EnergyBased|70.92|64.17|74.88|63.08|68.84|
+|KLMatching|67.19|65.38|65.97|55.15|84.71|
+#### TinyImageNetResize
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|56.79|54.36|57.60|52.19|90.62|
+|MaxLogit|67.48|61.26|71.15|60.39|74.22|
+|MaxSoftmax|61.73|58.70|62.27|54.79|85.43|
+|ODIN|48.45|47.71|49.21|49.45|96.10|
+|OpenMax|64.97|59.10|65.27|57.05|80.90|
+|EnergyBased|67.20|60.76|71.44|61.48|72.05|
+|KLMatching|68.57|66.60|68.10|56.69|81.62|
+#### CIFAR10
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|43.62|79.26|15.17|79.95|95.29|
+|MaxLogit|63.66|88.28|32.08|82.23|81.62|
+|MaxSoftmax|66.07|89.00|36.70|83.06|76.64|
+|ODIN|60.42|87.11|27.26|81.56|85.64|
+|OpenMax|60.42|86.77|27.19|81.92|83.46|
+|EnergyBased|60.48|87.05|29.25|81.91|83.56|
+|KLMatching|60.35|86.80|25.93|81.44|86.34|
+--------- CUT HERE ---------
+===================== resnet50 =====================
+Trainable params: 25557032
+Features: 2048
+Train from scratch: True
+Files already downloaded and verified
+Files already downloaded and verified
+Adjusting learning rate of group 0 to 1.0000e-03.
+Time to initialize prototypes: 14.286
+TRAIN={'Accuracy': tensor(0.0466), 'Precision': tensor(0.0356), 'Recall': tensor(0.0466), 'F1Score': tensor(0.0337), 'AUROC': tensor(0.7079)}
+Adjusting learning rate of group 0 to 9.0000e-04.
+EVAL={'Accuracy': tensor(0.0734), 'Precision': tensor(0.0546), 'Recall': tensor(0.0734), 'F1Score': tensor(0.0406), 'AUROC': tensor(0.7780)}
+TRAIN={'Accuracy': tensor(0.0832), 'Precision': tensor(0.0634), 'Recall': tensor(0.0832), 'F1Score': tensor(0.0634), 'AUROC': tensor(0.7809)}
+Adjusting learning rate of group 0 to 8.1000e-04.
+EVAL={'Accuracy': tensor(0.1011), 'Precision': tensor(0.0739), 'Recall': tensor(0.1011), 'F1Score': tensor(0.0674), 'AUROC': tensor(0.8104)}
+TRAIN={'Accuracy': tensor(0.1130), 'Precision': tensor(0.0916), 'Recall': tensor(0.1130), 'F1Score': tensor(0.0921), 'AUROC': tensor(0.8105)}
+Adjusting learning rate of group 0 to 7.2900e-04.
+EVAL={'Accuracy': tensor(0.1233), 'Precision': tensor(0.1086), 'Recall': tensor(0.1233), 'F1Score': tensor(0.0963), 'AUROC': tensor(0.8246)}
+TRAIN={'Accuracy': tensor(0.1418), 'Precision': tensor(0.1195), 'Recall': tensor(0.1418), 'F1Score': tensor(0.1216), 'AUROC': tensor(0.8308)}
+Adjusting learning rate of group 0 to 6.5610e-04.
+EVAL={'Accuracy': tensor(0.1626), 'Precision': tensor(0.1484), 'Recall': tensor(0.1626), 'F1Score': tensor(0.1354), 'AUROC': tensor(0.8512)}
+TRAIN={'Accuracy': tensor(0.1687), 'Precision': tensor(0.1459), 'Recall': tensor(0.1687), 'F1Score': tensor(0.1482), 'AUROC': tensor(0.8492)}
+Adjusting learning rate of group 0 to 5.9049e-04.
+EVAL={'Accuracy': tensor(0.1866), 'Precision': tensor(0.1820), 'Recall': tensor(0.1866), 'F1Score': tensor(0.1596), 'AUROC': tensor(0.8622)}
+TRAIN={'Accuracy': tensor(0.1918), 'Precision': tensor(0.1693), 'Recall': tensor(0.1918), 'F1Score': tensor(0.1715), 'AUROC': tensor(0.8621)}
+Adjusting learning rate of group 0 to 5.3144e-04.
+EVAL={'Accuracy': tensor(0.2097), 'Precision': tensor(0.1937), 'Recall': tensor(0.2097), 'F1Score': tensor(0.1833), 'AUROC': tensor(0.8748)}
+TRAIN={'Accuracy': tensor(0.2094), 'Precision': tensor(0.1875), 'Recall': tensor(0.2094), 'F1Score': tensor(0.1900), 'AUROC': tensor(0.8713)}
+Adjusting learning rate of group 0 to 4.7830e-04.
+EVAL={'Accuracy': tensor(0.2272), 'Precision': tensor(0.2210), 'Recall': tensor(0.2272), 'F1Score': tensor(0.2065), 'AUROC': tensor(0.8800)}
+TRAIN={'Accuracy': tensor(0.2242), 'Precision': tensor(0.2031), 'Recall': tensor(0.2242), 'F1Score': tensor(0.2055), 'AUROC': tensor(0.8785)}
+Adjusting learning rate of group 0 to 4.3047e-04.
+EVAL={'Accuracy': tensor(0.2382), 'Precision': tensor(0.2305), 'Recall': tensor(0.2382), 'F1Score': tensor(0.2163), 'AUROC': tensor(0.8844)}
+TRAIN={'Accuracy': tensor(0.2370), 'Precision': tensor(0.2150), 'Recall': tensor(0.2370), 'F1Score': tensor(0.2184), 'AUROC': tensor(0.8831)}
+Adjusting learning rate of group 0 to 3.8742e-04.
+EVAL={'Accuracy': tensor(0.2499), 'Precision': tensor(0.2423), 'Recall': tensor(0.2499), 'F1Score': tensor(0.2299), 'AUROC': tensor(0.8902)}
+TRAIN={'Accuracy': tensor(0.2491), 'Precision': tensor(0.2268), 'Recall': tensor(0.2491), 'F1Score': tensor(0.2309), 'AUROC': tensor(0.8873)}
+Adjusting learning rate of group 0 to 3.4868e-04.
+EVAL={'Accuracy': tensor(0.2669), 'Precision': tensor(0.2623), 'Recall': tensor(0.2669), 'F1Score': tensor(0.2455), 'AUROC': tensor(0.8950)}
+TRAIN={'Accuracy': tensor(0.2621), 'Precision': tensor(0.2410), 'Recall': tensor(0.2621), 'F1Score': tensor(0.2444), 'AUROC': tensor(0.8913)}
+Adjusting learning rate of group 0 to 3.1381e-04.
+EVAL={'Accuracy': tensor(0.2676), 'Precision': tensor(0.2535), 'Recall': tensor(0.2676), 'F1Score': tensor(0.2460), 'AUROC': tensor(0.8976)}
+TRAIN={'Accuracy': tensor(0.2698), 'Precision': tensor(0.2492), 'Recall': tensor(0.2698), 'F1Score': tensor(0.2527), 'AUROC': tensor(0.8948)}
+Adjusting learning rate of group 0 to 2.8243e-04.
+EVAL={'Accuracy': tensor(0.2729), 'Precision': tensor(0.2608), 'Recall': tensor(0.2729), 'F1Score': tensor(0.2518), 'AUROC': tensor(0.8962)}
+TRAIN={'Accuracy': tensor(0.2805), 'Precision': tensor(0.2607), 'Recall': tensor(0.2805), 'F1Score': tensor(0.2645), 'AUROC': tensor(0.8978)}
+Adjusting learning rate of group 0 to 2.5419e-04.
+EVAL={'Accuracy': tensor(0.2909), 'Precision': tensor(0.2821), 'Recall': tensor(0.2909), 'F1Score': tensor(0.2739), 'AUROC': tensor(0.9014)}
+TRAIN={'Accuracy': tensor(0.2892), 'Precision': tensor(0.2679), 'Recall': tensor(0.2892), 'F1Score': tensor(0.2728), 'AUROC': tensor(0.9001)}
+Adjusting learning rate of group 0 to 2.2877e-04.
+EVAL={'Accuracy': tensor(0.2938), 'Precision': tensor(0.2810), 'Recall': tensor(0.2938), 'F1Score': tensor(0.2722), 'AUROC': tensor(0.9027)}
+TRAIN={'Accuracy': tensor(0.2995), 'Precision': tensor(0.2803), 'Recall': tensor(0.2995), 'F1Score': tensor(0.2842), 'AUROC': tensor(0.9033)}
+Adjusting learning rate of group 0 to 2.0589e-04.
+EVAL={'Accuracy': tensor(0.2980), 'Precision': tensor(0.2836), 'Recall': tensor(0.2980), 'F1Score': tensor(0.2772), 'AUROC': tensor(0.9043)}
+TRAIN={'Accuracy': tensor(0.3072), 'Precision': tensor(0.2882), 'Recall': tensor(0.3072), 'F1Score': tensor(0.2923), 'AUROC': tensor(0.9046)}
+Adjusting learning rate of group 0 to 1.8530e-04.
+EVAL={'Accuracy': tensor(0.3111), 'Precision': tensor(0.2996), 'Recall': tensor(0.3111), 'F1Score': tensor(0.2926), 'AUROC': tensor(0.9064)}
+TRAIN={'Accuracy': tensor(0.3155), 'Precision': tensor(0.2966), 'Recall': tensor(0.3155), 'F1Score': tensor(0.3009), 'AUROC': tensor(0.9082)}
+Adjusting learning rate of group 0 to 1.6677e-04.
+EVAL={'Accuracy': tensor(0.3161), 'Precision': tensor(0.3017), 'Recall': tensor(0.3161), 'F1Score': tensor(0.2982), 'AUROC': tensor(0.9082)}
+TRAIN={'Accuracy': tensor(0.3202), 'Precision': tensor(0.3017), 'Recall': tensor(0.3202), 'F1Score': tensor(0.3060), 'AUROC': tensor(0.9085)}
+Adjusting learning rate of group 0 to 1.5009e-04.
+EVAL={'Accuracy': tensor(0.3200), 'Precision': tensor(0.3140), 'Recall': tensor(0.3200), 'F1Score': tensor(0.3075), 'AUROC': tensor(0.9085)}
+TRAIN={'Accuracy': tensor(0.3280), 'Precision': tensor(0.3097), 'Recall': tensor(0.3280), 'F1Score': tensor(0.3145), 'AUROC': tensor(0.9103)}
+Adjusting learning rate of group 0 to 1.3509e-04.
+EVAL={'Accuracy': tensor(0.3227), 'Precision': tensor(0.3083), 'Recall': tensor(0.3227), 'F1Score': tensor(0.3063), 'AUROC': tensor(0.9095)}
+TRAIN={'Accuracy': tensor(0.3349), 'Precision': tensor(0.3171), 'Recall': tensor(0.3349), 'F1Score': tensor(0.3216), 'AUROC': tensor(0.9122)}
+Adjusting learning rate of group 0 to 1.2158e-04.
+EVAL={'Accuracy': tensor(0.3317), 'Precision': tensor(0.3175), 'Recall': tensor(0.3317), 'F1Score': tensor(0.3129), 'AUROC': tensor(0.9111)}
+TRAIN={'Accuracy': tensor(0.3398), 'Precision': tensor(0.3222), 'Recall': tensor(0.3398), 'F1Score': tensor(0.3268), 'AUROC': tensor(0.9134)}
+Adjusting learning rate of group 0 to 1.0942e-04.
+EVAL={'Accuracy': tensor(0.3347), 'Precision': tensor(0.3256), 'Recall': tensor(0.3347), 'F1Score': tensor(0.3201), 'AUROC': tensor(0.9120)}
+TRAIN={'Accuracy': tensor(0.3446), 'Precision': tensor(0.3269), 'Recall': tensor(0.3446), 'F1Score': tensor(0.3312), 'AUROC': tensor(0.9149)}
+Adjusting learning rate of group 0 to 9.8477e-05.
+EVAL={'Accuracy': tensor(0.3379), 'Precision': tensor(0.3299), 'Recall': tensor(0.3379), 'F1Score': tensor(0.3240), 'AUROC': tensor(0.9132)}
+TRAIN={'Accuracy': tensor(0.3500), 'Precision': tensor(0.3326), 'Recall': tensor(0.3500), 'F1Score': tensor(0.3372), 'AUROC': tensor(0.9162)}
+Adjusting learning rate of group 0 to 8.8629e-05.
+EVAL={'Accuracy': tensor(0.3430), 'Precision': tensor(0.3334), 'Recall': tensor(0.3430), 'F1Score': tensor(0.3287), 'AUROC': tensor(0.9128)}
+TRAIN={'Accuracy': tensor(0.3548), 'Precision': tensor(0.3381), 'Recall': tensor(0.3548), 'F1Score': tensor(0.3424), 'AUROC': tensor(0.9162)}
+Adjusting learning rate of group 0 to 7.9766e-05.
+EVAL={'Accuracy': tensor(0.3505), 'Precision': tensor(0.3395), 'Recall': tensor(0.3505), 'F1Score': tensor(0.3372), 'AUROC': tensor(0.9138)}
+TRAIN={'Accuracy': tensor(0.3593), 'Precision': tensor(0.3431), 'Recall': tensor(0.3593), 'F1Score': tensor(0.3471), 'AUROC': tensor(0.9168)}
+Adjusting learning rate of group 0 to 7.1790e-05.
+EVAL={'Accuracy': tensor(0.3539), 'Precision': tensor(0.3454), 'Recall': tensor(0.3539), 'F1Score': tensor(0.3400), 'AUROC': tensor(0.9142)}
+TRAIN={'Accuracy': tensor(0.3637), 'Precision': tensor(0.3480), 'Recall': tensor(0.3637), 'F1Score': tensor(0.3518), 'AUROC': tensor(0.9183)}
+Adjusting learning rate of group 0 to 6.4611e-05.
+EVAL={'Accuracy': tensor(0.3539), 'Precision': tensor(0.3438), 'Recall': tensor(0.3539), 'F1Score': tensor(0.3405), 'AUROC': tensor(0.9142)}
+TRAIN={'Accuracy': tensor(0.3665), 'Precision': tensor(0.3505), 'Recall': tensor(0.3665), 'F1Score': tensor(0.3547), 'AUROC': tensor(0.9188)}
+Adjusting learning rate of group 0 to 5.8150e-05.
+EVAL={'Accuracy': tensor(0.3591), 'Precision': tensor(0.3457), 'Recall': tensor(0.3591), 'F1Score': tensor(0.3458), 'AUROC': tensor(0.9159)}
+TRAIN={'Accuracy': tensor(0.3695), 'Precision': tensor(0.3538), 'Recall': tensor(0.3695), 'F1Score': tensor(0.3578), 'AUROC': tensor(0.9201)}
+Adjusting learning rate of group 0 to 5.2335e-05.
+EVAL={'Accuracy': tensor(0.3591), 'Precision': tensor(0.3479), 'Recall': tensor(0.3591), 'F1Score': tensor(0.3470), 'AUROC': tensor(0.9156)}
+TRAIN={'Accuracy': tensor(0.3716), 'Precision': tensor(0.3562), 'Recall': tensor(0.3716), 'F1Score': tensor(0.3602), 'AUROC': tensor(0.9199)}
+Adjusting learning rate of group 0 to 4.7101e-05.
+EVAL={'Accuracy': tensor(0.3629), 'Precision': tensor(0.3551), 'Recall': tensor(0.3629), 'F1Score': tensor(0.3521), 'AUROC': tensor(0.9160)}
+TRAIN={'Accuracy': tensor(0.3753), 'Precision': tensor(0.3598), 'Recall': tensor(0.3753), 'F1Score': tensor(0.3640), 'AUROC': tensor(0.9212)}
+Adjusting learning rate of group 0 to 4.2391e-05.
+EVAL={'Accuracy': tensor(0.3647), 'Precision': tensor(0.3540), 'Recall': tensor(0.3647), 'F1Score': tensor(0.3537), 'AUROC': tensor(0.9176)}
+Using downloaded and verified file: data/train_32x32.mat
+Evaluating for SVHN
+Metrics for Mahalanobis
+{'AUROC': 0.5627482533454895, 'AUPR-IN': 0.8843417763710022, 'AUPR-OUT': 0.16243362426757812, 'ACC95TPR': 0.8516160845756531, 'FPR95TPR': 0.8691999912261963}
+Metrics for MaxLogit
+{'AUROC': 0.5577210783958435, 'AUPR-IN': 0.8843772411346436, 'AUPR-OUT': 0.22013038396835327, 'ACC95TPR': 0.853693962097168, 'FPR95TPR': 0.8518999814987183}
+Metrics for MaxSoftmax
+{'AUROC': 0.5728734135627747, 'AUPR-IN': 0.8976424932479858, 'AUPR-OUT': 0.20159538090229034, 'ACC95TPR': 0.8516280651092529, 'FPR95TPR': 0.8690999746322632}
+Metrics for ODIN
+{'AUROC': 0.6275980472564697, 'AUPR-IN': 0.9209245443344116, 'AUPR-OUT': 0.2212553769350052, 'ACC95TPR': 0.8520845174789429, 'FPR95TPR': 0.8652999997138977}
+Metrics for OpenMax
+{'AUROC': 0.5555956363677979, 'AUPR-IN': 0.8791616559028625, 'AUPR-OUT': 0.22938242554664612, 'ACC95TPR': 0.856948971748352, 'FPR95TPR': 0.8248000144958496}
+Metrics for EnergyBased
+{'AUROC': 0.5441152453422546, 'AUPR-IN': 0.8748062252998352, 'AUPR-OUT': 0.22681589424610138, 'ACC95TPR': 0.8557478785514832, 'FPR95TPR': 0.8348000049591064}
+Metrics for KLMatching
+{'AUROC': 0.555544376373291, 'AUPR-IN': 0.8981142044067383, 'AUPR-OUT': 0.13571541011333466, 'ACC95TPR': 0.8418511152267456, 'FPR95TPR': 0.9505000114440918}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|56.27|88.43|16.24|85.16|86.92|
+|MaxLogit|55.77|88.44|22.01|85.37|85.19|
+|MaxSoftmax|57.29|89.76|20.16|85.16|86.91|
+|ODIN|62.76|92.09|22.13|85.21|86.53|
+|OpenMax|55.56|87.92|22.94|85.69|82.48|
+|EnergyBased|54.41|87.48|22.68|85.57|83.48|
+|KLMatching|55.55|89.81|13.57|84.19|95.05|
+Evaluating for LSUNCrop
+Metrics for Mahalanobis
+{'AUROC': 0.5676053762435913, 'AUPR-IN': 0.5321022272109985, 'AUPR-OUT': 0.5533124804496765, 'ACC95TPR': 0.5293499827384949, 'FPR95TPR': 0.8913000226020813}
+Metrics for MaxLogit
+{'AUROC': 0.6565578579902649, 'AUPR-IN': 0.6024987101554871, 'AUPR-OUT': 0.6856305599212646, 'ACC95TPR': 0.5903499722480774, 'FPR95TPR': 0.7692999839782715}
+Metrics for MaxSoftmax
+{'AUROC': 0.5812425017356873, 'AUPR-IN': 0.5653098821640015, 'AUPR-OUT': 0.5962996482849121, 'ACC95TPR': 0.5393000245094299, 'FPR95TPR': 0.871399998664856}
+Metrics for ODIN
+{'AUROC': 0.5504109859466553, 'AUPR-IN': 0.5455935001373291, 'AUPR-OUT': 0.5415309071540833, 'ACC95TPR': 0.5060999989509583, 'FPR95TPR': 0.9377999901771545}
+Metrics for OpenMax
+{'AUROC': 0.6462597250938416, 'AUPR-IN': 0.5922442674636841, 'AUPR-OUT': 0.6475870013237, 'ACC95TPR': 0.553600013256073, 'FPR95TPR': 0.8428000211715698}
+Metrics for EnergyBased
+{'AUROC': 0.6688296794891357, 'AUPR-IN': 0.5997369885444641, 'AUPR-OUT': 0.7018775939941406, 'ACC95TPR': 0.6040999889373779, 'FPR95TPR': 0.7418000102043152}
+Metrics for KLMatching
+{'AUROC': 0.6169962882995605, 'AUPR-IN': 0.6244636178016663, 'AUPR-OUT': 0.5863572955131531, 'ACC95TPR': 0.5177000164985657, 'FPR95TPR': 0.9146000146865845}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|56.76|53.21|55.33|52.93|89.13|
+|MaxLogit|65.66|60.25|68.56|59.03|76.93|
+|MaxSoftmax|58.12|56.53|59.63|53.93|87.14|
+|ODIN|55.04|54.56|54.15|50.61|93.78|
+|OpenMax|64.63|59.22|64.76|55.36|84.28|
+|EnergyBased|66.88|59.97|70.19|60.41|74.18|
+|KLMatching|61.70|62.45|58.64|51.77|91.46|
+Evaluating for LSUNResize
+Metrics for Mahalanobis
+{'AUROC': 0.5180991888046265, 'AUPR-IN': 0.47992897033691406, 'AUPR-OUT': 0.5462189316749573, 'ACC95TPR': 0.544700026512146, 'FPR95TPR': 0.8605999946594238}
+Metrics for MaxLogit
+{'AUROC': 0.5505868792533875, 'AUPR-IN': 0.4921256899833679, 'AUPR-OUT': 0.6339842081069946, 'ACC95TPR': 0.5849499702453613, 'FPR95TPR': 0.7800999879837036}
+Metrics for MaxSoftmax
+{'AUROC': 0.6986446976661682, 'AUPR-IN': 0.6627247333526611, 'AUPR-OUT': 0.7214837074279785, 'ACC95TPR': 0.6021999716758728, 'FPR95TPR': 0.7455999851226807}
+Metrics for ODIN
+{'AUROC': 0.5257332921028137, 'AUPR-IN': 0.509966254234314, 'AUPR-OUT': 0.5491264462471008, 'ACC95TPR': 0.520550012588501, 'FPR95TPR': 0.9089000225067139}
+Metrics for OpenMax
+{'AUROC': 0.5005291700363159, 'AUPR-IN': 0.4557076692581177, 'AUPR-OUT': 0.6121376156806946, 'ACC95TPR': 0.5835999846458435, 'FPR95TPR': 0.782800018787384}
+Metrics for EnergyBased
+{'AUROC': 0.4791943430900574, 'AUPR-IN': 0.44507795572280884, 'AUPR-OUT': 0.588923990726471, 'ACC95TPR': 0.5687500238418579, 'FPR95TPR': 0.8125}
+Metrics for KLMatching
+{'AUROC': 0.6014696359634399, 'AUPR-IN': 0.5709209442138672, 'AUPR-OUT': 0.597185492515564, 'ACC95TPR': 0.5304499864578247, 'FPR95TPR': 0.8891000151634216}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|51.81|47.99|54.62|54.47|86.06|
+|MaxLogit|55.06|49.21|63.40|58.49|78.01|
+|MaxSoftmax|69.86|66.27|72.15|60.22|74.56|
+|ODIN|52.57|51.00|54.91|52.06|90.89|
+|OpenMax|50.05|45.57|61.21|58.36|78.28|
+|EnergyBased|47.92|44.51|58.89|56.88|81.25|
+|KLMatching|60.15|57.09|59.72|53.04|88.91|
+Evaluating for Textures
+Metrics for Mahalanobis
+{'AUROC': 0.34682580828666687, 'AUPR-IN': 0.28788164258003235, 'AUPR-OUT': 0.5659148097038269, 'ACC95TPR': 0.3452685475349426, 'FPR95TPR': 0.9958000183105469}
+Metrics for MaxLogit
+{'AUROC': 0.2747916281223297, 'AUPR-IN': 0.2535662055015564, 'AUPR-OUT': 0.49725544452667236, 'ACC95TPR': 0.3446930944919586, 'FPR95TPR': 0.9966999888420105}
+Metrics for MaxSoftmax
+{'AUROC': 0.28068408370018005, 'AUPR-IN': 0.25452721118927, 'AUPR-OUT': 0.5003761649131775, 'ACC95TPR': 0.3442455232143402, 'FPR95TPR': 0.9973999857902527}
+Metrics for ODIN
+{'AUROC': 0.23787902295589447, 'AUPR-IN': 0.24234002828598022, 'AUPR-OUT': 0.4826219975948334, 'ACC95TPR': 0.3445012867450714, 'FPR95TPR': 0.996999979019165}
+Metrics for OpenMax
+{'AUROC': 0.3313412666320801, 'AUPR-IN': 0.30775922536849976, 'AUPR-OUT': 0.5235571265220642, 'ACC95TPR': 0.3505115211009979, 'FPR95TPR': 0.9876000285148621}
+Metrics for EnergyBased
+{'AUROC': 0.2882346510887146, 'AUPR-IN': 0.2583260238170624, 'AUPR-OUT': 0.5021733641624451, 'ACC95TPR': 0.344629168510437, 'FPR95TPR': 0.9968000054359436}
+Metrics for KLMatching
+{'AUROC': 0.6059220433235168, 'AUPR-IN': 0.4464046061038971, 'AUPR-OUT': 0.7470937967300415, 'ACC95TPR': 0.4632352888584137, 'FPR95TPR': 0.8101000189781189}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|34.68|28.79|56.59|34.53|99.58|
+|MaxLogit|27.48|25.36|49.73|34.47|99.67|
+|MaxSoftmax|28.07|25.45|50.04|34.42|99.74|
+|ODIN|23.79|24.23|48.26|34.45|99.70|
+|OpenMax|33.13|30.78|52.36|35.05|98.76|
+|EnergyBased|28.82|25.83|50.22|34.46|99.68|
+|KLMatching|60.59|44.64|74.71|46.32|81.01|
+Evaluating for TinyImageNetCrop
+Metrics for Mahalanobis
+{'AUROC': 0.5033276081085205, 'AUPR-IN': 0.4826160967350006, 'AUPR-OUT': 0.5170043706893921, 'ACC95TPR': 0.5180000066757202, 'FPR95TPR': 0.9139999747276306}
+Metrics for MaxLogit
+{'AUROC': 0.6174279451370239, 'AUPR-IN': 0.5623266100883484, 'AUPR-OUT': 0.6462264657020569, 'ACC95TPR': 0.5679500102996826, 'FPR95TPR': 0.8141000270843506}
+Metrics for MaxSoftmax
+{'AUROC': 0.6458991765975952, 'AUPR-IN': 0.6237272024154663, 'AUPR-OUT': 0.642061173915863, 'ACC95TPR': 0.5540500283241272, 'FPR95TPR': 0.8418999910354614}
+Metrics for ODIN
+{'AUROC': 0.5263829231262207, 'AUPR-IN': 0.519489049911499, 'AUPR-OUT': 0.5224520564079285, 'ACC95TPR': 0.5030999779701233, 'FPR95TPR': 0.9437999725341797}
+Metrics for OpenMax
+{'AUROC': 0.5988774299621582, 'AUPR-IN': 0.5405848026275635, 'AUPR-OUT': 0.6386899352073669, 'ACC95TPR': 0.5680999755859375, 'FPR95TPR': 0.8137999773025513}
+Metrics for EnergyBased
+{'AUROC': 0.5870578289031982, 'AUPR-IN': 0.5302762985229492, 'AUPR-OUT': 0.6310794353485107, 'ACC95TPR': 0.5687999725341797, 'FPR95TPR': 0.8123999834060669}
+Metrics for KLMatching
+{'AUROC': 0.5945550203323364, 'AUPR-IN': 0.5823908448219299, 'AUPR-OUT': 0.578299343585968, 'ACC95TPR': 0.5180500149726868, 'FPR95TPR': 0.9139000177383423}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|50.33|48.26|51.70|51.80|91.40|
+|MaxLogit|61.74|56.23|64.62|56.80|81.41|
+|MaxSoftmax|64.59|62.37|64.21|55.41|84.19|
+|ODIN|52.64|51.95|52.25|50.31|94.38|
+|OpenMax|59.89|54.06|63.87|56.81|81.38|
+|EnergyBased|58.71|53.03|63.11|56.88|81.24|
+|KLMatching|59.46|58.24|57.83|51.81|91.39|
+Evaluating for TinyImageNetResize
+Metrics for Mahalanobis
+{'AUROC': 0.5140395164489746, 'AUPR-IN': 0.49261271953582764, 'AUPR-OUT': 0.5216028690338135, 'ACC95TPR': 0.5285500288009644, 'FPR95TPR': 0.8928999900817871}
+Metrics for MaxLogit
+{'AUROC': 0.5406176447868347, 'AUPR-IN': 0.49429407715797424, 'AUPR-OUT': 0.5993320941925049, 'ACC95TPR': 0.5547999739646912, 'FPR95TPR': 0.840399980545044}
+Metrics for MaxSoftmax
+{'AUROC': 0.6276859641075134, 'AUPR-IN': 0.5972341895103455, 'AUPR-OUT': 0.6396366953849792, 'ACC95TPR': 0.5551999807357788, 'FPR95TPR': 0.8396000266075134}
+Metrics for ODIN
+{'AUROC': 0.487364798784256, 'AUPR-IN': 0.4811374247074127, 'AUPR-OUT': 0.5034011602401733, 'ACC95TPR': 0.5048999786376953, 'FPR95TPR': 0.9401999711990356}
+Metrics for OpenMax
+{'AUROC': 0.5151929259300232, 'AUPR-IN': 0.47307631373405457, 'AUPR-OUT': 0.5923148989677429, 'ACC95TPR': 0.5620999932289124, 'FPR95TPR': 0.8258000016212463}
+Metrics for EnergyBased
+{'AUROC': 0.49760040640830994, 'AUPR-IN': 0.46283453702926636, 'AUPR-OUT': 0.5751977562904358, 'ACC95TPR': 0.5532000064849854, 'FPR95TPR': 0.8435999751091003}
+Metrics for KLMatching
+{'AUROC': 0.6041468381881714, 'AUPR-IN': 0.5815867185592651, 'AUPR-OUT': 0.5940614938735962, 'ACC95TPR': 0.5251500010490417, 'FPR95TPR': 0.8996999859809875}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|51.40|49.26|52.16|52.86|89.29|
+|MaxLogit|54.06|49.43|59.93|55.48|84.04|
+|MaxSoftmax|62.77|59.72|63.96|55.52|83.96|
+|ODIN|48.74|48.11|50.34|50.49|94.02|
+|OpenMax|51.52|47.31|59.23|56.21|82.58|
+|EnergyBased|49.76|46.28|57.52|55.32|84.36|
+|KLMatching|60.41|58.16|59.41|52.52|89.97|
+Files already downloaded and verified
+Evaluating for CIFAR10
+Metrics for Mahalanobis
+{'AUROC': 0.4895502030849457, 'AUPR-IN': 0.8225787878036499, 'AUPR-OUT': 0.16774915158748627, 'ACC95TPR': 0.8010166883468628, 'FPR95TPR': 0.9438999891281128}
+Metrics for MaxLogit
+{'AUROC': 0.623533308506012, 'AUPR-IN': 0.880100667476654, 'AUPR-OUT': 0.30899110436439514, 'ACC95TPR': 0.8208333253860474, 'FPR95TPR': 0.824999988079071}
+Metrics for MaxSoftmax
+{'AUROC': 0.6282374262809753, 'AUPR-IN': 0.875899612903595, 'AUPR-OUT': 0.3281049132347107, 'ACC95TPR': 0.8247666954994202, 'FPR95TPR': 0.8014000058174133}
+Metrics for ODIN
+{'AUROC': 0.5889002084732056, 'AUPR-IN': 0.8653416633605957, 'AUPR-OUT': 0.24998757243156433, 'ACC95TPR': 0.8126333355903625, 'FPR95TPR': 0.8741999864578247}
+Metrics for OpenMax
+{'AUROC': 0.5989528298377991, 'AUPR-IN': 0.8706488013267517, 'AUPR-OUT': 0.24709245562553406, 'ACC95TPR': 0.815583348274231, 'FPR95TPR': 0.8565000295639038}
+Metrics for EnergyBased
+{'AUROC': 0.6013786196708679, 'AUPR-IN': 0.87317955493927, 'AUPR-OUT': 0.28308695554733276, 'ACC95TPR': 0.817383348941803, 'FPR95TPR': 0.8457000255584717}
+Metrics for KLMatching
+{'AUROC': 0.5540125370025635, 'AUPR-IN': 0.8522012233734131, 'AUPR-OUT': 0.20791396498680115, 'ACC95TPR': 0.8066499829292297, 'FPR95TPR': 0.910099983215332}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|48.96|82.26|16.77|80.10|94.39|
+|MaxLogit|62.35|88.01|30.90|82.08|82.50|
+|MaxSoftmax|62.82|87.59|32.81|82.48|80.14|
+|ODIN|58.89|86.53|25.00|81.26|87.42|
+|OpenMax|59.90|87.06|24.71|81.56|85.65|
+|EnergyBased|60.14|87.32|28.31|81.74|84.57|
+|KLMatching|55.40|85.22|20.79|80.66|91.01|
+--------- CUT HERE ---------
+### Results
+```
+PRETRAINED=False
+MODEL=resnet50
+TRAINABLE_PARAMS=25557032
+EPOCHS=30
+LR=0.001
+USE_CIDER=False
+ALPHA=0.95
+TEMPERATURE=0.1
+COMPACT_SCALER=2.0
+CIDER_GLOBAL_SCALE=0.1
+MOMENTUM=0.9
+```
+#### SVHN
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|56.27|88.43|16.24|85.16|86.92|
+|MaxLogit|55.77|88.44|22.01|85.37|85.19|
+|MaxSoftmax|57.29|89.76|20.16|85.16|86.91|
+|ODIN|62.76|92.09|22.13|85.21|86.53|
+|OpenMax|55.56|87.92|22.94|85.69|82.48|
+|EnergyBased|54.41|87.48|22.68|85.57|83.48|
+|KLMatching|55.55|89.81|13.57|84.19|95.05|
+#### LSUNCrop
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|56.76|53.21|55.33|52.93|89.13|
+|MaxLogit|65.66|60.25|68.56|59.03|76.93|
+|MaxSoftmax|58.12|56.53|59.63|53.93|87.14|
+|ODIN|55.04|54.56|54.15|50.61|93.78|
+|OpenMax|64.63|59.22|64.76|55.36|84.28|
+|EnergyBased|66.88|59.97|70.19|60.41|74.18|
+|KLMatching|61.70|62.45|58.64|51.77|91.46|
+#### LSUNResize
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|51.81|47.99|54.62|54.47|86.06|
+|MaxLogit|55.06|49.21|63.40|58.49|78.01|
+|MaxSoftmax|69.86|66.27|72.15|60.22|74.56|
+|ODIN|52.57|51.00|54.91|52.06|90.89|
+|OpenMax|50.05|45.57|61.21|58.36|78.28|
+|EnergyBased|47.92|44.51|58.89|56.88|81.25|
+|KLMatching|60.15|57.09|59.72|53.04|88.91|
+#### Textures
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|34.68|28.79|56.59|34.53|99.58|
+|MaxLogit|27.48|25.36|49.73|34.47|99.67|
+|MaxSoftmax|28.07|25.45|50.04|34.42|99.74|
+|ODIN|23.79|24.23|48.26|34.45|99.70|
+|OpenMax|33.13|30.78|52.36|35.05|98.76|
+|EnergyBased|28.82|25.83|50.22|34.46|99.68|
+|KLMatching|60.59|44.64|74.71|46.32|81.01|
+#### TinyImageNetCrop
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|50.33|48.26|51.70|51.80|91.40|
+|MaxLogit|61.74|56.23|64.62|56.80|81.41|
+|MaxSoftmax|64.59|62.37|64.21|55.41|84.19|
+|ODIN|52.64|51.95|52.25|50.31|94.38|
+|OpenMax|59.89|54.06|63.87|56.81|81.38|
+|EnergyBased|58.71|53.03|63.11|56.88|81.24|
+|KLMatching|59.46|58.24|57.83|51.81|91.39|
+#### TinyImageNetResize
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|51.40|49.26|52.16|52.86|89.29|
+|MaxLogit|54.06|49.43|59.93|55.48|84.04|
+|MaxSoftmax|62.77|59.72|63.96|55.52|83.96|
+|ODIN|48.74|48.11|50.34|50.49|94.02|
+|OpenMax|51.52|47.31|59.23|56.21|82.58|
+|EnergyBased|49.76|46.28|57.52|55.32|84.36|
+|KLMatching|60.41|58.16|59.41|52.52|89.97|
+#### CIFAR10
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|48.96|82.26|16.77|80.10|94.39|
+|MaxLogit|62.35|88.01|30.90|82.08|82.50|
+|MaxSoftmax|62.82|87.59|32.81|82.48|80.14|
+|ODIN|58.89|86.53|25.00|81.26|87.42|
+|OpenMax|59.90|87.06|24.71|81.56|85.65|
+|EnergyBased|60.14|87.32|28.31|81.74|84.57|
+|KLMatching|55.40|85.22|20.79|80.66|91.01|
+--------- CUT HERE ---------
+===================== resnet101 =====================
+Trainable params: 44549160
+Features: 2048
+Train from scratch: True
+Files already downloaded and verified
+Files already downloaded and verified
+Adjusting learning rate of group 0 to 1.0000e-03.
+Time to initialize prototypes: 21.846
+TRAIN={'Accuracy': tensor(0.0410), 'Precision': tensor(0.0315), 'Recall': tensor(0.0410), 'F1Score': tensor(0.0297), 'AUROC': tensor(0.6908)}
+Adjusting learning rate of group 0 to 9.0000e-04.
+EVAL={'Accuracy': tensor(0.0646), 'Precision': tensor(0.0309), 'Recall': tensor(0.0646), 'F1Score': tensor(0.0317), 'AUROC': tensor(0.7626)}
+TRAIN={'Accuracy': tensor(0.0807), 'Precision': tensor(0.0610), 'Recall': tensor(0.0807), 'F1Score': tensor(0.0609), 'AUROC': tensor(0.7670)}
+Adjusting learning rate of group 0 to 8.1000e-04.
+EVAL={'Accuracy': tensor(0.1015), 'Precision': tensor(0.0746), 'Recall': tensor(0.1015), 'F1Score': tensor(0.0716), 'AUROC': tensor(0.7989)}
+TRAIN={'Accuracy': tensor(0.1109), 'Precision': tensor(0.0894), 'Recall': tensor(0.1109), 'F1Score': tensor(0.0888), 'AUROC': tensor(0.8019)}
+Adjusting learning rate of group 0 to 7.2900e-04.
+EVAL={'Accuracy': tensor(0.1200), 'Precision': tensor(0.0900), 'Recall': tensor(0.1200), 'F1Score': tensor(0.0873), 'AUROC': tensor(0.8170)}
+TRAIN={'Accuracy': tensor(0.1376), 'Precision': tensor(0.1156), 'Recall': tensor(0.1376), 'F1Score': tensor(0.1157), 'AUROC': tensor(0.8255)}
+Adjusting learning rate of group 0 to 6.5610e-04.
+EVAL={'Accuracy': tensor(0.1610), 'Precision': tensor(0.1551), 'Recall': tensor(0.1610), 'F1Score': tensor(0.1321), 'AUROC': tensor(0.8463)}
+TRAIN={'Accuracy': tensor(0.1597), 'Precision': tensor(0.1373), 'Recall': tensor(0.1597), 'F1Score': tensor(0.1387), 'AUROC': tensor(0.8426)}
+Adjusting learning rate of group 0 to 5.9049e-04.
+EVAL={'Accuracy': tensor(0.1802), 'Precision': tensor(0.1803), 'Recall': tensor(0.1802), 'F1Score': tensor(0.1574), 'AUROC': tensor(0.8583)}
+TRAIN={'Accuracy': tensor(0.1847), 'Precision': tensor(0.1619), 'Recall': tensor(0.1847), 'F1Score': tensor(0.1649), 'AUROC': tensor(0.8563)}
+Adjusting learning rate of group 0 to 5.3144e-04.
+EVAL={'Accuracy': tensor(0.1983), 'Precision': tensor(0.1813), 'Recall': tensor(0.1983), 'F1Score': tensor(0.1697), 'AUROC': tensor(0.8691)}
+TRAIN={'Accuracy': tensor(0.2045), 'Precision': tensor(0.1816), 'Recall': tensor(0.2045), 'F1Score': tensor(0.1853), 'AUROC': tensor(0.8671)}
+Adjusting learning rate of group 0 to 4.7830e-04.
+EVAL={'Accuracy': tensor(0.2298), 'Precision': tensor(0.2324), 'Recall': tensor(0.2298), 'F1Score': tensor(0.2081), 'AUROC': tensor(0.8761)}
+TRAIN={'Accuracy': tensor(0.2254), 'Precision': tensor(0.2025), 'Recall': tensor(0.2254), 'F1Score': tensor(0.2067), 'AUROC': tensor(0.8738)}
+Adjusting learning rate of group 0 to 4.3047e-04.
+EVAL={'Accuracy': tensor(0.2445), 'Precision': tensor(0.2517), 'Recall': tensor(0.2445), 'F1Score': tensor(0.2199), 'AUROC': tensor(0.8822)}
+TRAIN={'Accuracy': tensor(0.2448), 'Precision': tensor(0.2223), 'Recall': tensor(0.2448), 'F1Score': tensor(0.2267), 'AUROC': tensor(0.8794)}
+Adjusting learning rate of group 0 to 3.8742e-04.
+EVAL={'Accuracy': tensor(0.2608), 'Precision': tensor(0.2580), 'Recall': tensor(0.2608), 'F1Score': tensor(0.2383), 'AUROC': tensor(0.8873)}
+TRAIN={'Accuracy': tensor(0.2608), 'Precision': tensor(0.2388), 'Recall': tensor(0.2608), 'F1Score': tensor(0.2439), 'AUROC': tensor(0.8846)}
+Adjusting learning rate of group 0 to 3.4868e-04.
+EVAL={'Accuracy': tensor(0.2770), 'Precision': tensor(0.2646), 'Recall': tensor(0.2770), 'F1Score': tensor(0.2511), 'AUROC': tensor(0.8848)}
+TRAIN={'Accuracy': tensor(0.2760), 'Precision': tensor(0.2541), 'Recall': tensor(0.2760), 'F1Score': tensor(0.2593), 'AUROC': tensor(0.8880)}
+Adjusting learning rate of group 0 to 3.1381e-04.
+EVAL={'Accuracy': tensor(0.2866), 'Precision': tensor(0.2803), 'Recall': tensor(0.2866), 'F1Score': tensor(0.2685), 'AUROC': tensor(0.8789)}
+TRAIN={'Accuracy': tensor(0.2903), 'Precision': tensor(0.2696), 'Recall': tensor(0.2903), 'F1Score': tensor(0.2745), 'AUROC': tensor(0.8921)}
+Adjusting learning rate of group 0 to 2.8243e-04.
+EVAL={'Accuracy': tensor(0.2935), 'Precision': tensor(0.2860), 'Recall': tensor(0.2935), 'F1Score': tensor(0.2766), 'AUROC': tensor(0.8851)}
+TRAIN={'Accuracy': tensor(0.2994), 'Precision': tensor(0.2791), 'Recall': tensor(0.2994), 'F1Score': tensor(0.2842), 'AUROC': tensor(0.8945)}
+Adjusting learning rate of group 0 to 2.5419e-04.
+EVAL={'Accuracy': tensor(0.3051), 'Precision': tensor(0.2931), 'Recall': tensor(0.3051), 'F1Score': tensor(0.2868), 'AUROC': tensor(0.8806)}
+TRAIN={'Accuracy': tensor(0.3129), 'Precision': tensor(0.2936), 'Recall': tensor(0.3129), 'F1Score': tensor(0.2985), 'AUROC': tensor(0.8982)}
+Adjusting learning rate of group 0 to 2.2877e-04.
+EVAL={'Accuracy': tensor(0.3217), 'Precision': tensor(0.3148), 'Recall': tensor(0.3217), 'F1Score': tensor(0.3042), 'AUROC': tensor(0.8935)}
+TRAIN={'Accuracy': tensor(0.3273), 'Precision': tensor(0.3078), 'Recall': tensor(0.3273), 'F1Score': tensor(0.3132), 'AUROC': tensor(0.9004)}
+Adjusting learning rate of group 0 to 2.0589e-04.
+EVAL={'Accuracy': tensor(0.3265), 'Precision': tensor(0.3277), 'Recall': tensor(0.3265), 'F1Score': tensor(0.3148), 'AUROC': tensor(0.8874)}
+TRAIN={'Accuracy': tensor(0.3376), 'Precision': tensor(0.3190), 'Recall': tensor(0.3376), 'F1Score': tensor(0.3241), 'AUROC': tensor(0.9037)}
+Adjusting learning rate of group 0 to 1.8530e-04.
+EVAL={'Accuracy': tensor(0.3395), 'Precision': tensor(0.3333), 'Recall': tensor(0.3395), 'F1Score': tensor(0.3242), 'AUROC': tensor(0.8876)}
+TRAIN={'Accuracy': tensor(0.3459), 'Precision': tensor(0.3280), 'Recall': tensor(0.3459), 'F1Score': tensor(0.3331), 'AUROC': tensor(0.9049)}
+Adjusting learning rate of group 0 to 1.6677e-04.
+EVAL={'Accuracy': tensor(0.3460), 'Precision': tensor(0.3415), 'Recall': tensor(0.3460), 'F1Score': tensor(0.3325), 'AUROC': tensor(0.8923)}
+TRAIN={'Accuracy': tensor(0.3566), 'Precision': tensor(0.3396), 'Recall': tensor(0.3566), 'F1Score': tensor(0.3446), 'AUROC': tensor(0.9078)}
+Adjusting learning rate of group 0 to 1.5009e-04.
+EVAL={'Accuracy': tensor(0.3558), 'Precision': tensor(0.3567), 'Recall': tensor(0.3558), 'F1Score': tensor(0.3434), 'AUROC': tensor(0.8899)}
+TRAIN={'Accuracy': tensor(0.3659), 'Precision': tensor(0.3496), 'Recall': tensor(0.3659), 'F1Score': tensor(0.3542), 'AUROC': tensor(0.9086)}
+Adjusting learning rate of group 0 to 1.3509e-04.
+EVAL={'Accuracy': tensor(0.3723), 'Precision': tensor(0.3659), 'Recall': tensor(0.3723), 'F1Score': tensor(0.3579), 'AUROC': tensor(0.8992)}
+TRAIN={'Accuracy': tensor(0.3718), 'Precision': tensor(0.3553), 'Recall': tensor(0.3718), 'F1Score': tensor(0.3604), 'AUROC': tensor(0.9109)}
+Adjusting learning rate of group 0 to 1.2158e-04.
+EVAL={'Accuracy': tensor(0.3689), 'Precision': tensor(0.3621), 'Recall': tensor(0.3689), 'F1Score': tensor(0.3566), 'AUROC': tensor(0.8925)}
+TRAIN={'Accuracy': tensor(0.3811), 'Precision': tensor(0.3655), 'Recall': tensor(0.3811), 'F1Score': tensor(0.3700), 'AUROC': tensor(0.9125)}
+Adjusting learning rate of group 0 to 1.0942e-04.
+EVAL={'Accuracy': tensor(0.3788), 'Precision': tensor(0.3778), 'Recall': tensor(0.3788), 'F1Score': tensor(0.3698), 'AUROC': tensor(0.8981)}
+TRAIN={'Accuracy': tensor(0.3905), 'Precision': tensor(0.3751), 'Recall': tensor(0.3905), 'F1Score': tensor(0.3797), 'AUROC': tensor(0.9133)}
+Adjusting learning rate of group 0 to 9.8477e-05.
+EVAL={'Accuracy': tensor(0.3847), 'Precision': tensor(0.3776), 'Recall': tensor(0.3847), 'F1Score': tensor(0.3747), 'AUROC': tensor(0.9017)}
+TRAIN={'Accuracy': tensor(0.3952), 'Precision': tensor(0.3800), 'Recall': tensor(0.3952), 'F1Score': tensor(0.3847), 'AUROC': tensor(0.9153)}
+Adjusting learning rate of group 0 to 8.8629e-05.
+EVAL={'Accuracy': tensor(0.3921), 'Precision': tensor(0.3856), 'Recall': tensor(0.3921), 'F1Score': tensor(0.3815), 'AUROC': tensor(0.9123)}
+TRAIN={'Accuracy': tensor(0.4026), 'Precision': tensor(0.3882), 'Recall': tensor(0.4026), 'F1Score': tensor(0.3926), 'AUROC': tensor(0.9159)}
+Adjusting learning rate of group 0 to 7.9766e-05.
+EVAL={'Accuracy': tensor(0.3995), 'Precision': tensor(0.3926), 'Recall': tensor(0.3995), 'F1Score': tensor(0.3882), 'AUROC': tensor(0.9133)}
+TRAIN={'Accuracy': tensor(0.4094), 'Precision': tensor(0.3957), 'Recall': tensor(0.4094), 'F1Score': tensor(0.3996), 'AUROC': tensor(0.9176)}
+Adjusting learning rate of group 0 to 7.1790e-05.
+EVAL={'Accuracy': tensor(0.4024), 'Precision': tensor(0.3922), 'Recall': tensor(0.4024), 'F1Score': tensor(0.3915), 'AUROC': tensor(0.9115)}
+TRAIN={'Accuracy': tensor(0.4128), 'Precision': tensor(0.3992), 'Recall': tensor(0.4128), 'F1Score': tensor(0.4035), 'AUROC': tensor(0.9170)}
+Adjusting learning rate of group 0 to 6.4611e-05.
+EVAL={'Accuracy': tensor(0.4102), 'Precision': tensor(0.4005), 'Recall': tensor(0.4102), 'F1Score': tensor(0.3997), 'AUROC': tensor(0.9125)}
+TRAIN={'Accuracy': tensor(0.4181), 'Precision': tensor(0.4045), 'Recall': tensor(0.4181), 'F1Score': tensor(0.4088), 'AUROC': tensor(0.9185)}
+Adjusting learning rate of group 0 to 5.8150e-05.
+EVAL={'Accuracy': tensor(0.4053), 'Precision': tensor(0.3932), 'Recall': tensor(0.4053), 'F1Score': tensor(0.3932), 'AUROC': tensor(0.9099)}
+TRAIN={'Accuracy': tensor(0.4236), 'Precision': tensor(0.4103), 'Recall': tensor(0.4236), 'F1Score': tensor(0.4142), 'AUROC': tensor(0.9196)}
+Adjusting learning rate of group 0 to 5.2335e-05.
+EVAL={'Accuracy': tensor(0.4068), 'Precision': tensor(0.4021), 'Recall': tensor(0.4068), 'F1Score': tensor(0.3984), 'AUROC': tensor(0.9046)}
+TRAIN={'Accuracy': tensor(0.4267), 'Precision': tensor(0.4137), 'Recall': tensor(0.4267), 'F1Score': tensor(0.4179), 'AUROC': tensor(0.9199)}
+Adjusting learning rate of group 0 to 4.7101e-05.
+EVAL={'Accuracy': tensor(0.4146), 'Precision': tensor(0.4049), 'Recall': tensor(0.4146), 'F1Score': tensor(0.4043), 'AUROC': tensor(0.9116)}
+TRAIN={'Accuracy': tensor(0.4316), 'Precision': tensor(0.4187), 'Recall': tensor(0.4316), 'F1Score': tensor(0.4229), 'AUROC': tensor(0.9208)}
+Adjusting learning rate of group 0 to 4.2391e-05.
+EVAL={'Accuracy': tensor(0.4163), 'Precision': tensor(0.4068), 'Recall': tensor(0.4163), 'F1Score': tensor(0.4048), 'AUROC': tensor(0.9157)}
+Using downloaded and verified file: data/train_32x32.mat
+Evaluating for SVHN
+Metrics for Mahalanobis
+{'AUROC': 0.5057228207588196, 'AUPR-IN': 0.879050612449646, 'AUPR-OUT': 0.12679888308048248, 'ACC95TPR': 0.8429201245307922, 'FPR95TPR': 0.9416000247001648}
+Metrics for MaxLogit
+{'AUROC': 0.4544444680213928, 'AUPR-IN': 0.8439252376556396, 'AUPR-OUT': 0.14929097890853882, 'ACC95TPR': 0.8483490943908691, 'FPR95TPR': 0.896399974822998}
+Metrics for MaxSoftmax
+{'AUROC': 0.5561209917068481, 'AUPR-IN': 0.8897329568862915, 'AUPR-OUT': 0.20637163519859314, 'ACC95TPR': 0.8524568676948547, 'FPR95TPR': 0.8622000217437744}
+Metrics for ODIN
+{'AUROC': 0.6170223951339722, 'AUPR-IN': 0.9125012159347534, 'AUPR-OUT': 0.2240825593471527, 'ACC95TPR': 0.8538020849227905, 'FPR95TPR': 0.8510000109672546}
+Metrics for OpenMax
+{'AUROC': 0.4210672378540039, 'AUPR-IN': 0.831962525844574, 'AUPR-OUT': 0.11611822247505188, 'ACC95TPR': 0.8458508253097534, 'FPR95TPR': 0.9172000288963318}
+Metrics for EnergyBased
+{'AUROC': 0.43255534768104553, 'AUPR-IN': 0.8344102501869202, 'AUPR-OUT': 0.14598369598388672, 'ACC95TPR': 0.8484812378883362, 'FPR95TPR': 0.8952999711036682}
+Metrics for KLMatching
+{'AUROC': 0.6242848634719849, 'AUPR-IN': 0.9213041663169861, 'AUPR-OUT': 0.1700330525636673, 'ACC95TPR': 0.8463192582130432, 'FPR95TPR': 0.9133999943733215}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|50.57|87.91|12.68|84.29|94.16|
+|MaxLogit|45.44|84.39|14.93|84.83|89.64|
+|MaxSoftmax|55.61|88.97|20.64|85.25|86.22|
+|ODIN|61.70|91.25|22.41|85.38|85.10|
+|OpenMax|42.11|83.20|11.61|84.59|91.72|
+|EnergyBased|43.26|83.44|14.60|84.85|89.53|
+|KLMatching|62.43|92.13|17.00|84.63|91.34|
+Evaluating for LSUNCrop
+Metrics for Mahalanobis
+{'AUROC': 0.3870195746421814, 'AUPR-IN': 0.41087841987609863, 'AUPR-OUT': 0.4610205590724945, 'ACC95TPR': 0.5128999948501587, 'FPR95TPR': 0.9241999983787537}
+Metrics for MaxLogit
+{'AUROC': 0.5479042530059814, 'AUPR-IN': 0.507544755935669, 'AUPR-OUT': 0.5878357887268066, 'ACC95TPR': 0.5434499979019165, 'FPR95TPR': 0.863099992275238}
+Metrics for MaxSoftmax
+{'AUROC': 0.6252555847167969, 'AUPR-IN': 0.5931359529495239, 'AUPR-OUT': 0.6482604146003723, 'ACC95TPR': 0.5633999705314636, 'FPR95TPR': 0.823199987411499}
+Metrics for ODIN
+{'AUROC': 0.5338139533996582, 'AUPR-IN': 0.5255810022354126, 'AUPR-OUT': 0.5489840507507324, 'ACC95TPR': 0.5234500169754028, 'FPR95TPR': 0.9031000137329102}
+Metrics for OpenMax
+{'AUROC': 0.5396281480789185, 'AUPR-IN': 0.49994906783103943, 'AUPR-OUT': 0.5875625610351562, 'ACC95TPR': 0.5462499856948853, 'FPR95TPR': 0.8575000166893005}
+Metrics for EnergyBased
+{'AUROC': 0.5211187601089478, 'AUPR-IN': 0.4836425483226776, 'AUPR-OUT': 0.5731192231178284, 'ACC95TPR': 0.5418499708175659, 'FPR95TPR': 0.8662999868392944}
+Metrics for KLMatching
+{'AUROC': 0.6551265120506287, 'AUPR-IN': 0.6575394868850708, 'AUPR-OUT': 0.6224008798599243, 'ACC95TPR': 0.5263500213623047, 'FPR95TPR': 0.8974000215530396}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|38.70|41.09|46.10|51.29|92.42|
+|MaxLogit|54.79|50.75|58.78|54.34|86.31|
+|MaxSoftmax|62.53|59.31|64.83|56.34|82.32|
+|ODIN|53.38|52.56|54.90|52.35|90.31|
+|OpenMax|53.96|49.99|58.76|54.62|85.75|
+|EnergyBased|52.11|48.36|57.31|54.18|86.63|
+|KLMatching|65.51|65.75|62.24|52.64|89.74|
+Evaluating for LSUNResize
+Metrics for Mahalanobis
+{'AUROC': 0.5097543001174927, 'AUPR-IN': 0.4917319416999817, 'AUPR-OUT': 0.5406161546707153, 'ACC95TPR': 0.51705002784729, 'FPR95TPR': 0.9158999919891357}
+Metrics for MaxLogit
+{'AUROC': 0.5900086164474487, 'AUPR-IN': 0.5202412605285645, 'AUPR-OUT': 0.6543148756027222, 'ACC95TPR': 0.5842499732971191, 'FPR95TPR': 0.781499981880188}
+Metrics for MaxSoftmax
+{'AUROC': 0.6785827279090881, 'AUPR-IN': 0.6350138783454895, 'AUPR-OUT': 0.7112058401107788, 'ACC95TPR': 0.5969499945640564, 'FPR95TPR': 0.7560999989509583}
+Metrics for ODIN
+{'AUROC': 0.5276696681976318, 'AUPR-IN': 0.5079482197761536, 'AUPR-OUT': 0.5622615218162537, 'ACC95TPR': 0.5289000272750854, 'FPR95TPR': 0.8921999931335449}
+Metrics for OpenMax
+{'AUROC': 0.5799078941345215, 'AUPR-IN': 0.5088066458702087, 'AUPR-OUT': 0.6534860730171204, 'ACC95TPR': 0.5875999927520752, 'FPR95TPR': 0.7748000025749207}
+Metrics for EnergyBased
+{'AUROC': 0.5519852638244629, 'AUPR-IN': 0.4895225763320923, 'AUPR-OUT': 0.6316514015197754, 'ACC95TPR': 0.5778999924659729, 'FPR95TPR': 0.7942000031471252}
+Metrics for KLMatching
+{'AUROC': 0.7006186842918396, 'AUPR-IN': 0.6562403440475464, 'AUPR-OUT': 0.7026160955429077, 'ACC95TPR': 0.5746999979019165, 'FPR95TPR': 0.8007000088691711}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|50.98|49.17|54.06|51.71|91.59|
+|MaxLogit|59.00|52.02|65.43|58.42|78.15|
+|MaxSoftmax|67.86|63.50|71.12|59.69|75.61|
+|ODIN|52.77|50.79|56.23|52.89|89.22|
+|OpenMax|57.99|50.88|65.35|58.76|77.48|
+|EnergyBased|55.20|48.95|63.17|57.79|79.42|
+|KLMatching|70.06|65.62|70.26|57.47|80.07|
+Evaluating for Textures
+Metrics for Mahalanobis
+{'AUROC': 0.7224748730659485, 'AUPR-IN': 0.701601505279541, 'AUPR-OUT': 0.9162626266479492, 'ACC95TPR': 0.6464194655418396, 'FPR95TPR': 0.5248000025749207}
+Metrics for MaxLogit
+{'AUROC': 0.31607383489608765, 'AUPR-IN': 0.31577304005622864, 'AUPR-OUT': 0.5160261988639832, 'ACC95TPR': 0.3425831198692322, 'FPR95TPR': 1.0}
+Metrics for MaxSoftmax
+{'AUROC': 0.2811506688594818, 'AUPR-IN': 0.2512865364551544, 'AUPR-OUT': 0.5080336332321167, 'ACC95TPR': 0.3606138229370117, 'FPR95TPR': 1.0}
+Metrics for ODIN
+{'AUROC': 0.2445671707391739, 'AUPR-IN': 0.24191032350063324, 'AUPR-OUT': 0.4894039034843445, 'ACC95TPR': 0.3606138229370117, 'FPR95TPR': 1.0}
+Metrics for OpenMax
+{'AUROC': 0.29912257194519043, 'AUPR-IN': 0.2774236798286438, 'AUPR-OUT': 0.5129125118255615, 'ACC95TPR': 0.3606138229370117, 'FPR95TPR': 1.0}
+Metrics for EnergyBased
+{'AUROC': 0.3310677707195282, 'AUPR-IN': 0.32277512550354004, 'AUPR-OUT': 0.522089958190918, 'ACC95TPR': 0.3425831198692322, 'FPR95TPR': 1.0}
+Metrics for KLMatching
+{'AUROC': 0.7138818502426147, 'AUPR-IN': 0.6231138706207275, 'AUPR-OUT': 0.6707063317298889, 'ACC95TPR': 0.467902809381485, 'FPR95TPR': 0.741599977016449}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|72.25|70.16|91.63|64.64|52.48|
+|MaxLogit|31.61|31.58|51.60|34.26|100.00|
+|MaxSoftmax|28.12|25.13|50.80|36.06|100.00|
+|ODIN|24.46|24.19|48.94|36.06|100.00|
+|OpenMax|29.91|27.74|51.29|36.06|100.00|
+|EnergyBased|33.11|32.28|52.21|34.26|100.00|
+|KLMatching|71.39|62.31|67.07|46.79|74.16|
+Evaluating for TinyImageNetCrop
+Metrics for Mahalanobis
+{'AUROC': 0.4869265556335449, 'AUPR-IN': 0.4790278673171997, 'AUPR-OUT': 0.5037015676498413, 'ACC95TPR': 0.5073500275611877, 'FPR95TPR': 0.9352999925613403}
+Metrics for MaxLogit
+{'AUROC': 0.593453049659729, 'AUPR-IN': 0.536874532699585, 'AUPR-OUT': 0.6252927780151367, 'ACC95TPR': 0.5544000267982483, 'FPR95TPR': 0.8411999940872192}
+Metrics for MaxSoftmax
+{'AUROC': 0.6290829181671143, 'AUPR-IN': 0.6000752449035645, 'AUPR-OUT': 0.6461303234100342, 'ACC95TPR': 0.5620999932289124, 'FPR95TPR': 0.8258000016212463}
+Metrics for ODIN
+{'AUROC': 0.48379459977149963, 'AUPR-IN': 0.481657475233078, 'AUPR-OUT': 0.5136731863021851, 'ACC95TPR': 0.5130500197410583, 'FPR95TPR': 0.9239000082015991}
+Metrics for OpenMax
+{'AUROC': 0.5932068824768066, 'AUPR-IN': 0.5338774919509888, 'AUPR-OUT': 0.6320485472679138, 'ACC95TPR': 0.5634999871253967, 'FPR95TPR': 0.8230000138282776}
+Metrics for EnergyBased
+{'AUROC': 0.5709152817726135, 'AUPR-IN': 0.5148631930351257, 'AUPR-OUT': 0.6144471168518066, 'ACC95TPR': 0.5533000230789185, 'FPR95TPR': 0.8434000015258789}
+Metrics for KLMatching
+{'AUROC': 0.662870466709137, 'AUPR-IN': 0.6317309141159058, 'AUPR-OUT': 0.6552162170410156, 'ACC95TPR': 0.5522500276565552, 'FPR95TPR': 0.8449000120162964}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|48.69|47.90|50.37|50.74|93.53|
+|MaxLogit|59.35|53.69|62.53|55.44|84.12|
+|MaxSoftmax|62.91|60.01|64.61|56.21|82.58|
+|ODIN|48.38|48.17|51.37|51.31|92.39|
+|OpenMax|59.32|53.39|63.20|56.35|82.30|
+|EnergyBased|57.09|51.49|61.44|55.33|84.34|
+|KLMatching|66.29|63.17|65.52|55.23|84.49|
+Evaluating for TinyImageNetResize
+Metrics for Mahalanobis
+{'AUROC': 0.5189235806465149, 'AUPR-IN': 0.521561861038208, 'AUPR-OUT': 0.5050955414772034, 'ACC95TPR': 0.4991999864578247, 'FPR95TPR': 0.9516000151634216}
+Metrics for MaxLogit
+{'AUROC': 0.5361336469650269, 'AUPR-IN': 0.4914642572402954, 'AUPR-OUT': 0.5858817100524902, 'ACC95TPR': 0.5464500188827515, 'FPR95TPR': 0.8571000099182129}
+Metrics for MaxSoftmax
+{'AUROC': 0.5898429751396179, 'AUPR-IN': 0.5559273958206177, 'AUPR-OUT': 0.6245716214179993, 'ACC95TPR': 0.5578500032424927, 'FPR95TPR': 0.8342999815940857}
+Metrics for ODIN
+{'AUROC': 0.4445720314979553, 'AUPR-IN': 0.44817304611206055, 'AUPR-OUT': 0.49681150913238525, 'ACC95TPR': 0.5120499730110168, 'FPR95TPR': 0.9258999824523926}
+Metrics for OpenMax
+{'AUROC': 0.5421473979949951, 'AUPR-IN': 0.4941251277923584, 'AUPR-OUT': 0.6006503105163574, 'ACC95TPR': 0.5562499761581421, 'FPR95TPR': 0.8374999761581421}
+Metrics for EnergyBased
+{'AUROC': 0.5177559852600098, 'AUPR-IN': 0.47715383768081665, 'AUPR-OUT': 0.5759775638580322, 'ACC95TPR': 0.5468000173568726, 'FPR95TPR': 0.8564000129699707}
+Metrics for KLMatching
+{'AUROC': 0.6854963898658752, 'AUPR-IN': 0.6557143330574036, 'AUPR-OUT': 0.6784871220588684, 'ACC95TPR': 0.5616999864578247, 'FPR95TPR': 0.8266000151634216}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|51.89|52.16|50.51|49.92|95.16|
+|MaxLogit|53.61|49.15|58.59|54.65|85.71|
+|MaxSoftmax|58.98|55.59|62.46|55.79|83.43|
+|ODIN|44.46|44.82|49.68|51.20|92.59|
+|OpenMax|54.21|49.41|60.07|55.62|83.75|
+|EnergyBased|51.78|47.72|57.60|54.68|85.64|
+|KLMatching|68.55|65.57|67.85|56.17|82.66|
+Files already downloaded and verified
+Evaluating for CIFAR10
+Metrics for Mahalanobis
+{'AUROC': 0.4496932327747345, 'AUPR-IN': 0.7997349500656128, 'AUPR-OUT': 0.1582966446876526, 'ACC95TPR': 0.8016499876976013, 'FPR95TPR': 0.9401000142097473}
+Metrics for MaxLogit
+{'AUROC': 0.616966962814331, 'AUPR-IN': 0.872349202632904, 'AUPR-OUT': 0.3146361708641052, 'ACC95TPR': 0.8227333426475525, 'FPR95TPR': 0.8136000037193298}
+Metrics for MaxSoftmax
+{'AUROC': 0.6461483836174011, 'AUPR-IN': 0.8833276033401489, 'AUPR-OUT': 0.3402692675590515, 'ACC95TPR': 0.8264666795730591, 'FPR95TPR': 0.7911999821662903}
+Metrics for ODIN
+{'AUROC': 0.6014146208763123, 'AUPR-IN': 0.87116539478302, 'AUPR-OUT': 0.26346808671951294, 'ACC95TPR': 0.8147500157356262, 'FPR95TPR': 0.8615000247955322}
+Metrics for OpenMax
+{'AUROC': 0.5917102098464966, 'AUPR-IN': 0.861336886882782, 'AUPR-OUT': 0.24314194917678833, 'ACC95TPR': 0.8170166611671448, 'FPR95TPR': 0.8478999733924866}
+Metrics for EnergyBased
+{'AUROC': 0.5922710299491882, 'AUPR-IN': 0.862357497215271, 'AUPR-OUT': 0.2932094931602478, 'ACC95TPR': 0.8199666738510132, 'FPR95TPR': 0.8302000164985657}
+Metrics for KLMatching
+{'AUROC': 0.5799715518951416, 'AUPR-IN': 0.859785795211792, 'AUPR-OUT': 0.23998235166072845, 'ACC95TPR': 0.8120833039283752, 'FPR95TPR': 0.8774999976158142}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|44.97|79.97|15.83|80.16|94.01|
+|MaxLogit|61.70|87.23|31.46|82.27|81.36|
+|MaxSoftmax|64.61|88.33|34.03|82.65|79.12|
+|ODIN|60.14|87.12|26.35|81.48|86.15|
+|OpenMax|59.17|86.13|24.31|81.70|84.79|
+|EnergyBased|59.23|86.24|29.32|82.00|83.02|
+|KLMatching|58.00|85.98|24.00|81.21|87.75|
+--------- CUT HERE ---------
+### Results
+```
+PRETRAINED=False
+MODEL=resnet101
+TRAINABLE_PARAMS=44549160
+EPOCHS=30
+LR=0.001
+USE_CIDER=False
+ALPHA=0.95
+TEMPERATURE=0.1
+COMPACT_SCALER=2.0
+CIDER_GLOBAL_SCALE=0.1
+MOMENTUM=0.9
+```
+#### SVHN
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|50.57|87.91|12.68|84.29|94.16|
+|MaxLogit|45.44|84.39|14.93|84.83|89.64|
+|MaxSoftmax|55.61|88.97|20.64|85.25|86.22|
+|ODIN|61.70|91.25|22.41|85.38|85.10|
+|OpenMax|42.11|83.20|11.61|84.59|91.72|
+|EnergyBased|43.26|83.44|14.60|84.85|89.53|
+|KLMatching|62.43|92.13|17.00|84.63|91.34|
+#### LSUNCrop
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|38.70|41.09|46.10|51.29|92.42|
+|MaxLogit|54.79|50.75|58.78|54.34|86.31|
+|MaxSoftmax|62.53|59.31|64.83|56.34|82.32|
+|ODIN|53.38|52.56|54.90|52.35|90.31|
+|OpenMax|53.96|49.99|58.76|54.62|85.75|
+|EnergyBased|52.11|48.36|57.31|54.18|86.63|
+|KLMatching|65.51|65.75|62.24|52.64|89.74|
+#### LSUNResize
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|50.98|49.17|54.06|51.71|91.59|
+|MaxLogit|59.00|52.02|65.43|58.42|78.15|
+|MaxSoftmax|67.86|63.50|71.12|59.69|75.61|
+|ODIN|52.77|50.79|56.23|52.89|89.22|
+|OpenMax|57.99|50.88|65.35|58.76|77.48|
+|EnergyBased|55.20|48.95|63.17|57.79|79.42|
+|KLMatching|70.06|65.62|70.26|57.47|80.07|
+#### Textures
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|72.25|70.16|91.63|64.64|52.48|
+|MaxLogit|31.61|31.58|51.60|34.26|100.00|
+|MaxSoftmax|28.12|25.13|50.80|36.06|100.00|
+|ODIN|24.46|24.19|48.94|36.06|100.00|
+|OpenMax|29.91|27.74|51.29|36.06|100.00|
+|EnergyBased|33.11|32.28|52.21|34.26|100.00|
+|KLMatching|71.39|62.31|67.07|46.79|74.16|
+#### TinyImageNetCrop
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|48.69|47.90|50.37|50.74|93.53|
+|MaxLogit|59.35|53.69|62.53|55.44|84.12|
+|MaxSoftmax|62.91|60.01|64.61|56.21|82.58|
+|ODIN|48.38|48.17|51.37|51.31|92.39|
+|OpenMax|59.32|53.39|63.20|56.35|82.30|
+|EnergyBased|57.09|51.49|61.44|55.33|84.34|
+|KLMatching|66.29|63.17|65.52|55.23|84.49|
+#### TinyImageNetResize
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|51.89|52.16|50.51|49.92|95.16|
+|MaxLogit|53.61|49.15|58.59|54.65|85.71|
+|MaxSoftmax|58.98|55.59|62.46|55.79|83.43|
+|ODIN|44.46|44.82|49.68|51.20|92.59|
+|OpenMax|54.21|49.41|60.07|55.62|83.75|
+|EnergyBased|51.78|47.72|57.60|54.68|85.64|
+|KLMatching|68.55|65.57|67.85|56.17|82.66|
+#### CIFAR10
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|44.97|79.97|15.83|80.16|94.01|
+|MaxLogit|61.70|87.23|31.46|82.27|81.36|
+|MaxSoftmax|64.61|88.33|34.03|82.65|79.12|
+|ODIN|60.14|87.12|26.35|81.48|86.15|
+|OpenMax|59.17|86.13|24.31|81.70|84.79|
+|EnergyBased|59.23|86.24|29.32|82.00|83.02|
+|KLMatching|58.00|85.98|24.00|81.21|87.75|
+--------- CUT HERE ---------
+===================== resnet152 =====================
+Trainable params: 60192808
+Features: 2048
+Train from scratch: True
+Files already downloaded and verified
+Files already downloaded and verified
+Adjusting learning rate of group 0 to 1.0000e-03.
+Time to initialize prototypes: 29.225
+TRAIN={'Accuracy': tensor(0.0381), 'Precision': tensor(0.0269), 'Recall': tensor(0.0381), 'F1Score': tensor(0.0264), 'AUROC': tensor(0.6861)}
+Adjusting learning rate of group 0 to 9.0000e-04.
+EVAL={'Accuracy': tensor(0.0568), 'Precision': tensor(0.0242), 'Recall': tensor(0.0568), 'F1Score': tensor(0.0244), 'AUROC': tensor(0.7376)}
+TRAIN={'Accuracy': tensor(0.0608), 'Precision': tensor(0.0436), 'Recall': tensor(0.0608), 'F1Score': tensor(0.0414), 'AUROC': tensor(0.7408)}
+Adjusting learning rate of group 0 to 8.1000e-04.
+EVAL={'Accuracy': tensor(0.0614), 'Precision': tensor(0.0408), 'Recall': tensor(0.0614), 'F1Score': tensor(0.0352), 'AUROC': tensor(0.7531)}
+TRAIN={'Accuracy': tensor(0.0787), 'Precision': tensor(0.0603), 'Recall': tensor(0.0787), 'F1Score': tensor(0.0589), 'AUROC': tensor(0.7648)}
+Adjusting learning rate of group 0 to 7.2900e-04.
+EVAL={'Accuracy': tensor(0.0925), 'Precision': tensor(0.0674), 'Recall': tensor(0.0925), 'F1Score': tensor(0.0557), 'AUROC': tensor(0.7878)}
+TRAIN={'Accuracy': tensor(0.0950), 'Precision': tensor(0.0736), 'Recall': tensor(0.0950), 'F1Score': tensor(0.0742), 'AUROC': tensor(0.7854)}
+Adjusting learning rate of group 0 to 6.5610e-04.
+EVAL={'Accuracy': tensor(0.1043), 'Precision': tensor(0.0779), 'Recall': tensor(0.1043), 'F1Score': tensor(0.0721), 'AUROC': tensor(0.8072)}
+TRAIN={'Accuracy': tensor(0.1153), 'Precision': tensor(0.0933), 'Recall': tensor(0.1153), 'F1Score': tensor(0.0934), 'AUROC': tensor(0.8046)}
+Adjusting learning rate of group 0 to 5.9049e-04.
+EVAL={'Accuracy': tensor(0.1328), 'Precision': tensor(0.1190), 'Recall': tensor(0.1328), 'F1Score': tensor(0.0983), 'AUROC': tensor(0.8241)}
+TRAIN={'Accuracy': tensor(0.1316), 'Precision': tensor(0.1073), 'Recall': tensor(0.1316), 'F1Score': tensor(0.1087), 'AUROC': tensor(0.8203)}
+Adjusting learning rate of group 0 to 5.3144e-04.
+EVAL={'Accuracy': tensor(0.1499), 'Precision': tensor(0.1379), 'Recall': tensor(0.1499), 'F1Score': tensor(0.1205), 'AUROC': tensor(0.8335)}
+TRAIN={'Accuracy': tensor(0.1468), 'Precision': tensor(0.1204), 'Recall': tensor(0.1468), 'F1Score': tensor(0.1230), 'AUROC': tensor(0.8315)}
+Adjusting learning rate of group 0 to 4.7830e-04.
+EVAL={'Accuracy': tensor(0.1515), 'Precision': tensor(0.1432), 'Recall': tensor(0.1515), 'F1Score': tensor(0.1247), 'AUROC': tensor(0.8412)}
+TRAIN={'Accuracy': tensor(0.1576), 'Precision': tensor(0.1293), 'Recall': tensor(0.1576), 'F1Score': tensor(0.1330), 'AUROC': tensor(0.8386)}
+Adjusting learning rate of group 0 to 4.3047e-04.
+EVAL={'Accuracy': tensor(0.1650), 'Precision': tensor(0.1529), 'Recall': tensor(0.1650), 'F1Score': tensor(0.1362), 'AUROC': tensor(0.8438)}
+TRAIN={'Accuracy': tensor(0.1675), 'Precision': tensor(0.1395), 'Recall': tensor(0.1675), 'F1Score': tensor(0.1430), 'AUROC': tensor(0.8459)}
+Adjusting learning rate of group 0 to 3.8742e-04.
+EVAL={'Accuracy': tensor(0.1767), 'Precision': tensor(0.1673), 'Recall': tensor(0.1767), 'F1Score': tensor(0.1519), 'AUROC': tensor(0.8534)}
+TRAIN={'Accuracy': tensor(0.1812), 'Precision': tensor(0.1538), 'Recall': tensor(0.1812), 'F1Score': tensor(0.1575), 'AUROC': tensor(0.8520)}
+Adjusting learning rate of group 0 to 3.4868e-04.
+EVAL={'Accuracy': tensor(0.2000), 'Precision': tensor(0.1774), 'Recall': tensor(0.2000), 'F1Score': tensor(0.1649), 'AUROC': tensor(0.8596)}
+TRAIN={'Accuracy': tensor(0.1973), 'Precision': tensor(0.1702), 'Recall': tensor(0.1973), 'F1Score': tensor(0.1742), 'AUROC': tensor(0.8572)}
+Adjusting learning rate of group 0 to 3.1381e-04.
+EVAL={'Accuracy': tensor(0.2073), 'Precision': tensor(0.1874), 'Recall': tensor(0.2073), 'F1Score': tensor(0.1802), 'AUROC': tensor(0.8653)}
+TRAIN={'Accuracy': tensor(0.2074), 'Precision': tensor(0.1800), 'Recall': tensor(0.2074), 'F1Score': tensor(0.1855), 'AUROC': tensor(0.8622)}
+Adjusting learning rate of group 0 to 2.8243e-04.
+EVAL={'Accuracy': tensor(0.2239), 'Precision': tensor(0.2149), 'Recall': tensor(0.2239), 'F1Score': tensor(0.1981), 'AUROC': tensor(0.8714)}
+TRAIN={'Accuracy': tensor(0.2321), 'Precision': tensor(0.2046), 'Recall': tensor(0.2321), 'F1Score': tensor(0.2106), 'AUROC': tensor(0.8682)}
+Adjusting learning rate of group 0 to 2.5419e-04.
+EVAL={'Accuracy': tensor(0.2377), 'Precision': tensor(0.2151), 'Recall': tensor(0.2377), 'F1Score': tensor(0.2099), 'AUROC': tensor(0.8746)}
+TRAIN={'Accuracy': tensor(0.2444), 'Precision': tensor(0.2171), 'Recall': tensor(0.2444), 'F1Score': tensor(0.2236), 'AUROC': tensor(0.8709)}
+Adjusting learning rate of group 0 to 2.2877e-04.
+EVAL={'Accuracy': tensor(0.2564), 'Precision': tensor(0.2439), 'Recall': tensor(0.2564), 'F1Score': tensor(0.2337), 'AUROC': tensor(0.8755)}
+TRAIN={'Accuracy': tensor(0.2558), 'Precision': tensor(0.2295), 'Recall': tensor(0.2558), 'F1Score': tensor(0.2357), 'AUROC': tensor(0.8733)}
+Adjusting learning rate of group 0 to 2.0589e-04.
+EVAL={'Accuracy': tensor(0.2663), 'Precision': tensor(0.2489), 'Recall': tensor(0.2663), 'F1Score': tensor(0.2410), 'AUROC': tensor(0.8764)}
+TRAIN={'Accuracy': tensor(0.2659), 'Precision': tensor(0.2396), 'Recall': tensor(0.2659), 'F1Score': tensor(0.2462), 'AUROC': tensor(0.8739)}
+Adjusting learning rate of group 0 to 1.8530e-04.
+EVAL={'Accuracy': tensor(0.2814), 'Precision': tensor(0.2712), 'Recall': tensor(0.2814), 'F1Score': tensor(0.2614), 'AUROC': tensor(0.8772)}
+TRAIN={'Accuracy': tensor(0.2764), 'Precision': tensor(0.2503), 'Recall': tensor(0.2764), 'F1Score': tensor(0.2572), 'AUROC': tensor(0.8729)}
+Adjusting learning rate of group 0 to 1.6677e-04.
+EVAL={'Accuracy': tensor(0.2854), 'Precision': tensor(0.2668), 'Recall': tensor(0.2854), 'F1Score': tensor(0.2595), 'AUROC': tensor(0.8712)}
+TRAIN={'Accuracy': tensor(0.2878), 'Precision': tensor(0.2624), 'Recall': tensor(0.2878), 'F1Score': tensor(0.2692), 'AUROC': tensor(0.8746)}
+Adjusting learning rate of group 0 to 1.5009e-04.
+EVAL={'Accuracy': tensor(0.3012), 'Precision': tensor(0.2908), 'Recall': tensor(0.3012), 'F1Score': tensor(0.2821), 'AUROC': tensor(0.8759)}
+TRAIN={'Accuracy': tensor(0.2970), 'Precision': tensor(0.2733), 'Recall': tensor(0.2970), 'F1Score': tensor(0.2800), 'AUROC': tensor(0.8735)}
+Adjusting learning rate of group 0 to 1.3509e-04.
+EVAL={'Accuracy': tensor(0.3025), 'Precision': tensor(0.2777), 'Recall': tensor(0.3025), 'F1Score': tensor(0.2757), 'AUROC': tensor(0.8758)}
+TRAIN={'Accuracy': tensor(0.3060), 'Precision': tensor(0.2816), 'Recall': tensor(0.3060), 'F1Score': tensor(0.2884), 'AUROC': tensor(0.8731)}
+Adjusting learning rate of group 0 to 1.2158e-04.
+EVAL={'Accuracy': tensor(0.3123), 'Precision': tensor(0.2983), 'Recall': tensor(0.3123), 'F1Score': tensor(0.2906), 'AUROC': tensor(0.8726)}
+TRAIN={'Accuracy': tensor(0.3132), 'Precision': tensor(0.2901), 'Recall': tensor(0.3132), 'F1Score': tensor(0.2965), 'AUROC': tensor(0.8739)}
+Adjusting learning rate of group 0 to 1.0942e-04.
+EVAL={'Accuracy': tensor(0.3174), 'Precision': tensor(0.3025), 'Recall': tensor(0.3174), 'F1Score': tensor(0.2959), 'AUROC': tensor(0.8678)}
+TRAIN={'Accuracy': tensor(0.3188), 'Precision': tensor(0.2962), 'Recall': tensor(0.3188), 'F1Score': tensor(0.3026), 'AUROC': tensor(0.8736)}
+Adjusting learning rate of group 0 to 9.8477e-05.
+EVAL={'Accuracy': tensor(0.3246), 'Precision': tensor(0.3109), 'Recall': tensor(0.3246), 'F1Score': tensor(0.3055), 'AUROC': tensor(0.8690)}
+TRAIN={'Accuracy': tensor(0.3237), 'Precision': tensor(0.3022), 'Recall': tensor(0.3237), 'F1Score': tensor(0.3084), 'AUROC': tensor(0.8737)}
+Adjusting learning rate of group 0 to 8.8629e-05.
+EVAL={'Accuracy': tensor(0.3272), 'Precision': tensor(0.3164), 'Recall': tensor(0.3272), 'F1Score': tensor(0.3109), 'AUROC': tensor(0.8625)}
+TRAIN={'Accuracy': tensor(0.3325), 'Precision': tensor(0.3111), 'Recall': tensor(0.3325), 'F1Score': tensor(0.3175), 'AUROC': tensor(0.8725)}
+Adjusting learning rate of group 0 to 7.9766e-05.
+EVAL={'Accuracy': tensor(0.3386), 'Precision': tensor(0.3215), 'Recall': tensor(0.3386), 'F1Score': tensor(0.3210), 'AUROC': tensor(0.8689)}
+TRAIN={'Accuracy': tensor(0.3393), 'Precision': tensor(0.3182), 'Recall': tensor(0.3393), 'F1Score': tensor(0.3246), 'AUROC': tensor(0.8726)}
+Adjusting learning rate of group 0 to 7.1790e-05.
+EVAL={'Accuracy': tensor(0.3366), 'Precision': tensor(0.3215), 'Recall': tensor(0.3366), 'F1Score': tensor(0.3171), 'AUROC': tensor(0.8662)}
+TRAIN={'Accuracy': tensor(0.3429), 'Precision': tensor(0.3216), 'Recall': tensor(0.3429), 'F1Score': tensor(0.3279), 'AUROC': tensor(0.8713)}
+Adjusting learning rate of group 0 to 6.4611e-05.
+EVAL={'Accuracy': tensor(0.3433), 'Precision': tensor(0.3309), 'Recall': tensor(0.3433), 'F1Score': tensor(0.3273), 'AUROC': tensor(0.8593)}
+TRAIN={'Accuracy': tensor(0.3508), 'Precision': tensor(0.3306), 'Recall': tensor(0.3508), 'F1Score': tensor(0.3368), 'AUROC': tensor(0.8731)}
+Adjusting learning rate of group 0 to 5.8150e-05.
+EVAL={'Accuracy': tensor(0.3504), 'Precision': tensor(0.3361), 'Recall': tensor(0.3504), 'F1Score': tensor(0.3344), 'AUROC': tensor(0.8681)}
+TRAIN={'Accuracy': tensor(0.3545), 'Precision': tensor(0.3351), 'Recall': tensor(0.3545), 'F1Score': tensor(0.3407), 'AUROC': tensor(0.8733)}
+Adjusting learning rate of group 0 to 5.2335e-05.
+EVAL={'Accuracy': tensor(0.3466), 'Precision': tensor(0.3376), 'Recall': tensor(0.3466), 'F1Score': tensor(0.3328), 'AUROC': tensor(0.8638)}
+TRAIN={'Accuracy': tensor(0.3571), 'Precision': tensor(0.3378), 'Recall': tensor(0.3571), 'F1Score': tensor(0.3436), 'AUROC': tensor(0.8729)}
+Adjusting learning rate of group 0 to 4.7101e-05.
+EVAL={'Accuracy': tensor(0.3584), 'Precision': tensor(0.3414), 'Recall': tensor(0.3584), 'F1Score': tensor(0.3428), 'AUROC': tensor(0.8655)}
+TRAIN={'Accuracy': tensor(0.3635), 'Precision': tensor(0.3432), 'Recall': tensor(0.3635), 'F1Score': tensor(0.3497), 'AUROC': tensor(0.8741)}
+Adjusting learning rate of group 0 to 4.2391e-05.
+EVAL={'Accuracy': tensor(0.3551), 'Precision': tensor(0.3380), 'Recall': tensor(0.3551), 'F1Score': tensor(0.3383), 'AUROC': tensor(0.8648)}
+Using downloaded and verified file: data/train_32x32.mat
+Evaluating for SVHN
+Metrics for Mahalanobis
+{'AUROC': 0.4150691032409668, 'AUPR-IN': 0.8407431840896606, 'AUPR-OUT': 0.10852732509374619, 'ACC95TPR': 0.8408542275428772, 'FPR95TPR': 0.9588000178337097}
+Metrics for MaxLogit
+{'AUROC': 0.440705806016922, 'AUPR-IN': 0.8363854885101318, 'AUPR-OUT': 0.14625021815299988, 'ACC95TPR': 0.847532331943512, 'FPR95TPR': 0.9031999707221985}
+Metrics for MaxSoftmax
+{'AUROC': 0.5515985488891602, 'AUPR-IN': 0.8920168876647949, 'AUPR-OUT': 0.21547836065292358, 'ACC95TPR': 0.8523727655410767, 'FPR95TPR': 0.8629000186920166}
+Metrics for ODIN
+{'AUROC': 0.5924253463745117, 'AUPR-IN': 0.9090834856033325, 'AUPR-OUT': 0.19393855333328247, 'ACC95TPR': 0.8488415479660034, 'FPR95TPR': 0.892300009727478}
+Metrics for OpenMax
+{'AUROC': 0.45453116297721863, 'AUPR-IN': 0.8386440873146057, 'AUPR-OUT': 0.16926252841949463, 'ACC95TPR': 0.849598228931427, 'FPR95TPR': 0.8859999775886536}
+Metrics for EnergyBased
+{'AUROC': 0.4253412187099457, 'AUPR-IN': 0.8277570009231567, 'AUPR-OUT': 0.14633801579475403, 'ACC95TPR': 0.848361074924469, 'FPR95TPR': 0.8963000178337097}
+Metrics for KLMatching
+{'AUROC': 0.5729655623435974, 'AUPR-IN': 0.9023348689079285, 'AUPR-OUT': 0.15883421897888184, 'ACC95TPR': 0.8446376919746399, 'FPR95TPR': 0.9333999752998352}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|41.51|84.07|10.85|84.09|95.88|
+|MaxLogit|44.07|83.64|14.63|84.75|90.32|
+|MaxSoftmax|55.16|89.20|21.55|85.24|86.29|
+|ODIN|59.24|90.91|19.39|84.88|89.23|
+|OpenMax|45.45|83.86|16.93|84.96|88.60|
+|EnergyBased|42.53|82.78|14.63|84.84|89.63|
+|KLMatching|57.30|90.23|15.88|84.46|93.34|
+Evaluating for LSUNCrop
+Metrics for Mahalanobis
+{'AUROC': 0.479738712310791, 'AUPR-IN': 0.465980589389801, 'AUPR-OUT': 0.5044618844985962, 'ACC95TPR': 0.5107499957084656, 'FPR95TPR': 0.9284999966621399}
+Metrics for MaxLogit
+{'AUROC': 0.5636462569236755, 'AUPR-IN': 0.5161653161048889, 'AUPR-OUT': 0.6185068488121033, 'ACC95TPR': 0.56454998254776, 'FPR95TPR': 0.820900022983551}
+Metrics for MaxSoftmax
+{'AUROC': 0.5823595523834229, 'AUPR-IN': 0.579939603805542, 'AUPR-OUT': 0.6027205586433411, 'ACC95TPR': 0.5514000058174133, 'FPR95TPR': 0.8471999764442444}
+Metrics for ODIN
+{'AUROC': 0.5777902007102966, 'AUPR-IN': 0.5764080286026001, 'AUPR-OUT': 0.5825879573822021, 'ACC95TPR': 0.5321999788284302, 'FPR95TPR': 0.8855999708175659}
+Metrics for OpenMax
+{'AUROC': 0.5691989660263062, 'AUPR-IN': 0.5175547003746033, 'AUPR-OUT': 0.6078263521194458, 'ACC95TPR': 0.5598499774932861, 'FPR95TPR': 0.830299973487854}
+Metrics for EnergyBased
+{'AUROC': 0.5519040822982788, 'AUPR-IN': 0.5019276738166809, 'AUPR-OUT': 0.6157585382461548, 'ACC95TPR': 0.5690000057220459, 'FPR95TPR': 0.8119999766349792}
+Metrics for KLMatching
+{'AUROC': 0.609447717666626, 'AUPR-IN': 0.6028037667274475, 'AUPR-OUT': 0.5930145978927612, 'ACC95TPR': 0.5225499868392944, 'FPR95TPR': 0.910099983215332}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|47.97|46.60|50.45|51.07|92.85|
+|MaxLogit|56.36|51.62|61.85|56.45|82.09|
+|MaxSoftmax|58.24|57.99|60.27|55.14|84.72|
+|ODIN|57.78|57.64|58.26|53.22|88.56|
+|OpenMax|56.92|51.76|60.78|55.98|83.03|
+|EnergyBased|55.19|50.19|61.58|56.90|81.20|
+|KLMatching|60.94|60.28|59.30|52.25|91.01|
+Evaluating for LSUNResize
+Metrics for Mahalanobis
+{'AUROC': 0.5930991172790527, 'AUPR-IN': 0.558530330657959, 'AUPR-OUT': 0.5577959418296814, 'ACC95TPR': 0.536899983882904, 'FPR95TPR': 0.8762000203132629}
+Metrics for MaxLogit
+{'AUROC': 0.6876019835472107, 'AUPR-IN': 0.6142428517341614, 'AUPR-OUT': 0.7335749864578247, 'ACC95TPR': 0.6241000294685364, 'FPR95TPR': 0.7017999887466431}
+Metrics for MaxSoftmax
+{'AUROC': 0.5381133556365967, 'AUPR-IN': 0.5061990022659302, 'AUPR-OUT': 0.5872966647148132, 'ACC95TPR': 0.5528500080108643, 'FPR95TPR': 0.8442999720573425}
+Metrics for ODIN
+{'AUROC': 0.48876872658729553, 'AUPR-IN': 0.4744775891304016, 'AUPR-OUT': 0.5262339115142822, 'ACC95TPR': 0.5151000022888184, 'FPR95TPR': 0.9197999835014343}
+Metrics for OpenMax
+{'AUROC': 0.6527521014213562, 'AUPR-IN': 0.5976921319961548, 'AUPR-OUT': 0.6262794733047485, 'ACC95TPR': 0.5159000158309937, 'FPR95TPR': 0.9182000160217285}
+Metrics for EnergyBased
+{'AUROC': 0.6931300759315491, 'AUPR-IN': 0.6233931183815002, 'AUPR-OUT': 0.7352083325386047, 'ACC95TPR': 0.6249499917030334, 'FPR95TPR': 0.7001000046730042}
+Metrics for KLMatching
+{'AUROC': 0.6641923785209656, 'AUPR-IN': 0.6222582459449768, 'AUPR-OUT': 0.6755037307739258, 'ACC95TPR': 0.5597000122070312, 'FPR95TPR': 0.8367999792098999}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|59.31|55.85|55.78|53.69|87.62|
+|MaxLogit|68.76|61.42|73.36|62.41|70.18|
+|MaxSoftmax|53.81|50.62|58.73|55.29|84.43|
+|ODIN|48.88|47.45|52.62|51.51|91.98|
+|OpenMax|65.28|59.77|62.63|51.59|91.82|
+|EnergyBased|69.31|62.34|73.52|62.49|70.01|
+|KLMatching|66.42|62.23|67.55|55.97|83.68|
+Evaluating for Textures
+Metrics for Mahalanobis
+{'AUROC': 0.5226157903671265, 'AUPR-IN': 0.4339035153388977, 'AUPR-OUT': 0.623665988445282, 'ACC95TPR': 0.3540281355381012, 'FPR95TPR': 0.9821000099182129}
+Metrics for MaxLogit
+{'AUROC': 0.5874432325363159, 'AUPR-IN': 0.41612672805786133, 'AUPR-OUT': 0.7234054207801819, 'ACC95TPR': 0.42576727271080017, 'FPR95TPR': 0.8698999881744385}
+Metrics for MaxSoftmax
+{'AUROC': 0.4803656339645386, 'AUPR-IN': 0.3571016192436218, 'AUPR-OUT': 0.6323339939117432, 'ACC95TPR': 0.37787723541259766, 'FPR95TPR': 0.9448000192642212}
+Metrics for ODIN
+{'AUROC': 0.47861191630363464, 'AUPR-IN': 0.3560062646865845, 'AUPR-OUT': 0.6232948303222656, 'ACC95TPR': 0.36668798327445984, 'FPR95TPR': 0.9623000025749207}
+Metrics for OpenMax
+{'AUROC': 0.5246999859809875, 'AUPR-IN': 0.37309354543685913, 'AUPR-OUT': 0.6351767778396606, 'ACC95TPR': 0.35236573219299316, 'FPR95TPR': 0.9847000241279602}
+Metrics for EnergyBased
+{'AUROC': 0.5980224609375, 'AUPR-IN': 0.4336808919906616, 'AUPR-OUT': 0.7285425066947937, 'ACC95TPR': 0.43017902970314026, 'FPR95TPR': 0.8629999756813049}
+Metrics for KLMatching
+{'AUROC': 0.707242488861084, 'AUPR-IN': 0.5732804536819458, 'AUPR-OUT': 0.7693019509315491, 'ACC95TPR': 0.44603580236434937, 'FPR95TPR': 0.8377000093460083}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|52.26|43.39|62.37|35.40|98.21|
+|MaxLogit|58.74|41.61|72.34|42.58|86.99|
+|MaxSoftmax|48.04|35.71|63.23|37.79|94.48|
+|ODIN|47.86|35.60|62.33|36.67|96.23|
+|OpenMax|52.47|37.31|63.52|35.24|98.47|
+|EnergyBased|59.80|43.37|72.85|43.02|86.30|
+|KLMatching|70.72|57.33|76.93|44.60|83.77|
+Evaluating for TinyImageNetCrop
+Metrics for Mahalanobis
+{'AUROC': 0.6088210344314575, 'AUPR-IN': 0.5787442922592163, 'AUPR-OUT': 0.5692126750946045, 'ACC95TPR': 0.5244500041007996, 'FPR95TPR': 0.9010999798774719}
+Metrics for MaxLogit
+{'AUROC': 0.6783568263053894, 'AUPR-IN': 0.6146827340126038, 'AUPR-OUT': 0.7104331254959106, 'ACC95TPR': 0.6060500144958496, 'FPR95TPR': 0.7379000186920166}
+Metrics for MaxSoftmax
+{'AUROC': 0.6257336735725403, 'AUPR-IN': 0.6015265583992004, 'AUPR-OUT': 0.6273810863494873, 'ACC95TPR': 0.5528500080108643, 'FPR95TPR': 0.8442999720573425}
+Metrics for ODIN
+{'AUROC': 0.5464673042297363, 'AUPR-IN': 0.5300873517990112, 'AUPR-OUT': 0.551034688949585, 'ACC95TPR': 0.5178499817848206, 'FPR95TPR': 0.9143000245094299}
+Metrics for OpenMax
+{'AUROC': 0.6440372467041016, 'AUPR-IN': 0.590968132019043, 'AUPR-OUT': 0.6272099614143372, 'ACC95TPR': 0.5388000011444092, 'FPR95TPR': 0.8723999857902527}
+Metrics for EnergyBased
+{'AUROC': 0.6663033962249756, 'AUPR-IN': 0.6061857342720032, 'AUPR-OUT': 0.7029410600662231, 'ACC95TPR': 0.6047999858856201, 'FPR95TPR': 0.7404000163078308}
+Metrics for KLMatching
+{'AUROC': 0.6275544762611389, 'AUPR-IN': 0.6074913740158081, 'AUPR-OUT': 0.6085184812545776, 'ACC95TPR': 0.5295000076293945, 'FPR95TPR': 0.8916000127792358}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|60.88|57.87|56.92|52.45|90.11|
+|MaxLogit|67.84|61.47|71.04|60.61|73.79|
+|MaxSoftmax|62.57|60.15|62.74|55.29|84.43|
+|ODIN|54.65|53.01|55.10|51.78|91.43|
+|OpenMax|64.40|59.10|62.72|53.88|87.24|
+|EnergyBased|66.63|60.62|70.29|60.48|74.04|
+|KLMatching|62.76|60.75|60.85|52.95|89.16|
+Evaluating for TinyImageNetResize
+Metrics for Mahalanobis
+{'AUROC': 0.6132214069366455, 'AUPR-IN': 0.6097179055213928, 'AUPR-OUT': 0.5822203755378723, 'ACC95TPR': 0.5138499736785889, 'FPR95TPR': 0.9222999811172485}
+Metrics for MaxLogit
+{'AUROC': 0.6916400194168091, 'AUPR-IN': 0.64151531457901, 'AUPR-OUT': 0.7117694616317749, 'ACC95TPR': 0.5985999703407288, 'FPR95TPR': 0.7527999877929688}
+Metrics for MaxSoftmax
+{'AUROC': 0.48612573742866516, 'AUPR-IN': 0.47402578592300415, 'AUPR-OUT': 0.5185619592666626, 'ACC95TPR': 0.5159500241279602, 'FPR95TPR': 0.9180999994277954}
+Metrics for ODIN
+{'AUROC': 0.44329285621643066, 'AUPR-IN': 0.44785794615745544, 'AUPR-OUT': 0.47551000118255615, 'ACC95TPR': 0.49845001101493835, 'FPR95TPR': 0.9531000256538391}
+Metrics for OpenMax
+{'AUROC': 0.5935021638870239, 'AUPR-IN': 0.575855016708374, 'AUPR-OUT': 0.537916898727417, 'ACC95TPR': 0.4783500134944916, 'FPR95TPR': 0.9933000206947327}
+Metrics for EnergyBased
+{'AUROC': 0.7065567970275879, 'AUPR-IN': 0.6594595909118652, 'AUPR-OUT': 0.7229306697845459, 'ACC95TPR': 0.6036499738693237, 'FPR95TPR': 0.7426999807357788}
+Metrics for KLMatching
+{'AUROC': 0.698718249797821, 'AUPR-IN': 0.6636273860931396, 'AUPR-OUT': 0.6873789429664612, 'ACC95TPR': 0.5670499801635742, 'FPR95TPR': 0.8194000124931335}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|61.32|60.97|58.22|51.38|92.23|
+|MaxLogit|69.16|64.15|71.18|59.86|75.28|
+|MaxSoftmax|48.61|47.40|51.86|51.60|91.81|
+|ODIN|44.33|44.79|47.55|49.85|95.31|
+|OpenMax|59.35|57.59|53.79|47.84|99.33|
+|EnergyBased|70.66|65.95|72.29|60.36|74.27|
+|KLMatching|69.87|66.36|68.74|56.70|81.94|
+Files already downloaded and verified
+Evaluating for CIFAR10
+Metrics for Mahalanobis
+{'AUROC': 0.5707190036773682, 'AUPR-IN': 0.8569632768630981, 'AUPR-OUT': 0.2095622569322586, 'ACC95TPR': 0.8073166608810425, 'FPR95TPR': 0.9060999751091003}
+Metrics for MaxLogit
+{'AUROC': 0.5464478731155396, 'AUPR-IN': 0.8396307229995728, 'AUPR-OUT': 0.24056918919086456, 'ACC95TPR': 0.8148999810218811, 'FPR95TPR': 0.8605999946594238}
+Metrics for MaxSoftmax
+{'AUROC': 0.6417906284332275, 'AUPR-IN': 0.8814114332199097, 'AUPR-OUT': 0.31950485706329346, 'ACC95TPR': 0.8255833387374878, 'FPR95TPR': 0.796500027179718}
+Metrics for ODIN
+{'AUROC': 0.5873467922210693, 'AUPR-IN': 0.8611698150634766, 'AUPR-OUT': 0.24360744655132294, 'ACC95TPR': 0.8129666447639465, 'FPR95TPR': 0.8722000122070312}
+Metrics for OpenMax
+{'AUROC': 0.5377892255783081, 'AUPR-IN': 0.8350374102592468, 'AUPR-OUT': 0.22014617919921875, 'ACC95TPR': 0.8129166960716248, 'FPR95TPR': 0.8725000023841858}
+Metrics for EnergyBased
+{'AUROC': 0.5205629467964172, 'AUPR-IN': 0.8276515007019043, 'AUPR-OUT': 0.22300273180007935, 'ACC95TPR': 0.8117166757583618, 'FPR95TPR': 0.8797000050544739}
+Metrics for KLMatching
+{'AUROC': 0.5282450318336487, 'AUPR-IN': 0.8403077125549316, 'AUPR-OUT': 0.19447311758995056, 'ACC95TPR': 0.8031499981880188, 'FPR95TPR': 0.9312999844551086}
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|57.07|85.70|20.96|80.73|90.61|
+|MaxLogit|54.64|83.96|24.06|81.49|86.06|
+|MaxSoftmax|64.18|88.14|31.95|82.56|79.65|
+|ODIN|58.73|86.12|24.36|81.30|87.22|
+|OpenMax|53.78|83.50|22.01|81.29|87.25|
+|EnergyBased|52.06|82.77|22.30|81.17|87.97|
+|KLMatching|52.82|84.03|19.45|80.31|93.13|
+--------- CUT HERE ---------
+### Results
+```
+PRETRAINED=False
+MODEL=resnet152
+TRAINABLE_PARAMS=60192808
+EPOCHS=30
+LR=0.001
+USE_CIDER=False
+ALPHA=0.95
+TEMPERATURE=0.1
+COMPACT_SCALER=2.0
+CIDER_GLOBAL_SCALE=0.1
+MOMENTUM=0.9
+```
+#### SVHN
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|41.51|84.07|10.85|84.09|95.88|
+|MaxLogit|44.07|83.64|14.63|84.75|90.32|
+|MaxSoftmax|55.16|89.20|21.55|85.24|86.29|
+|ODIN|59.24|90.91|19.39|84.88|89.23|
+|OpenMax|45.45|83.86|16.93|84.96|88.60|
+|EnergyBased|42.53|82.78|14.63|84.84|89.63|
+|KLMatching|57.30|90.23|15.88|84.46|93.34|
+#### LSUNCrop
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|47.97|46.60|50.45|51.07|92.85|
+|MaxLogit|56.36|51.62|61.85|56.45|82.09|
+|MaxSoftmax|58.24|57.99|60.27|55.14|84.72|
+|ODIN|57.78|57.64|58.26|53.22|88.56|
+|OpenMax|56.92|51.76|60.78|55.98|83.03|
+|EnergyBased|55.19|50.19|61.58|56.90|81.20|
+|KLMatching|60.94|60.28|59.30|52.25|91.01|
+#### LSUNResize
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|59.31|55.85|55.78|53.69|87.62|
+|MaxLogit|68.76|61.42|73.36|62.41|70.18|
+|MaxSoftmax|53.81|50.62|58.73|55.29|84.43|
+|ODIN|48.88|47.45|52.62|51.51|91.98|
+|OpenMax|65.28|59.77|62.63|51.59|91.82|
+|EnergyBased|69.31|62.34|73.52|62.49|70.01|
+|KLMatching|66.42|62.23|67.55|55.97|83.68|
+#### Textures
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|52.26|43.39|62.37|35.40|98.21|
+|MaxLogit|58.74|41.61|72.34|42.58|86.99|
+|MaxSoftmax|48.04|35.71|63.23|37.79|94.48|
+|ODIN|47.86|35.60|62.33|36.67|96.23|
+|OpenMax|52.47|37.31|63.52|35.24|98.47|
+|EnergyBased|59.80|43.37|72.85|43.02|86.30|
+|KLMatching|70.72|57.33|76.93|44.60|83.77|
+#### TinyImageNetCrop
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|60.88|57.87|56.92|52.45|90.11|
+|MaxLogit|67.84|61.47|71.04|60.61|73.79|
+|MaxSoftmax|62.57|60.15|62.74|55.29|84.43|
+|ODIN|54.65|53.01|55.10|51.78|91.43|
+|OpenMax|64.40|59.10|62.72|53.88|87.24|
+|EnergyBased|66.63|60.62|70.29|60.48|74.04|
+|KLMatching|62.76|60.75|60.85|52.95|89.16|
+#### TinyImageNetResize
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|61.32|60.97|58.22|51.38|92.23|
+|MaxLogit|69.16|64.15|71.18|59.86|75.28|
+|MaxSoftmax|48.61|47.40|51.86|51.60|91.81|
+|ODIN|44.33|44.79|47.55|49.85|95.31|
+|OpenMax|59.35|57.59|53.79|47.84|99.33|
+|EnergyBased|70.66|65.95|72.29|60.36|74.27|
+|KLMatching|69.87|66.36|68.74|56.70|81.94|
+#### CIFAR10
+|Method|AUROC|AUPR-IN|AUPR-OUT|ACC95TPR|FPR95TPR|
+|---|---|---|---|---|---|
+|Mahalanobis|57.07|85.70|20.96|80.73|90.61|
+|MaxLogit|54.64|83.96|24.06|81.49|86.06|
+|MaxSoftmax|64.18|88.14|31.95|82.56|79.65|
+|ODIN|58.73|86.12|24.36|81.30|87.22|
+|OpenMax|53.78|83.50|22.01|81.29|87.25|
+|EnergyBased|52.06|82.77|22.30|81.17|87.97|
+|KLMatching|52.82|84.03|19.45|80.31|93.13|
+--------- CUT HERE ---------
